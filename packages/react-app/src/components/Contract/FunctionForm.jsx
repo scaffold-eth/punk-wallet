@@ -12,8 +12,6 @@ const getFunctionInputKey = (functionInfo, input, inputIndex) => {
   return functionInfo.name + "_" + name + "_" + input.type;
 };
 
-const isReadable = fn => fn.stateMutability === "view" || fn.stateMutability === "pure";
-
 export default function FunctionForm({ contractFunction, functionInfo, provider, gasPrice, triggerRefresh }) {
   const [form, setForm] = useState({});
   const [txValue, setTxValue] = useState();
@@ -168,11 +166,12 @@ export default function FunctionForm({ contractFunction, functionInfo, provider,
     }
   };
 
-  const buttonIcon = isReadable(functionInfo) ? (
-    <Button style={{ marginLeft: -32 }}>Read📡</Button>
-  ) : (
-    <Button style={{ marginLeft: -32 }}>Send💸</Button>
-  );
+  const buttonIcon =
+    functionInfo.type === "call" ? (
+      <Button style={{ marginLeft: -32 }}>Read📡</Button>
+    ) : (
+      <Button style={{ marginLeft: -32 }}>Send💸</Button>
+    );
   inputs.push(
     <div style={{ cursor: "pointer", margin: 2 }} key="goButton">
       <Input
