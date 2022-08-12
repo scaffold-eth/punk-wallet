@@ -707,6 +707,7 @@ function App(props) {
       size="large"
       defaultValue={targetNetwork.name}
       style={{ textAlign: "left", width: 170, fontSize: 30 }}
+      listHeight={1024}
       onChange={value => {
         if (targetNetwork.chainId != NETWORKS[value].chainId) {
           window.localStorage.setItem("network", value);
