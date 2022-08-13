@@ -77,6 +77,27 @@ export default function Wallet(props) {
         console.log("wallet",wallet)
         const privateKey = wallet._privKey.toString('hex');
         console.log("privateKey",privateKey)
+
+        //
+        // Doing the same with ethers
+        //
+        const ethersSeed = ethers.utils.mnemonicToSeed(importMnemonic);
+        const ethersHDNode = ethers.utils.HDNode.fromSeed(ethersSeed);
+        const ethersDerivedHDNode = ethersHDNode.derivePath(fullPath);
+
+        const ethersPrivateKey = ethersDerivedHDNode.privateKey;
+        console.log("ethersPrivateKey", ethersPrivateKey);
+
+        if (ethersPrivateKey != ("0x"+privateKey)) {
+          console.error("Private Keys are different")
+        }
+        else {
+          console.log("Private Keys are the same")
+        }
+        //
+        // Doing the same with ethers
+        //
+
         setImportPrivatekey("0x"+privateKey)
       }else{
         setImportPrivatekey()
