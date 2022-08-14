@@ -10,9 +10,6 @@ import Balance from "./Balance";
 import QRPunkBlockie from "./QRPunkBlockie";
 import { EyeInvisibleOutlined, EyeTwoTone } from '@ant-design/icons';
 
-const bip39 = require('bip39');
-const hdkey = require('ethereumjs-wallet/hdkey');
-
 const { Text } = Typography;
 
 /*
