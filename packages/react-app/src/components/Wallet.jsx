@@ -58,6 +58,7 @@ export default function Wallet(props) {
 
   const [importMnemonic, setImportMnemonic] = useState();
   const [importMnemonicIndex, setImportMnemonicIndex] = useState("0");
+  const [password, setPassword] = useState("");
   const [importPrivatekey, setImportPrivatekey] = useState();
   const [importAddress, setImportAddress] = useState();
 
@@ -66,7 +67,7 @@ export default function Wallet(props) {
   useEffect(()=>{
     const calculatePK = async () => {
       if(importMnemonic){
-        const seed = await bip39.mnemonicToSeed(importMnemonic)
+        const seed = await bip39.mnemonicToSeed(importMnemonic, password)
         console.log("seed",seed)
         const hdwallet = hdkey.fromMasterSeed(seed);
         console.log("hdwallet",hdwallet)
@@ -81,7 +82,7 @@ export default function Wallet(props) {
         //
         // Doing the same with ethers
         //
-        const ethersSeed = ethers.utils.mnemonicToSeed(importMnemonic);
+        const ethersSeed = ethers.utils.mnemonicToSeed(importMnemonic, password);
         const ethersHDNode = ethers.utils.HDNode.fromSeed(ethersSeed);
         const ethersDerivedHDNode = ethersHDNode.derivePath(fullPath);
 
@@ -104,7 +105,7 @@ export default function Wallet(props) {
       }
     }
     calculatePK()
-  },[importMnemonic, importMnemonicIndex])
+  },[importMnemonic, importMnemonicIndex, password])
 
   useEffect(()=>{
     const calculateAddress = async () => {
@@ -407,6 +408,10 @@ export default function Wallet(props) {
               <Input style={{ width:69 }} value={importMnemonicIndex} onChange={(e)=>{
                 setImportMnemonicIndex(e.target.value)
               }}size="large" />
+
+              <Input.Password  style={{width:380}} size="large" placeholder="optional password" onChange={async (e)=>{
+                setPassword(e.target.value)
+              }}/>
 
               <div style={{marginTop:21, width:420}}><h4>OR</h4></div>
 
