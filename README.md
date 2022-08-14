@@ -25,7 +25,7 @@ required: [Node](https://nodejs.org/dist/latest-v12.x/) plus [Yarn](https://clas
 
 
 ```bash
-git clone -b punk-wallet https://github.com/austintgriffith/scaffold-eth.git punk-wallet
+git clone https://github.com/scaffold-eth/punk-wallet
 
 cd punk-wallet
 ```
