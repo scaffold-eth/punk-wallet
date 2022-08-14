@@ -5,7 +5,7 @@ import { Button, Input } from "antd";
 import Address from "./Address";
 import QRPunkBlockie from "./QRPunkBlockie";
 
-export default function WalletImport() {
+export default function WalletImport({setShowImport}) {
 	const [importMnemonic, setImportMnemonic] = useState();
 	const [importMnemonicIndex, setImportMnemonicIndex] = useState("0");
 	const [password, setPassword] = useState("");
@@ -114,6 +114,15 @@ export default function WalletImport() {
           <span style={{ marginRight: 8 }}>💾</span>Save
         </Button>
        </div>
+
+       	<Button
+	       	style={{ marginTop: 16 }}
+	        onClick={() => {
+	          setShowImport(false)
+	        }}
+      	>
+        <span style={{ marginRight: 8 }}>⏪</span>Cancel
+      </Button>
     </div>
   );
 }

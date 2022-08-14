@@ -327,18 +327,9 @@ export default function Wallet(props) {
 
     } else if(showImport){
       display = (
-        <div>
-              <WalletImport/>
-
-              <Button
-                style={{ marginTop: 16 }}
-                onClick={() => {
-                  setShowImport(false)
-                }}
-              >
-                <span style={{ marginRight: 8 }}>⏪</span>Cancel
-              </Button>
-        </div>
+        <WalletImport
+          setShowImport={setShowImport}
+        />
       );
     }else{
       display = (
