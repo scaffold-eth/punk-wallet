@@ -8,6 +8,7 @@ import { Blockie } from ".";
 import Address from "./Address";
 import Balance from "./Balance";
 import QRPunkBlockie from "./QRPunkBlockie";
+import WalletImport from "./WalletImport";
 import { EyeInvisibleOutlined, EyeTwoTone } from '@ant-design/icons';
 
 const { Text } = Typography;
@@ -372,6 +373,8 @@ export default function Wallet(props) {
     } else if(showImport){
       display = (
         <div>
+              <WalletImport/>
+
               <div style={{marginTop:21, width:420}}><h2>IMPORT</h2></div>
 
               <div style={{opacity:0.5}}>mnemonic</div>
