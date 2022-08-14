@@ -67,40 +67,18 @@ export default function Wallet(props) {
   useEffect(()=>{
     const calculatePK = async () => {
       if(importMnemonic){
-        const seed = await bip39.mnemonicToSeed(importMnemonic, password)
-        console.log("seed",seed)
-        const hdwallet = hdkey.fromMasterSeed(seed);
-        console.log("hdwallet",hdwallet)
-        const wallet_hdpath = "m/44'/60'/0'/0/";
-        const fullPath = wallet_hdpath + importMnemonicIndex
-        console.log("fullPath",fullPath)
-        const wallet = hdwallet.derivePath(fullPath).getWallet();
-        console.log("wallet",wallet)
-        const privateKey = wallet._privKey.toString('hex');
-        console.log("privateKey",privateKey)
-
-        //
-        // Doing the same with ethers
-        //
         const ethersSeed = ethers.utils.mnemonicToSeed(importMnemonic, password);
         const ethersHDNode = ethers.utils.HDNode.fromSeed(ethersSeed);
+
+        const wallet_hdpath = "m/44'/60'/0'/0/";
+        const fullPath = wallet_hdpath + importMnemonicIndex
+        
         const ethersDerivedHDNode = ethersHDNode.derivePath(fullPath);
-
         const ethersPrivateKey = ethersDerivedHDNode.privateKey;
-        console.log("ethersPrivateKey", ethersPrivateKey);
 
-        if (ethersPrivateKey != ("0x"+privateKey)) {
-          console.error("Private Keys are different")
-        }
-        else {
-          console.log("Private Keys are the same")
-        }
-        //
-        // Doing the same with ethers
-        //
-
-        setImportPrivatekey("0x"+privateKey)
-      }else{
+        setImportPrivatekey(ethersPrivateKey);
+      }
+      else{
         setImportPrivatekey()
       }
     }
