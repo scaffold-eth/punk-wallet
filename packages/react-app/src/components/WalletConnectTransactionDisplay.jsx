@@ -1,5 +1,8 @@
+import { Divider, Spin } from "antd";
 import React, { useEffect, useState } from "react";
 import { convertHexToNumber, convertHexToUtf8 } from "@walletconnect/utils";
+import axios from "axios";
+
 const { BigNumber, ethers } = require("ethers");
 
 const convertHexToUtf8IfPossible = (hex) => {
@@ -10,8 +13,66 @@ const convertHexToUtf8IfPossible = (hex) => {
   }
 }
 
-export default function WalletConnectTransactionDisplay({payload, provider}) {
+const TENDERLY_USER = process.env.REACT_APP_TENDERLY_USER;
+const TENDERLY_PROJECT = process.env.REACT_APP_TENDERLY_PROJECT;
+const TENDERLY_ACCESS_KEY = process.env.REACT_APP_TENDERLY_ACCESS_KEY;
+
+const SIMULATE_URL = `https://api.tenderly.co/api/v1/account/${TENDERLY_USER}/project/${TENDERLY_PROJECT}/simulate`;
+const OPTS = {
+  headers: {
+    'X-Access-Key': TENDERLY_ACCESS_KEY
+  }
+}
+
+export default function WalletConnectTransactionDisplay({payload, provider, chainId}) {
   const [paramsArray, setParamsArray] = useState([]);
+  const [simulated, setSimulated] = useState(false);
+  const [simulationFailed, setSimulationFailed] = useState(false);
+  const [simulationUnexpectedError, setSimulationUnexpectedError] = useState(false);
+  const [simulationId, setSimulationId] = useState();
+
+  useEffect(()=> {
+    // set up your access-key, if you don't have one or you want to generate new one follow next link
+    // https://dashboard.tenderly.co/account/authorization
+
+    const simulateTransaction = async () => {
+      try {
+        let params = payload.params;
+        if (Array.isArray(params)) {
+          params = params[0];
+        }
+
+        const body = {
+          "network_id": params.chainId ? params.chainId.toString() : chainId.toString(),
+          "from": params.from,
+          "to": params.to,
+          "input": params.data ? params.data : "",
+          "gas": BigNumber.from(params.gas).toNumber(),
+          "gas_price": "0",
+          "value": params.value ? BigNumber.from(params.value).toString() : "0",
+          // simulation config (tenderly specific)
+          "save_if_fails": true,
+          "save": true,
+          //"simulation_type": "quick"
+        }
+      
+        const resp = await axios.post(SIMULATE_URL, body, OPTS);
+
+        if (resp.data.simulation.status === false) {
+          setSimulationFailed(true);
+        }
+
+        setSimulationId(resp.data.simulation.id);
+        setSimulated(true);
+      }
+      catch(error) {
+        setSimulationUnexpectedError(true);
+        console.error("simulateTransaction", error)
+      }
+    }
+
+    simulateTransaction();
+  },[payload, chainId]);
 
   useEffect(()=>{
     for (let i = 0; i < paramsArray.length; i++) {
@@ -61,6 +122,12 @@ try {
 
     return (
       <pre>
+        <div style={{ textAlign: "center"}}>
+            {!simulated && !simulationUnexpectedError && <>Simulating on Tenderly... <Spin/></>}
+            {simulated && simulationId && <>Simulating on <a target="_blank" rel="noopener noreferrer" href={`https://dashboard.tenderly.co/${TENDERLY_USER}/${TENDERLY_PROJECT}/simulator/${simulationId}`}>Tenderly</a> {!simulationFailed ? "was successful!" : "has failed!"}</>}
+            {simulationUnexpectedError && <>Couldn't simulate on <a target="_blank" rel="noopener noreferrer" href="https://tenderly.co/">Tenderly</a> because of an unexpected error.</>}
+            <Divider/>
+         </div>
         <div style={{ display: "flex", flexDirection: "column", justifyContent:"space-around"}}>
           {options}
         </div>

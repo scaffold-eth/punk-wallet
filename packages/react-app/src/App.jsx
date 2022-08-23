@@ -359,7 +359,7 @@ function App(props) {
           size: "large",
           title: title,
           icon: <SendOutlined/>,
-          content: <WalletConnectTransactionDisplay payload={payload} provider={mainnetProvider}/>,
+          content: <WalletConnectTransactionDisplay payload={payload} provider={mainnetProvider} chainId={targetNetwork.chainId} />,
           onOk:async ()=>{
             let result;
 
