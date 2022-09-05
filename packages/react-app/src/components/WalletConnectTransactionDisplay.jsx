@@ -31,12 +31,24 @@ export default function WalletConnectTransactionDisplay({payload, provider, chai
   const [simulationUnexpectedError, setSimulationUnexpectedError] = useState(false);
   const [simulationId, setSimulationId] = useState();
 
+  const shouldSimulate = (payload) => {
+    if ((payload.method == "eth_sendTransaction") || (payload.method == "eth_signTransaction")) {
+      return true;
+    }
+
+    return false;
+  }
+
   useEffect(()=> {
     // set up your access-key, if you don't have one or you want to generate new one follow next link
     // https://dashboard.tenderly.co/account/authorization
 
     const simulateTransaction = async () => {
       try {
+        if (!shouldSimulate(payload)) {
+          return;
+        }
+
         let params = payload.params;
         if (Array.isArray(params)) {
           params = params[0];
@@ -122,12 +134,14 @@ try {
 
     return (
       <pre>
-        <div style={{ textAlign: "center"}}>
-            {!simulated && !simulationUnexpectedError && <>Simulating on Tenderly... <Spin/></>}
-            {simulated && simulationId && <>Simulating on <a target="_blank" rel="noopener noreferrer" href={`https://dashboard.tenderly.co/public/${TENDERLY_USER}/${TENDERLY_PROJECT}/simulator/${simulationId}`}>Tenderly</a> {!simulationFailed ? "was successful!" : "has failed!"}</>}
-            {simulationUnexpectedError && <>Couldn't simulate on <a target="_blank" rel="noopener noreferrer" href="https://tenderly.co/">Tenderly</a> because of an unexpected error.</>}
-            <Divider/>
-         </div>
+        {shouldSimulate(payload) &&
+          <div style={{ textAlign: "center"}}>
+              {!simulated && !simulationUnexpectedError && <>Simulating on Tenderly... <Spin/></>}
+              {simulated && simulationId && <>Simulating on <a target="_blank" rel="noopener noreferrer" href={`https://dashboard.tenderly.co/public/${TENDERLY_USER}/${TENDERLY_PROJECT}/simulator/${simulationId}`}>Tenderly</a> {!simulationFailed ? "was successful!" : "has failed!"}</>}
+              {simulationUnexpectedError && <>Couldn't simulate on <a target="_blank" rel="noopener noreferrer" href="https://tenderly.co/">Tenderly</a> because of an unexpected error.</>}
+              <Divider/>
+           </div>
+         }
         <div style={{ display: "flex", flexDirection: "column", justifyContent:"space-around"}}>
           {options}
         </div>
