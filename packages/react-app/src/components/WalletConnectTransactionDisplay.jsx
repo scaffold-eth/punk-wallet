@@ -55,7 +55,7 @@ export default function WalletConnectTransactionDisplay({payload, provider, chai
         }
 
         const body = {
-          "network_id": params.chainId ? params.chainId.toString() : chainId.toString(),
+          "network_id": params.chainId ? BigNumber.from(params.chainId.toString()).toNumber() : BigNumber.from(chainId.toString()).toNumber(), // Tenderly doesn't like hex
           "from": params.from,
           "to": params.to,
           "input": params.data ? params.data : "",
