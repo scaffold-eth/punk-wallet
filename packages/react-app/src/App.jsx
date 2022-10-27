@@ -1001,6 +1001,8 @@ function App(props) {
                 //ask rpc for gas price
               }else if(targetNetwork.name=="polygon"){
                   //ask rpc for gas price
+              }else if(targetNetwork.name=="goerli"){
+                  //ask rpc for gas price
               }else{
                 txConfig.gasPrice = gasPrice
               }
