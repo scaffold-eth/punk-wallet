@@ -23,9 +23,9 @@ import {
   Wallet,
   WalletConnectTransactionDisplay,
 } from "./components";
-import { INFURA_ID, NETWORK, NETWORKS } from "./constants";
+import { ALCHEMY_KEY, INFURA_ID, NETWORK, NETWORKS } from "./constants";
 import { Transactor } from "./helpers";
-import { useBalance, useExchangePrice, useGasPrice, useLocalStorage, usePoller, useUserProvider } from "./hooks";
+import { useBalance, useExchangePrice, useGasPrice, useLocalStorage, usePoller, useStaticJsonRPC, useUserProvider } from "./hooks";
 
 import WalletConnect from "@walletconnect/client";
 
@@ -62,14 +62,22 @@ if (!targetNetwork) {
 // 😬 Sorry for all the console logging
 const DEBUG = false;
 
-// 🛰 providers
 if (DEBUG) console.log("📡 Connecting to Mainnet Ethereum");
+
+// 🛰 providers
+const providers = [
+  "https://eth-mainnet.gateway.pokt.network/v1/lb/611156b4a585a20035148406",
+  `https://eth-mainnet.alchemyapi.io/v2/${ALCHEMY_KEY}`,
+  "https://rpc.scaffoldeth.io:48544",
+];
+
+
 // const mainnetProvider = getDefaultProvider("mainnet", { infura: INFURA_ID, etherscan: ETHERSCAN_KEY, quorum: 1 });
 // const mainnetProvider = new InfuraProvider("mainnet",INFURA_ID);
 //
 // attempt to connect to our own scaffold eth rpc and if that fails fall back to infura...
 // Using StaticJsonRpcProvider as the chainId won't change see https://github.com/ethers-io/ethers.js/issues/901
-const scaffoldEthProvider = new StaticJsonRpcProvider("https://rpc.scaffoldeth.io:48544");
+// const scaffoldEthProvider = new StaticJsonRpcProvider("https://rpc.scaffoldeth.io:48544");
 //const mainnetInfura = new StaticJsonRpcProvider("https://mainnet.infura.io/v3/" + INFURA_ID);
 // ( ⚠️ Getting "failed to meet quorum" errors? Check your INFURA_I
 
@@ -78,7 +86,7 @@ const localProviderUrl = targetNetwork.rpcUrl;
 // as you deploy to other networks you can set REACT_APP_PROVIDER=https://dai.poa.network in packages/react-app/.env
 const localProviderUrlFromEnv = process.env.REACT_APP_PROVIDER ? process.env.REACT_APP_PROVIDER : localProviderUrl;
 if (DEBUG) console.log("🏠 Connecting to provider:", localProviderUrlFromEnv);
-let localProvider = new StaticJsonRpcProvider(localProviderUrlFromEnv);
+// let localProvider = new StaticJsonRpcProvider(localProviderUrlFromEnv);
 
 
 // 🔭 block explorer URL
@@ -169,7 +177,8 @@ function App(props) {
 
   };
 
-  const mainnetProvider = scaffoldEthProvider //scaffoldEthProvider && scaffoldEthProvider._network ?  : mainnetInfura;
+  const localProvider = useStaticJsonRPC([localProviderUrlFromEnv]);
+  const mainnetProvider = useStaticJsonRPC(providers, providers[0]) //scaffoldEthProvider && scaffoldEthProvider._network ?  : mainnetInfura;
 
   const [injectedProvider, setInjectedProvider] = useState();
 
