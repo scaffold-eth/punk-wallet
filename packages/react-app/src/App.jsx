@@ -80,7 +80,6 @@ const localProviderUrlFromEnv = process.env.REACT_APP_PROVIDER ? process.env.REA
 if (DEBUG) console.log("🏠 Connecting to provider:", localProviderUrlFromEnv);
 let localProvider = new StaticJsonRpcProvider(localProviderUrlFromEnv);
 
-
 // 🔭 block explorer URL
 const blockExplorer = targetNetwork.blockExplorer;
 
@@ -103,16 +102,14 @@ const web3Modal = new Web3Modal({
           137: "https://polygon-rpc.com",
           31337: "http://localhost:8545",
           42161: "https://arb1.arbitrum.io/rpc",
-          80001: "https://rpc-mumbai.maticvigil.com"
+          80001: "https://rpc-mumbai.maticvigil.com",
         },
       },
     },
   },
 });
 
-
 function App(props) {
-
   //const [isWalletModalVisible, setIsWalletModalVisible] = useState(false);
   //const [walletModalData, setWalletModalData] = useState();
 
@@ -138,17 +135,17 @@ function App(props) {
   const [checkingBalances, setCheckingBalances] = useState();
   // a function to check your balance on every network and switch networks if found...
   const checkBalances = async address => {
-    if(!checkingBalances){
-      setCheckingBalances(true)
-      setTimeout(()=>{
-        setCheckingBalances(false)
-      },5000)
+    if (!checkingBalances) {
+      setCheckingBalances(true);
+      setTimeout(() => {
+        setCheckingBalances(false);
+      }, 5000);
       //getting current balance
       const currentBalance = await localProvider.getBalance(address);
-      if(currentBalance && ethers.utils.formatEther(currentBalance)=="0.0"){
-        console.log("No balance found... searching...")
+      if (currentBalance && ethers.utils.formatEther(currentBalance) == "0.0") {
+        console.log("No balance found... searching...");
         for (const n in NETWORKS) {
-          try{
+          try {
             const tempProvider = new JsonRpcProvider(NETWORKS[n].rpcUrl);
             const tempBalance = await tempProvider.getBalance(address);
             const result = tempBalance && formatEther(tempBalance);
@@ -159,30 +156,30 @@ function App(props) {
                 window.location.reload(true);
               }, 500);
             }
-          }catch(e){console.log(e)}
+          } catch (e) {
+            console.log(e);
+          }
         }
-      }else{
+      } else {
         window.location.reload(true);
       }
     }
-
-
   };
 
-  const mainnetProvider = scaffoldEthProvider //scaffoldEthProvider && scaffoldEthProvider._network ?  : mainnetInfura;
+  const mainnetProvider = scaffoldEthProvider; //scaffoldEthProvider && scaffoldEthProvider._network ?  : mainnetInfura;
 
   const [injectedProvider, setInjectedProvider] = useState();
 
   const logoutOfWeb3Modal = async () => {
     await web3Modal.clearCachedProvider();
-    if(injectedProvider && injectedProvider.provider && injectedProvider.provider.disconnect){
+    if (injectedProvider && injectedProvider.provider && injectedProvider.provider.disconnect) {
       await injectedProvider.provider.disconnect();
     }
     setTimeout(() => {
       window.location.reload();
     }, 1);
   };
-/*
+  /*
   // track an extra eth price to display USD for Optimism?
   const ethprice = useExchangePrice({
     name: "ethereum",
@@ -233,8 +230,8 @@ function App(props) {
     }
   }, 7777);*/
 
-  const connectWallet = (sessionDetails)=>{
-    console.log(" 📡 Connecting to Wallet Connect....",sessionDetails)
+  const connectWallet = sessionDetails => {
+    console.log(" 📡 Connecting to Wallet Connect....", sessionDetails);
 
     let connector;
     try {
@@ -243,14 +240,13 @@ function App(props) {
       if (peerMeta) {
         setWalletConnectPeerMeta(peerMeta);
       }
-    }
-    catch(error) {
+    } catch (error) {
       console.error("Coudn't connect to", sessionDetails, error);
       localStorage.removeItem("walletConnectUrl");
       return;
     }
 
-    setWallectConnectConnector(connector)
+    setWallectConnectConnector(connector);
 
     // Subscribe to session requests
     connector.on("session_request", (error, payload) => {
@@ -258,18 +254,19 @@ function App(props) {
         throw error;
       }
 
-      console.log("SESSION REQUEST")
+      console.log("SESSION REQUEST");
       // Handle Session Request
 
       connector.approveSession({
-        accounts: [                 // required
-          address
+        accounts: [
+          // required
+          address,
         ],
-        chainId: targetNetwork.chainId               // required
-      })
+        chainId: targetNetwork.chainId, // required
+      });
 
-      setWalletConnectConnected(true)
-      setWallectConnectConnectorSession(connector.session)
+      setWalletConnectConnected(true);
+      setWallectConnectConnectorSession(connector.session);
       const { peerMeta } = payload.params[0];
       if (peerMeta) {
         setWalletConnectPeerMeta(peerMeta);
@@ -299,7 +296,7 @@ function App(props) {
         throw error;
       }
 
-      console.log("REQUEST PERMISSION TO:",payload,payload.params[0])
+      console.log("REQUEST PERMISSION TO:", payload, payload.params[0]);
       // Handle Call Request
       //console.log("SETTING TO",payload.params[0].to)
 
@@ -355,90 +352,94 @@ function App(props) {
       }
 
       confirm({
-          width: "90%",
-          size: "large",
-          title: title,
-          icon: <SendOutlined/>,
-          content: <WalletConnectTransactionDisplay payload={payload} provider={mainnetProvider} chainId={targetNetwork.chainId} />,
-          onOk:async ()=>{
-            let result;
+        width: "90%",
+        size: "large",
+        title: title,
+        icon: <SendOutlined />,
+        content: (
+          <WalletConnectTransactionDisplay
+            payload={payload}
+            provider={mainnetProvider}
+            chainId={targetNetwork.chainId}
+          />
+        ),
+        onOk: async () => {
+          let result;
 
-            if (payload.method === 'eth_sendTransaction') {
-              try {
-                let signer = userProvider.getSigner();
+          if (payload.method === "eth_sendTransaction") {
+            try {
+              let signer = userProvider.getSigner();
 
-                // I'm not sure if all the Dapps send an array or not
-                let params = payload.params;
-                if (Array.isArray(params)) {
-                  params = params[0];
-                }
-
-                // Ethers uses gasLimit instead of gas
-                let gasLimit = params.gas;
-                params.gasLimit = gasLimit;
-                delete params.gas;
-
-                // Speed up transaction list is filtered by chainId
-                if (!params.chainId) {
-                  params.chainId = targetNetwork.chainId;  
-                }
-
-                // Remove empty data
-                // I assume wallet connect adds "data" here: https://github.com/WalletConnect/walletconnect-monorepo/blob/7573fa9e1d91588d4af3409159b4fd2f9448a0e2/packages/helpers/utils/src/ethereum.ts#L78
-                // And ethers cannot hexlify this: https://github.com/ethers-io/ethers.js/blob/8b62aeff9cce44cbd16ff41f8fc01ebb101f8265/packages/providers/src.ts/json-rpc-provider.ts#L694
-                if (params.data === "") {
-                  delete params.data;  
-                }
-
-                result = await signer.sendTransaction(params);
-
-                const transactionManager = new TransactionManager(userProvider, signer, true);
-                transactionManager.setTransactionResponse(result);
+              // I'm not sure if all the Dapps send an array or not
+              let params = payload.params;
+              if (Array.isArray(params)) {
+                params = params[0];
               }
-              catch (error) {
-                // Fallback to original code without the speed up option
-                console.error("Coudn't create transaction which can be speed up", error);
-                result = await userProvider.send(payload.method, payload.params)
+
+              // Ethers uses gasLimit instead of gas
+              let gasLimit = params.gas;
+              params.gasLimit = gasLimit;
+              delete params.gas;
+
+              // Speed up transaction list is filtered by chainId
+              if (!params.chainId) {
+                params.chainId = targetNetwork.chainId;
               }
+
+              // Remove empty data
+              // I assume wallet connect adds "data" here: https://github.com/WalletConnect/walletconnect-monorepo/blob/7573fa9e1d91588d4af3409159b4fd2f9448a0e2/packages/helpers/utils/src/ethereum.ts#L78
+              // And ethers cannot hexlify this: https://github.com/ethers-io/ethers.js/blob/8b62aeff9cce44cbd16ff41f8fc01ebb101f8265/packages/providers/src.ts/json-rpc-provider.ts#L694
+              if (params.data === "") {
+                delete params.data;
+              }
+
+              result = await signer.sendTransaction(params);
+
+              const transactionManager = new TransactionManager(userProvider, signer, true);
+              transactionManager.setTransactionResponse(result);
+            } catch (error) {
+              // Fallback to original code without the speed up option
+              console.error("Coudn't create transaction which can be speed up", error);
+              result = await userProvider.send(payload.method, payload.params);
             }
-            else {
-              result = await userProvider.send(payload.method, payload.params)
-            }
+          } else {
+            result = await userProvider.send(payload.method, payload.params);
+          }
 
-            //console.log("MSG:",ethers.utils.toUtf8Bytes(msg).toString())
+          //console.log("MSG:",ethers.utils.toUtf8Bytes(msg).toString())
 
-            //console.log("payload.params[0]:",payload.params[1])
-            //console.log("address:",address)
+          //console.log("payload.params[0]:",payload.params[1])
+          //console.log("address:",address)
 
-            //let userSigner = userProvider.getSigner()
-            //let result = await userSigner.signMessage(msg)
-            console.log("RESULT:",result)
+          //let userSigner = userProvider.getSigner()
+          //let result = await userSigner.signMessage(msg)
+          console.log("RESULT:", result);
 
-            let wcRecult = result.hash ? result.hash : (result.raw ? result.raw : result)
+          let wcRecult = result.hash ? result.hash : result.raw ? result.raw : result;
 
-            connector.approveRequest({
-              id: payload.id,
-              result: wcRecult
-            });
+          connector.approveRequest({
+            id: payload.id,
+            result: wcRecult,
+          });
 
-            notification.info({
-              message: "Wallet Connect Transaction Sent",
-              description: wcRecult,
-              placement: "bottomRight",
-            });
-          },
-          onCancel: ()=>{
-            console.log('Cancel');
-            connector.rejectRequest({
-              id: payload.id,
-              error: { message:"User rejected" },
-            });
-          },
-        });
+          notification.info({
+            message: "Wallet Connect Transaction Sent",
+            description: wcRecult,
+            placement: "bottomRight",
+          });
+        },
+        onCancel: () => {
+          console.log("Cancel");
+          connector.rejectRequest({
+            id: payload.id,
+            error: { message: "User rejected" },
+          });
+        },
+      });
       //setIsWalletModalVisible(true)
       //if(payload.method == "personal_sign"){
       //  console.log("SIGNING A MESSAGE!!!")
-        //const msg = payload.params[0]
+      //const msg = payload.params[0]
       //}
     });
 
@@ -446,10 +447,10 @@ function App(props) {
       if (error) {
         throw error;
       }
-      console.log("disconnect")
+      console.log("disconnect");
 
-      localStorage.removeItem("walletConnectUrl")
-      localStorage.removeItem("wallectConnectConnectorSession")
+      localStorage.removeItem("walletConnectUrl");
+      localStorage.removeItem("wallectConnectConnectorSession");
 
       setTimeout(() => {
         window.location.reload();
@@ -457,17 +458,19 @@ function App(props) {
 
       // Delete connector
     });
-  }
+  };
 
-  const [ walletConnectUrl, setWalletConnectUrl ] = useLocalStorage("walletConnectUrl")
-  const [ walletConnectConnected, setWalletConnectConnected ] = useState()
-  const [ walletConnectPeerMeta, setWalletConnectPeerMeta ] = useState()
+  const [walletConnectUrl, setWalletConnectUrl] = useLocalStorage("walletConnectUrl");
+  const [walletConnectConnected, setWalletConnectConnected] = useState();
+  const [walletConnectPeerMeta, setWalletConnectPeerMeta] = useState();
 
-  const [ wallectConnectConnector, setWallectConnectConnector ] = useState()
+  const [wallectConnectConnector, setWallectConnectConnector] = useState();
   //store the connector session in local storage so sessions persist through page loads ( thanks Pedro <3 )
-  const [ wallectConnectConnectorSession, setWallectConnectConnectorSession ] = useLocalStorage("wallectConnectConnectorSession")
+  const [wallectConnectConnectorSession, setWallectConnectConnectorSession] = useLocalStorage(
+    "wallectConnectConnectorSession",
+  );
 
-  useEffect(()=>{
+  useEffect(() => {
     if (wallectConnectConnector && wallectConnectConnector.connected && address && localChainId) {
       const connectedAccounts = wallectConnectConnector?.accounts;
       let connectedAddress;
@@ -477,7 +480,7 @@ function App(props) {
       }
 
       // Use Checksummed addresses
-      if (connectedAddress && (ethers.utils.getAddress(connectedAddress) != ethers.utils.getAddress(address))) {
+      if (connectedAddress && ethers.utils.getAddress(connectedAddress) != ethers.utils.getAddress(address)) {
         console.log("Updating wallet connect session with the new address");
         console.log("Connected address", ethers.utils.getAddress(connectedAddress));
         console.log("New address ", ethers.utils.getAddress(address));
@@ -487,7 +490,7 @@ function App(props) {
 
       const connectedChainId = wallectConnectConnector?.chainId;
 
-      if (connectedChainId && (connectedChainId != localChainId)) {
+      if (connectedChainId && connectedChainId != localChainId) {
         console.log("Updating wallet connect session with the new chainId");
         console.log("Connected chainId", connectedChainId);
         console.log("New chainId ", localChainId);
@@ -495,41 +498,42 @@ function App(props) {
         updateWalletConnectSession(wallectConnectConnector, address, localChainId);
       }
     }
-  },[ address, localChainId ]);
+  }, [address, localChainId]);
 
   const updateWalletConnectSession = (wallectConnectConnector, address, chainId) => {
     wallectConnectConnector.updateSession({
       accounts: [address],
       chainId: localChainId,
     });
-  }
+  };
 
-  useEffect(()=>{
-    if(!walletConnectConnected && address){
-      let nextSession = localStorage.getItem("wallectConnectNextSession")
-      if(nextSession){
-        localStorage.removeItem("wallectConnectNextSession")
-        console.log("FOUND A NEXT SESSION IN CACHE")
-        setWalletConnectUrl(nextSession)
-      }else if(wallectConnectConnectorSession){
-        console.log("NOT CONNECTED AND wallectConnectConnectorSession",wallectConnectConnectorSession)
-        connectWallet( wallectConnectConnectorSession )
-        setWalletConnectConnected(true)
-      }else if(walletConnectUrl/*&&!walletConnectUrlSaved*/){
+  useEffect(() => {
+    if (!walletConnectConnected && address) {
+      let nextSession = localStorage.getItem("wallectConnectNextSession");
+      if (nextSession) {
+        localStorage.removeItem("wallectConnectNextSession");
+        console.log("FOUND A NEXT SESSION IN CACHE");
+        setWalletConnectUrl(nextSession);
+      } else if (wallectConnectConnectorSession) {
+        console.log("NOT CONNECTED AND wallectConnectConnectorSession", wallectConnectConnectorSession);
+        connectWallet(wallectConnectConnectorSession);
+        setWalletConnectConnected(true);
+      } else if (walletConnectUrl /*&&!walletConnectUrlSaved*/) {
         //CLEAR LOCAL STORAGE?!?
-        console.log("clear local storage and connect...")
-        localStorage.removeItem("walletconnect") // lololol
-        connectWallet(      {
-                // Required
-                uri: walletConnectUrl,
-                // Required
-                clientMeta: {
-                  description: "Forkable web wallet for small/quick transactions.",
-                  url: "https://punkwallet.io",
-                  icons: ["https://punkwallet.io/punk.png"],
-                  name: "🧑‍🎤 PunkWallet.io",
-                },
-              }/*,
+        console.log("clear local storage and connect...");
+        localStorage.removeItem("walletconnect"); // lololol
+        connectWallet(
+          {
+            // Required
+            uri: walletConnectUrl,
+            // Required
+            clientMeta: {
+              description: "Forkable web wallet for small/quick transactions.",
+              url: "https://punkwallet.io",
+              icons: ["https://punkwallet.io/punk.png"],
+              name: "🧑‍🎤 PunkWallet.io",
+            },
+          } /*,
               {
                 // Optional
                 url: "<YOUR_PUSH_SERVER_URL>",
@@ -537,22 +541,22 @@ function App(props) {
                 token: token,
                 peerMeta: true,
                 language: language,
-              }*/)
+              }*/,
+        );
       }
     }
-  },[ walletConnectUrl, address ])
+  }, [walletConnectUrl, address]);
 
   useMemo(() => {
     if (address && window.location.pathname) {
       if (window.location.pathname.indexOf("/wc") >= 0) {
-        console.log("WALLET CONNECT!!!!!",window.location.search)
-        let uri = window.location.search.replace("?uri=","")
-        console.log("WC URI:",uri)
-        setWalletConnectUrl(decodeURIComponent(uri))
+        console.log("WALLET CONNECT!!!!!", window.location.search);
+        let uri = window.location.search.replace("?uri=", "");
+        console.log("WC URI:", uri);
+        setWalletConnectUrl(decodeURIComponent(uri));
       }
     }
   }, [injectedProvider, localProvider, address]);
-
 
   /*
   setTimeout(()=>{
@@ -630,7 +634,7 @@ function App(props) {
                 You have <b>{networkSelected && networkSelected.name}</b> selected and you need to be on{" "}
                 <b>{networkLocal && networkLocal.name}</b>.
                 <Button
-                  style={{marginTop:4}}
+                  style={{ marginTop: 4 }}
                   onClick={async () => {
                     const ethereum = window.ethereum;
                     const data = [
@@ -647,36 +651,33 @@ function App(props) {
                     let switchTx;
 
                     try {
-                      console.log("first trying to add...")
+                      console.log("first trying to add...");
                       switchTx = await ethereum.request({
                         method: "wallet_addEthereumChain",
                         params: data,
                       });
                     } catch (addError) {
                       // handle "add" error
-                      console.log("error adding, trying to switch")
+                      console.log("error adding, trying to switch");
                       try {
-                        console.log("Trying a switch...")
+                        console.log("Trying a switch...");
                         switchTx = await ethereum.request({
                           method: "wallet_switchEthereumChain",
                           params: [{ chainId: data[0].chainId }],
                         });
                       } catch (switchError) {
                         // not checking specific error code, because maybe we're not using MetaMask
-
                       }
                     }
                     // https://docs.metamask.io/guide/rpc-api.html#other-rpc-methods
-
 
                     if (switchTx) {
                       console.log(switchTx);
                     }
                   }}
                 >
-                  <span style={{paddingRight:4}}>switch to</span>  <b>{NETWORK(localChainId).name}</b>
+                  <span style={{ paddingRight: 4 }}>switch to</span> <b>{NETWORK(localChainId).name}</b>
                 </Button>
-
               </div>
             }
             type="error"
@@ -723,10 +724,10 @@ function App(props) {
 
   const loadWeb3Modal = useCallback(async () => {
     const provider = await web3Modal.connect();
-    provider.on("disconnect",()=>{
-      console.log("LOGOUT!")
-      logoutOfWeb3Modal()
-    })
+    provider.on("disconnect", () => {
+      console.log("LOGOUT!");
+      logoutOfWeb3Modal();
+    });
     setInjectedProvider(new Web3Provider(provider));
   }, [setInjectedProvider]);
 
@@ -804,7 +805,7 @@ function App(props) {
   const [depositing, setDepositing] = useState();
   const [depositAmount, setDepositAmount] = useState();
 
-/*
+  /*
   const handleOk = async () => {
     setIsWalletModalVisible(false);
 
@@ -850,7 +851,13 @@ function App(props) {
       <div className="site-page-header-ghost-wrapper">
         <Header
           extra={[
-            <Address key="address" fontSize={32} address={address} ensProvider={mainnetProvider} blockExplorer={blockExplorer} />,
+            <Address
+              key="address"
+              fontSize={32}
+              address={address}
+              ensProvider={mainnetProvider}
+              blockExplorer={blockExplorer}
+            />,
             /* <span style={{ verticalAlign: "middle", paddingLeft: 16, fontSize: 32 }}>
               <Tooltip title="History">
                 <HistoryOutlined onClick={async () => {
@@ -860,7 +867,22 @@ function App(props) {
             </span>, */
             walletDisplay,
 
-            <span key="checkBalances" style={{color: "#1890ff",cursor:"pointer",fontSize:30,opacity:checkingBalances?0.2:1,paddingLeft:16,verticalAlign:"middle"}} onClick={()=>{checkBalances(address)}}><ReloadOutlined /></span>,
+            <span
+              key="checkBalances"
+              style={{
+                color: "#1890ff",
+                cursor: "pointer",
+                fontSize: 30,
+                opacity: checkingBalances ? 0.2 : 1,
+                paddingLeft: 16,
+                verticalAlign: "middle",
+              }}
+              onClick={() => {
+                checkBalances(address);
+              }}
+            >
+              <ReloadOutlined />
+            </span>,
             <Account
               key="account"
               address={address}
@@ -879,20 +901,21 @@ function App(props) {
 
       {/* ✏️ Edit the header and change the title to your project name */}
 
-      <div style={{ clear: "both", opacity: yourLocalBalance ? 1 : 0.2, width: 500, margin: "auto",position:"relative" }}>
-        <Balance value={yourLocalBalance} size={12+window.innerWidth/16} price={price} />
+      <div
+        style={{ clear: "both", opacity: yourLocalBalance ? 1 : 0.2, width: 500, margin: "auto", position: "relative" }}
+      >
+        <Balance value={yourLocalBalance} size={12 + window.innerWidth / 16} price={price} />
         <span style={{ verticalAlign: "middle" }}>
           {networkSelect}
           {faucetHint}
         </span>
       </div>
 
-      {
-        address && 
+      {address && (
         <div style={{ padding: 16, cursor: "pointer", backgroundColor: "#FFFFFF", width: 420, margin: "auto" }}>
-          <QRPunkBlockie withQr address={address} showAddress={true} /> 
+          <QRPunkBlockie withQr address={address} showAddress={true} />
         </div>
-      }
+      )}
 
       <div style={{ position: "relative", width: 320, margin: "auto", textAlign: "center", marginTop: 32 }}>
         <div style={{ padding: 10 }}>
@@ -905,9 +928,9 @@ function App(props) {
             hoistScanner={toggle => {
               scanner = toggle;
             }}
-            walletConnect={(wcLink)=>{
+            walletConnect={wcLink => {
               //if(walletConnectUrl){
-                /*try{
+              /*try{
                   //setWalletConnectConnected(false);
                   //setWalletConnectUrl();
                   //if(wallectConnectConnector) wallectConnectConnector.killSession();
@@ -923,31 +946,36 @@ function App(props) {
                 window.location.replace('/wc?uri='+wcLink);
               },500)*/
 
-              if(walletConnectUrl){
+              if (walletConnectUrl) {
                 //existing session... need to kill it and then connect new one....
                 setWalletConnectConnected(false);
-                if(wallectConnectConnector) wallectConnectConnector.killSession();
-                localStorage.removeItem("walletConnectUrl")
-                localStorage.removeItem("wallectConnectConnectorSession")
-                localStorage.setItem("wallectConnectNextSession",wcLink)
-              }else{
-                setWalletConnectUrl(wcLink)
+                if (wallectConnectConnector) wallectConnectConnector.killSession();
+                localStorage.removeItem("walletConnectUrl");
+                localStorage.removeItem("wallectConnectConnectorSession");
+                localStorage.setItem("wallectConnectNextSession", wcLink);
+              } else {
+                setWalletConnectUrl(wcLink);
               }
-
             }}
           />
         </div>
 
         <div style={{ padding: 10 }}>
-          {walletConnectTx ? <Input disabled={true} value={amount}/>:<EtherInput
-            price={price || targetNetwork.price}
-            value={amount}
-            token={targetNetwork.token || "ETH"}
-            onChange={value => {
-              setAmount(value);
-            }}
-          />}
-
+          {walletConnectTx ? (
+            <Input disabled={true} value={amount} />
+          ) : (
+            <EtherInput
+              price={price || targetNetwork.price}
+              value={amount}
+              token={targetNetwork.token || "ETH"}
+              address={address}
+              provider={localProvider}
+              gasPrice={gasPrice}
+              onChange={value => {
+                setAmount(value);
+              }}
+            />
+          )}
         </div>
         {/*
           <div style={{ padding: 10 }}>
@@ -961,7 +989,7 @@ function App(props) {
           />
           </div>
           */}
-        <div style={{ position: "relative", top: 10, left:40 }}> {networkDisplay} </div>
+        <div style={{ position: "relative", top: 10, left: 40 }}> {networkDisplay} </div>
         <div style={{ padding: 10 }}>
           <Button
             key="submit"
@@ -973,41 +1001,40 @@ function App(props) {
 
               let value;
               try {
-
-                console.log("PARSE ETHER",amount)
+                console.log("PARSE ETHER", amount);
                 value = parseEther("" + amount);
-                console.log("PARSEDVALUE",value)
+                console.log("PARSEDVALUE", value);
               } catch (e) {
                 const floatVal = parseFloat(amount).toFixed(8);
 
-                console.log("floatVal",floatVal)
+                console.log("floatVal", floatVal);
                 // failed to parseEther, try something else
                 value = parseEther("" + floatVal);
-                console.log("PARSEDfloatVALUE",value)
+                console.log("PARSEDfloatVALUE", value);
               }
 
               let txConfig = {
                 to: toAddress,
                 chainId: selectedChainId,
                 value,
-              }
+              };
 
-              if(targetNetwork.name=="arbitrum"){
+              if (targetNetwork.name == "arbitrum") {
                 //txConfig.gasLimit = 21000;
                 //ask rpc for gas price
-              }else if(targetNetwork.name=="optimism"){
+              } else if (targetNetwork.name == "optimism") {
                 //ask rpc for gas price
-              }else if(targetNetwork.name=="gnosis"){
+              } else if (targetNetwork.name == "gnosis") {
                 //ask rpc for gas price
-              }else if(targetNetwork.name=="polygon"){
-                  //ask rpc for gas price
-              }else if(targetNetwork.name=="goerli"){
-                  //ask rpc for gas price
-              }else{
-                txConfig.gasPrice = gasPrice
+              } else if (targetNetwork.name == "polygon") {
+                //ask rpc for gas price
+              } else if (targetNetwork.name == "goerli") {
+                //ask rpc for gas price
+              } else {
+                txConfig.gasPrice = gasPrice;
               }
 
-              console.log("SEND AND NETWORK",targetNetwork)
+              console.log("SEND AND NETWORK", targetNetwork);
               let result = tx(txConfig);
               // setToAddress("")
               setAmount("");
@@ -1137,125 +1164,147 @@ function App(props) {
 */}
 
       <div style={{ padding: 16, backgroundColor: "#FFFFFF", width: 420, margin: "auto" }}>
-          <TransactionResponses
-             provider={userProvider}
-             signer={userProvider.getSigner()}
-             injectedProvider={injectedProvider}
-             address={address} 
-             chainId={targetNetwork.chainId}
-             blockExplorer={blockExplorer}
-           />
+        <TransactionResponses
+          provider={userProvider}
+          signer={userProvider.getSigner()}
+          injectedProvider={injectedProvider}
+          address={address}
+          chainId={targetNetwork.chainId}
+          blockExplorer={blockExplorer}
+        />
       </div>
 
       <div style={{ zIndex: -1, paddingTop: 20, opacity: 0.5, fontSize: 12 }}>
         <Button
-          style={{ margin:8, marginTop: 16 }}
+          style={{ margin: 8, marginTop: 16 }}
           onClick={() => {
-            window.open("https://zapper.fi/account/"+address+"?tab=history");
+            window.open("https://zapper.fi/account/" + address + "?tab=history");
           }}
         >
           <span style={{ marginRight: 8 }}>📜</span>History
         </Button>
 
         <Button
-          style={{  margin:8, marginTop: 16, }}
+          style={{ margin: 8, marginTop: 16 }}
           onClick={() => {
-            window.open("https://zapper.fi/account/"+address);
+            window.open("https://zapper.fi/account/" + address);
           }}
         >
           <span style={{ marginRight: 8 }}>👛</span> Inventory
         </Button>
-
-
-
       </div>
 
-      <div style={{ clear: "both", width: 500, margin: "auto" ,marginTop:32, position:"relative"}}>
-        {(wallectConnectConnector && !wallectConnectConnector.connected) && 
-
+      <div style={{ clear: "both", width: 500, margin: "auto", marginTop: 32, position: "relative" }}>
+        {wallectConnectConnector && !wallectConnectConnector.connected && (
           <div>
             <Spin />
-            <div>
-               Connecting to the Dapp...
-            </div>   
-          </div>}
-        {walletConnectConnected ?
+            <div>Connecting to the Dapp...</div>
+          </div>
+        )}
+        {walletConnectConnected ? (
           <>
-            {(walletConnectPeerMeta?.icons[0]) ? 
-              <span >
-              {walletConnectPeerMeta?.icons[0] && <img style={{width: 40, top:-4, position:"absolute",left:26}} src={walletConnectPeerMeta.icons[0]} alt={walletConnectPeerMeta.name ? walletConnectPeerMeta.name : ""} />}
+            {walletConnectPeerMeta?.icons[0] ? (
+              <span>
+                {walletConnectPeerMeta?.icons[0] && (
+                  <img
+                    style={{ width: 40, top: -4, position: "absolute", left: 26 }}
+                    src={walletConnectPeerMeta.icons[0]}
+                    alt={walletConnectPeerMeta.name ? walletConnectPeerMeta.name : ""}
+                  />
+                )}
               </span>
-              :
-              <span style={{cursor:"pointer",padding:8,fontSize:30,position:"absolute",top:-16,left:28}}>✅</span>
-            }
+            ) : (
+              <span style={{ cursor: "pointer", padding: 8, fontSize: 30, position: "absolute", top: -16, left: 28 }}>
+                ✅
+              </span>
+            )}
           </>
-          :""
-        }
+        ) : (
+          ""
+        )}
         <Input
-          style={{width:"70%"}}
+          style={{ width: "70%" }}
           placeholder={"wallet connect url (or use the scanner-->)"}
           value={walletConnectUrl}
           disabled={walletConnectConnected}
-          onChange={(e)=>{
-            setWalletConnectUrl(e.target.value)
+          onChange={e => {
+            setWalletConnectUrl(e.target.value);
           }}
-        />{walletConnectConnected?<span style={{cursor:"pointer",padding:10,fontSize:30,position:"absolute", top:-18}} onClick={()=>{
-          setWalletConnectConnected(false);
-          if(wallectConnectConnector) wallectConnectConnector.killSession();
-          localStorage.removeItem("walletConnectUrl")
-          localStorage.removeItem("wallectConnectConnectorSession")
-        }}>🗑</span>:""}
+        />
+        {walletConnectConnected ? (
+          <span
+            style={{ cursor: "pointer", padding: 10, fontSize: 30, position: "absolute", top: -18 }}
+            onClick={() => {
+              setWalletConnectConnected(false);
+              if (wallectConnectConnector) wallectConnectConnector.killSession();
+              localStorage.removeItem("walletConnectUrl");
+              localStorage.removeItem("wallectConnectConnectorSession");
+            }}
+          >
+            🗑
+          </span>
+        ) : (
+          ""
+        )}
       </div>
 
-
-      { targetNetwork.name=="ethereum" ? <div style={{ zIndex: -1, padding: 64, opacity: 0.5, fontSize: 12 }}>
-        {
-          depositing ? <div style={{width:200,margin:"auto"}}>
-            <EtherInput
-              /*price={price || targetNetwork.price}*/
-              value={depositAmount}
-              token={targetNetwork.token || "ETH"}
-              onChange={value => {
-                setDepositAmount(value);
-              }}
-            />
-            <Button
-              style={{ margin:8, marginTop: 16 }}
-              onClick={() => {
-                console.log("DEPOSITING",depositAmount)
-                tx({
-                  to: "0x99C9fc46f92E8a1c0deC1b1747d010903E884bE1",
-                  value: ethers.utils.parseEther(depositAmount),
-                  gasLimit: 175000,
-                  gasPrice: gasPrice,
-                  data: "0xb1a1a882000000000000000000000000000000000000000000000000000000000013d62000000000000000000000000000000000000000000000000000000000000000400000000000000000000000000000000000000000000000000000000000000000"
-                })
-                setDepositAmount()
-                setDepositing()
-              }}
-            >
-              <span style={{ marginRight: 8 }}>🔴</span>Deposit
-            </Button>
-          </div>:<div>
-            <Button
-              style={{ margin:8, marginTop: 16 }}
-              onClick={() => {
-                setDepositing(true)
-                /*tx({
+      {targetNetwork.name == "ethereum" ? (
+        <div style={{ zIndex: -1, padding: 64, opacity: 0.5, fontSize: 12 }}>
+          {depositing ? (
+            <div style={{ width: 200, margin: "auto" }}>
+              <EtherInput
+                /*price={price || targetNetwork.price}*/
+                value={depositAmount}
+                token={targetNetwork.token || "ETH"}
+                // address={address}
+                // provider={localProvider}
+                // gasPrice={gasPrice}
+                onChange={value => {
+                  setDepositAmount(value);
+                }}
+              />
+              <Button
+                style={{ margin: 8, marginTop: 16 }}
+                onClick={() => {
+                  console.log("DEPOSITING", depositAmount);
+                  tx({
+                    to: "0x99C9fc46f92E8a1c0deC1b1747d010903E884bE1",
+                    value: ethers.utils.parseEther(depositAmount),
+                    gasLimit: 175000,
+                    gasPrice: gasPrice,
+                    data:
+                      "0xb1a1a882000000000000000000000000000000000000000000000000000000000013d62000000000000000000000000000000000000000000000000000000000000000400000000000000000000000000000000000000000000000000000000000000000",
+                  });
+                  setDepositAmount();
+                  setDepositing();
+                }}
+              >
+                <span style={{ marginRight: 8 }}>🔴</span>Deposit
+              </Button>
+            </div>
+          ) : (
+            <div>
+              <Button
+                style={{ margin: 8, marginTop: 16 }}
+                onClick={() => {
+                  setDepositing(true);
+                  /*tx({
                   to: "0x99C9fc46f92E8a1c0deC1b1747d010903E884bE1",
                   value: ethers.utils.parseEther("0.01"),
                   gasLimit: 175000,
                   gasPrice: gasPrice,
                   data: "0xb1a1a882000000000000000000000000000000000000000000000000000000000013d62000000000000000000000000000000000000000000000000000000000000000400000000000000000000000000000000000000000000000000000000000000000"
                 })*/
-              }}
-            >
-              <span style={{ marginRight: 8 }}>🔴</span>Deposit to OE
-            </Button>
-          </div>
-        }
-      </div> : ""}
-
+                }}
+              >
+                <span style={{ marginRight: 8 }}>🔴</span>Deposit to OE
+              </Button>
+            </div>
+          )}
+        </div>
+      ) : (
+        ""
+      )}
 
       <div style={{ zIndex: -1, padding: 64, opacity: 0.5, fontSize: 12 }}>
         created with <span style={{ marginRight: 4 }}>🏗</span>
@@ -1279,7 +1328,7 @@ function App(props) {
         <Button
           type="primary"
           shape="circle"
-          style={{backgroundColor:targetNetwork.color,borderColor:targetNetwork.color}}
+          style={{ backgroundColor: targetNetwork.color, borderColor: targetNetwork.color }}
           size="large"
           onClick={() => {
             scanner(true);
@@ -1289,7 +1338,7 @@ function App(props) {
         </Button>
       </div>
 
-{/*
+      {/*
 
       <Modal title={walletModalData && walletModalData.payload && walletModalData.payload.method} visible={isWalletModalVisible} onOk={handleOk} onCancel={handleCancel}>
        <pre>
@@ -1298,7 +1347,6 @@ function App(props) {
      </Modal>
   */}
 
-
       {/* 🗺 Extra UI like gas price, eth price, faucet, and support: */}
       <div style={{ position: "fixed", textAlign: "left", left: 0, bottom: 20, padding: 10 }}>
         <Row align="middle" gutter={[16, 16]}>
@@ -1306,9 +1354,16 @@ function App(props) {
             <Ramp price={price} address={address} networks={NETWORKS} />
           </Col>
 
-          {targetNetwork.name=="arbitrum"||targetNetwork.name=="gnosis"||targetNetwork.name=="optimism"||targetNetwork.name=="polygon"?"":<Col span={12} style={{ textAlign: "center", opacity: 0.8 }}>
-            <GasGauge gasPrice={gasPrice} />
-          </Col>}
+          {targetNetwork.name == "arbitrum" ||
+          targetNetwork.name == "gnosis" ||
+          targetNetwork.name == "optimism" ||
+          targetNetwork.name == "polygon" ? (
+            ""
+          ) : (
+            <Col span={12} style={{ textAlign: "center", opacity: 0.8 }}>
+              <GasGauge gasPrice={gasPrice} />
+            </Col>
+          )}
         </Row>
 
         <Row align="middle" gutter={[4, 4]}>
