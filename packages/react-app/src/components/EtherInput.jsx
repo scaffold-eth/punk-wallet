@@ -39,7 +39,7 @@ export default function EtherInput(props) {
 
   const currentValue = typeof props.value !== "undefined" ? props.value : value;
 
-  const balance = useBalance(props.provider, props.address, 0);
+  const balance = useBalance(props.provider, props.address, 1000);
   let floatBalance = parseFloat("0.00");
   let usingBalance = balance;
 
