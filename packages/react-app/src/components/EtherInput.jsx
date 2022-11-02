@@ -42,12 +42,13 @@ export default function EtherInput(props) {
   const balance = useBalance(props.provider, props.address, 1000);
   let floatBalance = parseFloat("0.00");
   let usingBalance = balance;
+  const gasLimit = 30000;
 
   let gasCost = 0;
 
   if (usingBalance) {
     if (props.gasPrice) {
-      gasCost = (parseInt(props.gasPrice, 10) * 1.3 * 100000) / 10 ** 18;
+      gasCost = (parseInt(props.gasPrice, 10) * 1.3 * gasLimit) / 10 ** 18;
     }
 
     const etherBalance = utils.formatEther(usingBalance);
