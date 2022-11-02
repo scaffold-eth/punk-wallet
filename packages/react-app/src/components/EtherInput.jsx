@@ -47,7 +47,7 @@ export default function EtherInput(props) {
 
   if (usingBalance) {
     if (props.gasPrice) {
-      gasCost = (parseInt(props.gasPrice, 10) * 150000) / 10 ** 18;
+      gasCost = (parseInt(props.gasPrice, 10) * 1.3 * 100000) / 10 ** 18;
     }
 
     const etherBalance = utils.formatEther(usingBalance);
