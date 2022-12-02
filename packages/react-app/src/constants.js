@@ -354,7 +354,16 @@ export const NETWORKS = {
     chainId: 5,
     faucet: "https://goerli-faucet.slock.it/",
     blockExplorer: "https://goerli.etherscan.io/",
-    rpcUrl: `https://goerli.infura.io/v3/${INFURA_ID}`,
+    rpcUrl: `https://eth-goerli.g.alchemy.com/v2/4vFnzFt4K0gFDvYodzTuH9ZjbGI-awSf`,
+  },
+  sepolia: {
+    name: "sepolia",
+    color: "#87ff65",
+    price: "uniswap",
+    chainId: 11155111,
+    faucet: "https://faucet.sepolia.dev/",
+    blockExplorer: "https://sepolia.etherscan.io/",
+    rpcUrl: `https://rpc.sepolia.dev`,
   },
   localhost: {
     name: "localhost",

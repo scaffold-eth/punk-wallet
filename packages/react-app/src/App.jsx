@@ -1030,6 +1030,8 @@ function App(props) {
                 //ask rpc for gas price
               } else if (targetNetwork.name == "goerli") {
                 //ask rpc for gas price
+              } else if (targetNetwork.name == "sepolia") {
+                //ask rpc for gas price
               } else {
                 txConfig.gasPrice = gasPrice;
               }
