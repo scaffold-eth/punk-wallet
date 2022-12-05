@@ -61,7 +61,7 @@ const useUserProvider = (injectedProvider, localProvider) =>
     }
     // eslint-disable-next-line no-underscore-dangle
     const networkName = localProvider._network && localProvider._network.name;
-    burnerConfig.rpcUrl = `https://rpc2.scaffoldeth.io:48544`;
+    burnerConfig.rpcUrl = `https://rpc.scaffoldeth.io:48544`;
     return new Web3Provider(new BurnerProvider(burnerConfig));
   }, [injectedProvider, localProvider]);
 
