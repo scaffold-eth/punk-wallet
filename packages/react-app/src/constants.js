@@ -302,7 +302,7 @@ export const NETWORKS = {
     color: "#ceb0fa",
     chainId: 1,
     price: "uniswap",
-    rpcUrl: `https://rpc.scaffoldeth.io:48544`,
+    rpcUrl: `https://rpc2.scaffoldeth.io:48544`,
     blockExplorer: "https://etherscan.io/",
   },
   optimism: {
@@ -363,7 +363,9 @@ export const NETWORKS = {
     chainId: 11155111,
     faucet: "https://faucet.sepolia.dev/",
     blockExplorer: "https://sepolia.etherscan.io/",
-    rpcUrl: `https://rpc.sepolia.dev`,
+    //rpcUrl: `https://rpc.sepolia.dev`,
+    rpcUrl: `https://rpc.sepolia.org/`,
+
   },
   localhost: {
     name: "localhost",
@@ -372,6 +374,15 @@ export const NETWORKS = {
     chainId: 31337,
     blockExplorer: "",
     rpcUrl: "http://localhost:8545",
+  },
+  zksyncalpha: {
+    name: "zksyncalpha",
+    color: "#45488f",
+    price: "uniswap",
+    chainId: 280,
+    rpcUrl: "https://zksync2-testnet.zksync.dev",
+    blockExplorer: "https://goerli.explorer.zksync.io/",
+    gasPrice: 100000000,
   },
   canto: {
     name: "canto",
