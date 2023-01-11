@@ -924,6 +924,7 @@ function App(props) {
             placeholder="to address"
             disabled={walletConnectTx}
             value={toAddress}
+            setAmount={setAmount}
             onChange={setToAddress}
             hoistScanner={toggle => {
               scanner = toggle;

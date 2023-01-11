@@ -5,6 +5,8 @@ import React, { useCallback, useState } from "react";
 import QrReader from "react-qr-reader";
 import { QRPunkBlockie } from ".";
 
+const { ethers } = require("ethers");
+
 // probably we need to change value={toAddress} to address={toAddress}
 
 /*
@@ -153,15 +155,39 @@ export default function AddressInput(props) {
               updateAddress();
             }else{
               let possibleNewValue = newValue;
-              possibleNewValue = possibleNewValue.replace("ethereum:", "");
-              possibleNewValue = possibleNewValue.replace("eth:", "");
-              console.log("possibleNewValue",possibleNewValue)
-              if (possibleNewValue.indexOf("/") >= 0) {
-                possibleNewValue = possibleNewValue.substr(possibleNewValue.lastIndexOf("0x"));
-                console.log("CLEANED VALUE", possibleNewValue);
+              let possibleNewAmount = null;
+
+              if (newValue.startsWith("ethereum:") || newValue.startsWith("ethereum:-pay")) {
+                 const eip618Address = newValue.slice(newValue.indexOf('0x'), newValue.indexOf('?'));
+                 const eip618Value = newValue.slice(newValue.indexOf("=") + 1)
+
+                 console.log("eip618Address", eip618Address);
+                 console.log("eip618Value", eip618Value);
+
+                 possibleNewValue = eip618Address;
+                 possibleNewAmount = Number(eip618Value).toString();
               }
+              else {
+                possibleNewValue = possibleNewValue.replace("ethereum:", "");
+                possibleNewValue = possibleNewValue.replace("eth:", "");
+                console.log("possibleNewValue",possibleNewValue)
+                if (possibleNewValue.indexOf("/") >= 0) {
+                  possibleNewValue = possibleNewValue.substr(possibleNewValue.lastIndexOf("0x"));
+                  console.log("CLEANED VALUE", possibleNewValue);
+                }
+              }
+
               setScan(false);
               updateAddress(possibleNewValue);
+              if (possibleNewAmount) {
+                console.log("possibleNewAmount", possibleNewAmount);
+
+                const amountBigNumber = ethers.BigNumber.from(possibleNewAmount);
+
+                console.log("formatted", ethers.utils.formatEther(amountBigNumber));
+
+                props.setAmount(ethers.utils.formatEther(amountBigNumber));
+              }
             }
 
           }
