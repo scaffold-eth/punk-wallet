@@ -25,6 +25,8 @@ const OPTS = {
 }
 
 export default function WalletConnectTransactionDisplay({payload, provider, chainId}) {
+  console.log("payload", payload);
+
   const [paramsArray, setParamsArray] = useState([]);
   const [simulated, setSimulated] = useState(false);
   const [simulationFailed, setSimulationFailed] = useState(false);
@@ -54,12 +56,14 @@ export default function WalletConnectTransactionDisplay({payload, provider, chai
           params = params[0];
         }
 
+        const gas = params.gas ? params.gas : "0x5208";
+
         const body = {
           "network_id": params.chainId ? params.chainId.toString() : chainId.toString(),
           "from": params.from,
           "to": params.to,
           "input": params.data ? params.data : "",
-          "gas": BigNumber.from(params.gas).toNumber(),
+          "gas": BigNumber.from(gas).toNumber(),
           "gas_price": "0",
           "value": params.value ? BigNumber.from(params.value).toString() : "0",
           // simulation config (tenderly specific)
@@ -117,9 +121,12 @@ try {
 
   if (paramsArray.length > 0) {
     const options = [];
+
+    let marginBottom = "0em";
+
     paramsArray.forEach((param) => {
         if (param.value) {
-          let marginBottom = "0em";
+          
           if (param.label == "Value") {
             marginBottom = "2em";
           }
@@ -131,6 +138,16 @@ try {
           )  
         }
     })
+
+    if (payload.erc20Object) {
+      const erc20Object = payload.erc20Object;
+
+      options.push(
+          <div key={erc20Object.symbol} style={{ display: "flex", justifyContent:"center", marginTop: "0.5em", marginBottom: marginBottom }}>
+           <div style={{ fontWeight: "bold"}}> {erc20Object.amount.toString()} {erc20Object.symbol}</div>
+          </div>
+        )
+    }
 
     return (
       <pre>
@@ -229,7 +246,9 @@ try {
       break;
   }
 
-  params.push({ label: "Method", value: payload.method });
+  if (payload.method != "eth_sendTransaction") {
+    params.push({ label: "Method", value: payload.method });  
+  }
 
   setParamsArray(params);
 }

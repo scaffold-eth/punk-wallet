@@ -31,6 +31,7 @@ import { useBalance, useExchangePrice, useGasPrice, useLocalStorage, usePoller, 
 import WalletConnect from "@walletconnect/client";
 
 import { TransactionManager } from "./helpers/TransactionManager";
+import { EIP618Helper } from "./helpers/EIP618Helper";
 
 const { confirm } = Modal;
 
@@ -923,6 +924,8 @@ function App(props) {
       <div style={{ position: "relative", width: 320, margin: "auto", textAlign: "center", marginTop: 32 }}>
         <div style={{ padding: 10 }}>
           <AddressInput
+            selectedChainId={selectedChainId}
+            eip618Helper={new EIP618Helper(tx, mainnetProvider, targetNetwork.chainId, address, userProvider)}
             ensProvider={mainnetProvider}
             placeholder="to address"
             disabled={walletConnectTx}

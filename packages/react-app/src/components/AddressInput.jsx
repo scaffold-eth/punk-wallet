@@ -124,6 +124,18 @@ export default function AddressInput(props) {
           if (newValue) {
             console.log("SCAN VALUE",newValue);
 
+            try {
+              props.eip618Helper.confirmTxModal(newValue);
+
+              setScan(false);
+              return;
+            }
+            catch (error) {
+              if (newValue.startsWith("ethereum:")) {
+                console.error("Coudn't parse EIP-618 URL", newValue, error);  
+              }
+            }
+
             if(newValue && newValue.length==66 && newValue.indexOf("0x")===0){
               console.log("This might be a PK...",newValue)
               setTimeout(()=>{
