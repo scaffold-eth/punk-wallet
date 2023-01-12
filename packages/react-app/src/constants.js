@@ -1,5 +1,5 @@
 // MY INFURA_ID, SWAP IN YOURS FROM https://infura.io/dashboard/ethereum
-export const INFURA_ID = "95ff362df12840c98fa418bcd4b27c8a";
+export const INFURA_ID = "5b3aa68d82264f59bb6a1874cb3c23ea"; // trying the  emoji.support key
 
 // MY ETHERSCAN_ID, SWAP IN YOURS FROM https://etherscan.io/myapikey
 export const ETHERSCAN_KEY = "PSW8C433Q667DVEX5BCRMGNAH9FSGFZ7Q8";
@@ -304,7 +304,7 @@ export const NETWORKS = {
     color: "#ceb0fa",
     chainId: 1,
     price: "uniswap",
-    rpcUrl: `https://mainnet.infura.io/v3/${INFURA_ID}`,
+    rpcUrl: `https://rpc2.scaffoldeth.io:48544`,
     blockExplorer: "https://etherscan.io/",
   },
   optimism: {
@@ -336,7 +336,6 @@ export const NETWORKS = {
       symbol: "xDAI",
       decimals: 18,
     },
-    gasPrice: 1000000000,
     rpcUrl: "https://rpc.gnosischain.com/",
     faucet: "https://xdai-faucet.top/",
     blockExplorer: "https://blockscout.com/poa/xdai/",
@@ -350,33 +349,6 @@ export const NETWORKS = {
     faucet: "https://faucet.matic.network/",
     blockExplorer: "https://polygonscan.com/",
   },
-  kovan: {
-    name: "kovan",
-    color: "#7003DD",
-    price: "uniswap",
-    chainId: 42,
-    rpcUrl: `https://kovan.infura.io/v3/${INFURA_ID}`,
-    blockExplorer: "https://kovan.etherscan.io/",
-    faucet: "https://gitter.im/kovan-testnet/faucet", // https://faucet.kovan.network/
-  },
-  rinkeby: {
-    name: "rinkeby",
-    color: "#e0d068",
-    price: "uniswap",
-    chainId: 4,
-    rpcUrl: `https://rinkeby.infura.io/v3/${INFURA_ID}`,
-    faucet: "https://faucet.rinkeby.io/",
-    blockExplorer: "https://rinkeby.etherscan.io/",
-  },
-  ropsten: {
-    name: "ropsten",
-    color: "#ff4a8d",
-    price: "uniswap",
-    chainId: 3,
-    faucet: "https://faucet.ropsten.be/",
-    blockExplorer: "https://ropsten.etherscan.io/",
-    rpcUrl: `https://ropsten.infura.io/v3/${INFURA_ID}`,
-  },
   goerli: {
     name: "goerli",
     color: "#0975F6",
@@ -384,7 +356,18 @@ export const NETWORKS = {
     chainId: 5,
     faucet: "https://goerli-faucet.slock.it/",
     blockExplorer: "https://goerli.etherscan.io/",
-    rpcUrl: `https://goerli.infura.io/v3/${INFURA_ID}`,
+    rpcUrl: `https://eth-goerli.g.alchemy.com/v2/4vFnzFt4K0gFDvYodzTuH9ZjbGI-awSf`,
+  },
+  sepolia: {
+    name: "sepolia",
+    color: "#87ff65",
+    price: "uniswap",
+    chainId: 11155111,
+    faucet: "https://faucet.sepolia.dev/",
+    blockExplorer: "https://sepolia.etherscan.io/",
+    //rpcUrl: `https://rpc.sepolia.dev`,
+    rpcUrl: `https://rpc.sepolia.org/`,
+
   },
   localhost: {
     name: "localhost",
@@ -393,6 +376,24 @@ export const NETWORKS = {
     chainId: 31337,
     blockExplorer: "",
     rpcUrl: "http://localhost:8545",
+  },
+  zksyncalpha: {
+    name: "zksyncalpha",
+    color: "#45488f",
+    price: "uniswap",
+    chainId: 280,
+    rpcUrl: "https://zksync2-testnet.zksync.dev",
+    blockExplorer: "https://goerli.explorer.zksync.io/",
+    gasPrice: 100000000,
+  },
+  canto: {
+    name: "canto",
+    color: "#00ff9b",
+    chainId: 7700,
+    gasPrice: 420000000000,
+    rpcUrl: "https://canto.slingshot.finance",
+    faucet: "https://cantofaucet.com/",
+    blockExplorer: "https://evm.explorer.canto.io/",
   },
   mumbai: {
     name: "mumbai",
