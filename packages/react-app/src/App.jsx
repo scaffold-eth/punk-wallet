@@ -74,9 +74,9 @@ if (DEBUG) console.log("📡 Connecting to Mainnet Ethereum");
 
 // 🛰 providers
 const providers = [
+  "https://rpc.scaffoldeth.io:48544",
   "https://eth-mainnet.gateway.pokt.network/v1/lb/611156b4a585a20035148406",
   `https://eth-mainnet.alchemyapi.io/v2/${ALCHEMY_KEY}`,
-  "https://rpc.scaffoldeth.io:48544",
 ];
 
 // const mainnetProvider = getDefaultProvider("mainnet", { infura: INFURA_ID, etherscan: ETHERSCAN_KEY, quorum: 1 });
