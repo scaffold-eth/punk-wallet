@@ -5,8 +5,6 @@ import React, { useCallback, useState } from "react";
 import QrReader from "react-qr-reader";
 import { QRPunkBlockie } from ".";
 
-import { parse, build } from 'eth-url-parser';
-
 const { ethers } = require("ethers");
 
 // probably we need to change value={toAddress} to address={toAddress}
@@ -160,17 +158,14 @@ export default function AddressInput(props) {
               let possibleNewAmount = null;
 
               if (newValue.startsWith("ethereum:") || newValue.startsWith("ethereum:-pay")) {
-                 const parsedObject = parse(newValue);
-                 console.log("parsedObject", parsedObject);
+                 const eip618Address = newValue.slice(newValue.indexOf('0x'), newValue.indexOf('?'));
+                 const eip618Value = newValue.slice(newValue.indexOf("=") + 1)
 
-                 //const eip618Address = newValue.slice(newValue.indexOf('0x'), newValue.indexOf('?'));
-                 //const eip618Value = newValue.slice(newValue.indexOf("=") + 1)
+                 console.log("eip618Address", eip618Address);
+                 console.log("eip618Value", eip618Value);
 
-                 //console.log("eip618Address", eip618Address);
-                 //console.log("eip618Value", eip618Value);
-
-                 possibleNewValue = parsedObject.target_address;
-                 possibleNewAmount = parsedObject.parameters.value;
+                 possibleNewValue = eip618Address;
+                 possibleNewAmount = Number(eip618Value).toString();
               }
               else {
                 possibleNewValue = possibleNewValue.replace("ethereum:", "");
