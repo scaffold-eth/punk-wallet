@@ -8,6 +8,7 @@ import { EIP618Display, QRPunkBlockie } from ".";
 import { parse } from 'eth-url-parser';
 
 const { confirm } = Modal;
+const { ethers } = require("ethers");
 
 // probably we need to change value={toAddress} to address={toAddress}
 
@@ -140,7 +141,13 @@ export default function AddressInput(props) {
                   <EIP618Display parsedObject={parsedObject} />
                 ),
                 onOk: async () => {
-                  console.log("ok")
+                  let txConfig = {
+                    to: parsedObject.target_address,
+                    chainId: props.selectedChainId,
+                    value:ethers.BigNumber.from(parsedObject.parameters.value),
+                  };
+
+                  props.tx(txConfig);
                 },
                 onCancel: () => {
                   console.log("Cancel");

@@ -921,6 +921,8 @@ function App(props) {
       <div style={{ position: "relative", width: 320, margin: "auto", textAlign: "center", marginTop: 32 }}>
         <div style={{ padding: 10 }}>
           <AddressInput
+            selectedChainId={selectedChainId}
+            tx={tx}
             ensProvider={mainnetProvider}
             placeholder="to address"
             disabled={walletConnectTx}
