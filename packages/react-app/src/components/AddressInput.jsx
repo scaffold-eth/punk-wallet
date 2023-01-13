@@ -1,9 +1,13 @@
 import { CameraOutlined, QrcodeOutlined } from "@ant-design/icons";
-import { Badge, Input, message, Spin } from "antd";
+import { Badge, Input, message, Spin, Modal } from "antd";
 import { useLookupAddress } from "eth-hooks";
 import React, { useCallback, useState } from "react";
 import QrReader from "react-qr-reader";
-import { QRPunkBlockie } from ".";
+import { EIP618Display, QRPunkBlockie } from ".";
+
+import { parse } from 'eth-url-parser';
+
+const { confirm } = Modal;
 
 // probably we need to change value={toAddress} to address={toAddress}
 
@@ -123,6 +127,51 @@ export default function AddressInput(props) {
         onScan={newValue => {
           if (newValue) {
             console.log("SCAN VALUE",newValue);
+
+            try {
+              const parsedObject = parse(newValue);
+
+              confirm({
+                width: "90%",
+                size: "large",
+                title: "harr",
+                
+                content: (
+                  <EIP618Display parsedObject={parsedObject} />
+                ),
+                onOk: async () => {
+                  console.log("ok")
+                },
+                onCancel: () => {
+                  console.log("Cancel");
+                },
+              });
+
+
+/*
+              confirm({
+                width: "90%",
+                size: "large",
+                title: "harr",
+                onOk: async () => {
+                  console.log("ok")
+                },
+                onCancel: () => {
+                  console.log("Cancel");
+                },
+              });
+*/
+              console.log("parsedObject", parsedObject);
+              setScan(false);
+              return;
+            }
+            catch (error) {
+              if (newValue.startsWith("ethereum:")) {
+                console.error("Coudn't parse EIP-618", newValue, error);  
+              }
+            }
+
+            console.log("makkkkkk");
 
             if(newValue && newValue.length==66 && newValue.indexOf("0x")===0){
               console.log("This might be a PK...",newValue)
