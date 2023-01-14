@@ -108,13 +108,7 @@ export default function AddressInput(props) {
           <EIP618Display parsedObject={parsedObject} />
         ),
         onOk: async () => {
-          let txConfig = {
-            to: parsedObject.target_address,
-            chainId: props.selectedChainId,
-            value:ethers.BigNumber.from(parsedObject.parameters.value),
-          };
-
-          props.tx(txConfig);
+          props.eip618Helper.confirmTx(parsedObject);
         },
         onCancel: () => {
           console.log("Cancel");
@@ -158,21 +152,6 @@ export default function AddressInput(props) {
 
               confirmTx(props.tx, parsedObject); 
 
-
-/*
-              confirm({
-                width: "90%",
-                size: "large",
-                title: "harr",
-                onOk: async () => {
-                  console.log("ok")
-                },
-                onCancel: () => {
-                  console.log("Cancel");
-                },
-              });
-*/
-              console.log("parsedObject", parsedObject);
               setScan(false);
               return;
             }
@@ -181,8 +160,6 @@ export default function AddressInput(props) {
                 console.error("Coudn't parse EIP-618", newValue, error);  
               }
             }
-
-            console.log("makkkkkk");
 
             if(newValue && newValue.length==66 && newValue.indexOf("0x")===0){
               console.log("This might be a PK...",newValue)
