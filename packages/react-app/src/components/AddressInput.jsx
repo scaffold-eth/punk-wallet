@@ -105,7 +105,7 @@ export default function AddressInput(props) {
         title: "harr",
         
         content: (
-          <EIP618Display parsedObject={parsedObject} />
+          props.eip618Helper.txDisplay(parsedObject)
         ),
         onOk: async () => {
           props.eip618Helper.confirmTx(parsedObject);

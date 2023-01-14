@@ -1,3 +1,5 @@
+import React from "react";
+
 const { BigNumber, ethers } = require("ethers");
 
 export class EIP618Helper {
@@ -38,6 +40,14 @@ export class EIP618Helper {
         },
       });
     */
+  }
+
+  txDisplay = (parsedObject) => {
+	return (
+		<pre>
+			{JSON.stringify(parsedObject, null, 2)}
+		</pre>
+	);
   }
 }
 
