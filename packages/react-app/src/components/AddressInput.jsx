@@ -98,6 +98,30 @@ export default function AddressInput(props) {
     [ensProvider, onChange],
   );
 
+  const confirmTx = (tx, parsedObject) => {
+      confirm({
+        width: "90%",
+        size: "large",
+        title: "harr",
+        
+        content: (
+          <EIP618Display parsedObject={parsedObject} />
+        ),
+        onOk: async () => {
+          let txConfig = {
+            to: parsedObject.target_address,
+            chainId: props.selectedChainId,
+            value:ethers.BigNumber.from(parsedObject.parameters.value),
+          };
+
+          props.tx(txConfig);
+        },
+        onCancel: () => {
+          console.log("Cancel");
+        },
+      });
+  }
+
   const scanner = scan ? (
     <div
       style={{
@@ -132,27 +156,7 @@ export default function AddressInput(props) {
             try {
               const parsedObject = parse(newValue);
 
-              confirm({
-                width: "90%",
-                size: "large",
-                title: "harr",
-                
-                content: (
-                  <EIP618Display parsedObject={parsedObject} />
-                ),
-                onOk: async () => {
-                  let txConfig = {
-                    to: parsedObject.target_address,
-                    chainId: props.selectedChainId,
-                    value:ethers.BigNumber.from(parsedObject.parameters.value),
-                  };
-
-                  props.tx(txConfig);
-                },
-                onCancel: () => {
-                  console.log("Cancel");
-                },
-              });
+              confirmTx(props.tx, parsedObject); 
 
 
 /*
