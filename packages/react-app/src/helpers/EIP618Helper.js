@@ -1,5 +1,8 @@
 import React from "react";
 
+import { Modal } from "antd";
+const { confirm } = Modal;
+
 const { BigNumber, ethers } = require("ethers");
 
 export class EIP618Helper {
@@ -7,7 +10,26 @@ export class EIP618Helper {
 		this.tx = tx;
 	}
 
-	confirmTx = (parsedObject) => {
+	confirmTxModal = (parsedObject) => {
+		confirm({
+			width: "90%",
+			size: "large",
+			title: "harr",
+
+			content: (
+				this.txDisplay(parsedObject)
+			),
+			onOk: async () => {
+				this.executeTx(parsedObject);
+			},
+			onCancel: () => {
+				console.log("Cancel");
+			},
+		});
+	}
+
+
+	executeTx = (parsedObject) => {
 		let txConfig = {
             to: parsedObject.target_address,
             //chainId: props.selectedChainId,

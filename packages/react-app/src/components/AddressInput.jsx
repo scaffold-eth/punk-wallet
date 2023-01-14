@@ -98,24 +98,6 @@ export default function AddressInput(props) {
     [ensProvider, onChange],
   );
 
-  const confirmTx = (tx, parsedObject) => {
-      confirm({
-        width: "90%",
-        size: "large",
-        title: "harr",
-        
-        content: (
-          props.eip618Helper.txDisplay(parsedObject)
-        ),
-        onOk: async () => {
-          props.eip618Helper.confirmTx(parsedObject);
-        },
-        onCancel: () => {
-          console.log("Cancel");
-        },
-      });
-  }
-
   const scanner = scan ? (
     <div
       style={{
@@ -150,7 +132,7 @@ export default function AddressInput(props) {
             try {
               const parsedObject = parse(newValue);
 
-              confirmTx(props.tx, parsedObject); 
+              props.eip618Helper.confirmTxModal(parsedObject);
 
               setScan(false);
               return;
