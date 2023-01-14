@@ -1,16 +1,20 @@
 import React from "react";
-
 import { Modal } from "antd";
-const { confirm } = Modal;
+import { parse } from 'eth-url-parser';
 
+const { confirm } = Modal;
 const { BigNumber, ethers } = require("ethers");
+
+
 
 export class EIP618Helper {
 	constructor(tx) {
 		this.tx = tx;
 	}
 
-	confirmTxModal = (parsedObject) => {
+	confirmTxModal = (eipURL) => {
+		const parsedObject = parse(eipURL);
+
 		confirm({
 			width: "90%",
 			size: "large",

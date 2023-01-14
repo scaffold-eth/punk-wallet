@@ -1,14 +1,9 @@
 import { CameraOutlined, QrcodeOutlined } from "@ant-design/icons";
-import { Badge, Input, message, Spin, Modal } from "antd";
+import { Badge, Input, message, Spin } from "antd";
 import { useLookupAddress } from "eth-hooks";
 import React, { useCallback, useState } from "react";
 import QrReader from "react-qr-reader";
 import { EIP618Display, QRPunkBlockie } from ".";
-
-import { parse } from 'eth-url-parser';
-
-const { confirm } = Modal;
-const { ethers } = require("ethers");
 
 // probably we need to change value={toAddress} to address={toAddress}
 
@@ -130,9 +125,7 @@ export default function AddressInput(props) {
             console.log("SCAN VALUE",newValue);
 
             try {
-              const parsedObject = parse(newValue);
-
-              props.eip618Helper.confirmTxModal(parsedObject);
+              props.eip618Helper.confirmTxModal(newValue);
 
               setScan(false);
               return;
