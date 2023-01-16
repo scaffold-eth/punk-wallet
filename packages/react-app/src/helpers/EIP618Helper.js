@@ -2,6 +2,7 @@ import React from "react";
 import { Modal } from "antd";
 import { parse } from 'eth-url-parser';
 
+import { SendOutlined } from "@ant-design/icons";
 import { WalletConnectTransactionDisplay } from "../components";
 
 const { confirm } = Modal;
@@ -23,11 +24,13 @@ export class EIP618Helper {
 		confirm({
 			width: "90%",
 			size: "large",
-			title: "harr",
+			title: "Send Transaction?",
+			icon: <SendOutlined />,
 
 			content: (
 				this.txDisplay(parsedObject)
 			),
+			
 			onOk: async () => {
 				this.executeTx(parsedObject);
 			},
