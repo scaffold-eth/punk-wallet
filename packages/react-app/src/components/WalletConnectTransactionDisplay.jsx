@@ -25,6 +25,8 @@ const OPTS = {
 }
 
 export default function WalletConnectTransactionDisplay({payload, provider, chainId}) {
+  console.log("payload", payload);
+
   const [paramsArray, setParamsArray] = useState([]);
   const [simulated, setSimulated] = useState(false);
   const [simulationFailed, setSimulationFailed] = useState(false);

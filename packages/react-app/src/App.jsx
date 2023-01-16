@@ -923,7 +923,7 @@ function App(props) {
         <div style={{ padding: 10 }}>
           <AddressInput
             selectedChainId={selectedChainId}
-            eip618Helper={new EIP618Helper(tx)}
+            eip618Helper={new EIP618Helper(tx, mainnetProvider, targetNetwork.chainId, address)}
             ensProvider={mainnetProvider}
             placeholder="to address"
             disabled={walletConnectTx}
