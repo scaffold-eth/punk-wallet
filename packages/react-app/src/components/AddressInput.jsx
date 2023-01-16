@@ -3,7 +3,7 @@ import { Badge, Input, message, Spin } from "antd";
 import { useLookupAddress } from "eth-hooks";
 import React, { useCallback, useState } from "react";
 import QrReader from "react-qr-reader";
-import { EIP618Display, QRPunkBlockie } from ".";
+import { QRPunkBlockie } from ".";
 
 // probably we need to change value={toAddress} to address={toAddress}
 
@@ -132,7 +132,7 @@ export default function AddressInput(props) {
             }
             catch (error) {
               if (newValue.startsWith("ethereum:")) {
-                console.error("Coudn't parse EIP-618", newValue, error);  
+                console.error("Coudn't parse EIP-618 URL", newValue, error);  
               }
             }
 
