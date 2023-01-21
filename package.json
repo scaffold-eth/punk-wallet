@@ -59,8 +59,5 @@
       "**/hardhat",
       "**/hardhat/**"
     ]
-  },
-  "dependencies": {
-    "eth-url-parser": "^1.0.4"
   }
 }
