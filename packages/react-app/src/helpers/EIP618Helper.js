@@ -80,11 +80,23 @@ export class EIP618Helper {
 }
 */
 
+/*
+	{
+    "scheme": "ethereum",
+    "target_address": "0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063",
+    "function_name": "transfer",
+    "parameters": {
+        "address": "0x8c9D11cE64289701eFEB6A68c16e849E9A2e781d",
+        "uint256": "1"
+    }
+}
+*/
+
 
 	const tx =  {
 	  data: '0xa9059cbb0000000000000000000000008c9d11ce64289701efeb6a68c16e849e9a2e781d0000000000000000000000000000000000000000000000000000000000000001',
 	  to: '0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063',
-	  from: '0x8c9D11cE64289701eFEB6A68c16e849E9A2e781d'
+	  from: '0x8c9D11cE64289701eFEB6A68c16e849E9A2e781d',
 	}
 
 	const payload = {
@@ -93,7 +105,9 @@ export class EIP618Helper {
 			from: this.address,
 			//to: parsedObject.target_address,
 			to: tx.to,
-			value: 0
+			data: tx.data,
+			value: 0,
+			chainId:137
 		}]
 	}	
 
