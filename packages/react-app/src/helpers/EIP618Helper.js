@@ -4,11 +4,10 @@ import { parse } from 'eth-url-parser';
 
 import { SendOutlined } from "@ant-design/icons";
 import { WalletConnectTransactionDisplay } from "../components";
+import { ERC20Helper } from "./ERC20Helper";
 
 const { confirm } = Modal;
 const { BigNumber, ethers } = require("ethers");
-
-
 
 export class EIP618Helper {
 	constructor(tx, provider, chainId, address) {
@@ -18,10 +17,12 @@ export class EIP618Helper {
 		this.address = address;
 	}
 
-	confirmTxModal = (eipURL) => {
+	confirmTxModal = async (eipURL) => {
 		const parsedObject = parse(eipURL);
 
 		console.log("parsedObject", parsedObject);
+
+		
 
 		confirm({
 			width: "90%",
@@ -42,7 +43,7 @@ export class EIP618Helper {
 		});
 	}
 
-	executeTx = (parsedObject) => {
+	executeTx = async (parsedObject) => {
 	/*	
 		let txConfig = {
 	        to: parsedObject.target_address,
@@ -51,15 +52,25 @@ export class EIP618Helper {
 	        value: BigNumber.from(parsedObject.parameters.value),
 	      };
 	*/
+
+		const erc20Helper = new ERC20Helper(parsedObject.target_address);
+
+		let populatedTx = await erc20Helper.transferPopulateTransaction(parsedObject.parameters.address, parsedObject.parameters.uint256);
+		console.log("populatedTx", populatedTx);
+
+		populatedTx.chainId = this.chainId;
+		populatedTx.from = this.address;
+
+/*
 	    const tx =  {
 		  data: '0xa9059cbb0000000000000000000000008c9d11ce64289701efeb6a68c16e849e9a2e781d0000000000000000000000000000000000000000000000000000000000000001',
 		  to: '0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063',
 		  from: '0xc54C244200d657650087455869f1aD168537d3B3',
 		  chainId: this.chainId
 		}
-
+*/
 	    //this.tx(txConfig);
-	    this.tx(tx);
+	    this.tx(populatedTx);
   }
 
   txDisplay = (parsedObject) => {
