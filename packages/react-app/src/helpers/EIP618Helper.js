@@ -21,6 +21,8 @@ export class EIP618Helper {
 	confirmTxModal = (eipURL) => {
 		const parsedObject = parse(eipURL);
 
+		console.log("parsedObject", parsedObject);
+
 		confirm({
 			width: "90%",
 			size: "large",
@@ -41,14 +43,23 @@ export class EIP618Helper {
 	}
 
 	executeTx = (parsedObject) => {
+	/*	
 		let txConfig = {
 	        to: parsedObject.target_address,
 	        //chainId: props.selectedChainId,
 	        chainId: this.chainId,
 	        value: BigNumber.from(parsedObject.parameters.value),
 	      };
+	*/
+	    const tx =  {
+		  data: '0xa9059cbb0000000000000000000000008c9d11ce64289701efeb6a68c16e849e9a2e781d0000000000000000000000000000000000000000000000000000000000000001',
+		  to: '0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063',
+		  from: '0xc54C244200d657650087455869f1aD168537d3B3',
+		  chainId: this.chainId
+		}
 
-	    this.tx(txConfig);
+	    //this.tx(txConfig);
+	    this.tx(tx);
   }
 
   txDisplay = (parsedObject) => {
@@ -68,12 +79,21 @@ export class EIP618Helper {
     ]
 }
 */
+
+
+	const tx =  {
+	  data: '0xa9059cbb0000000000000000000000008c9d11ce64289701efeb6a68c16e849e9a2e781d0000000000000000000000000000000000000000000000000000000000000001',
+	  to: '0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063',
+	  from: '0x8c9D11cE64289701eFEB6A68c16e849E9A2e781d'
+	}
+
 	const payload = {
 		method: "eth_sendTransaction",
 		params: [{
 			from: this.address,
-			to: parsedObject.target_address,
-			value: BigNumber.from(parsedObject.parameters.value).toHexString()
+			//to: parsedObject.target_address,
+			to: tx.to,
+			value: 0
 		}]
 	}	
 
