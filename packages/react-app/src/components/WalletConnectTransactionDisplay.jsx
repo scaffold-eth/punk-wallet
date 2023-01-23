@@ -123,7 +123,7 @@ try {
     const options = [];
 
     let marginBottom = "0em";
-    
+
     paramsArray.forEach((param) => {
         if (param.value) {
           
@@ -246,7 +246,9 @@ try {
       break;
   }
 
-  params.push({ label: "Method", value: payload.method });
+  if (payload.method != "eth_sendTransaction") {
+    params.push({ label: "Method", value: payload.method });  
+  }
 
   setParamsArray(params);
 }
