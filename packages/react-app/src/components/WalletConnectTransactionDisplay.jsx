@@ -121,9 +121,12 @@ try {
 
   if (paramsArray.length > 0) {
     const options = [];
+
+    let marginBottom = "0em";
+    
     paramsArray.forEach((param) => {
         if (param.value) {
-          let marginBottom = "0em";
+          
           if (param.label == "Value") {
             marginBottom = "2em";
           }
@@ -135,6 +138,16 @@ try {
           )  
         }
     })
+
+    if (payload.erc20Object) {
+      const erc20Object = payload.erc20Object;
+
+      options.push(
+          <div key={erc20Object.symbol} style={{ display: "flex", justifyContent:"center", marginTop: "0.5em", marginBottom: marginBottom }}>
+           <div style={{ fontWeight: "bold"}}> {erc20Object.amount.toString()} {erc20Object.symbol}</div>
+          </div>
+        )
+    }
 
     return (
       <pre>

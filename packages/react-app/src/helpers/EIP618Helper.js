@@ -58,11 +58,15 @@ export class EIP618Helper {
 			const erc20Helper = new ERC20Helper(erc20TokenAddress, this.userProvider.getSigner());
 			console.log("erc20Helper", erc20Helper);
 
+			const symbol = await erc20Helper.symbol();
+
 			const toAddress = parsedObject.parameters.address;
 			console.log("toAddress", toAddress);
 
 			const amount = parsedObject.parameters.uint256;
 			console.log("amount", amount);
+
+
 
 			const decimalCorrectedAmountBigNumber = await erc20Helper.getDecimalCorrectedAmountBigNumber(amount);
 
@@ -72,6 +76,7 @@ export class EIP618Helper {
 			erc20Object = {
 				erc20TokenAddress:erc20TokenAddress,
 				erc20Helper:erc20Helper,
+				symbol:symbol,
 				toAddress:toAddress,
 				amount:amount,
 				decimalCorrectedAmountBigNumber:decimalCorrectedAmountBigNumber,
