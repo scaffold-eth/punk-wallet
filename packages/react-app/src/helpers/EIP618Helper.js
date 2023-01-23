@@ -33,6 +33,18 @@ export class EIP618Helper {
 	        "uint256": "0.33"
 	 	}
 	}
+
+{
+    "scheme": "ethereum",
+    "target_address": "0x6b175474e89094c44da98b954eedeac495271d0f",
+    "prefix": "pay",
+    "chain_id": "137",
+    "function_name": "transfer",
+    "parameters": {
+        "address": "0x8c9D11cE64289701eFEB6A68c16e849E9A2e781d",
+        "uint256": "4.2"
+    }
+}
 }
 */
 
@@ -40,8 +52,10 @@ export class EIP618Helper {
 	{
 	    "scheme": "ethereum",
 	    "target_address": "0x8c9D11cE64289701eFEB6A68c16e849E9A2e781d",
+	    "prefix": "pay",
+	    "chain_id": "137",
 	    "parameters": {
-	        "value": "100000000000000000"
+	        "value": "420000000000000"
 	    }
 	}
 */
