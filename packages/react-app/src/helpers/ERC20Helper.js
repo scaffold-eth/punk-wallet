@@ -1,4 +1,4 @@
-const { BigNumber, ethers, utils, Wallet } = require("ethers");
+const { ethers, utils } = require("ethers");
 
 //const ERC20_ABI = '[ { "constant": true, "inputs": [], "name": "name", "outputs": [ { "name": "", "type": "string" } ], "payable": false, "stateMutability": "view", "type": "function" }, { "constant": false, "inputs": [ { "name": "_spender", "type": "address" }, { "name": "_value", "type": "uint256" } ], "name": "approve", "outputs": [ { "name": "", "type": "bool" } ], "payable": false, "stateMutability": "nonpayable", "type": "function" }, { "constant": true, "inputs": [], "name": "totalSupply", "outputs": [ { "name": "", "type": "uint256" } ], "payable": false, "stateMutability": "view", "type": "function" }, { "constant": false, "inputs": [ { "name": "_from", "type": "address" }, { "name": "_to", "type": "address" }, { "name": "_value", "type": "uint256" } ], "name": "transferFrom", "outputs": [ { "name": "", "type": "bool" } ], "payable": false, "stateMutability": "nonpayable", "type": "function" }, { "constant": true, "inputs": [], "name": "decimals", "outputs": [ { "name": "", "type": "uint8" } ], "payable": false, "stateMutability": "view", "type": "function" }, { "constant": true, "inputs": [ { "name": "_owner", "type": "address" } ], "name": "balanceOf", "outputs": [ { "name": "balance", "type": "uint256" } ], "payable": false, "stateMutability": "view", "type": "function" }, { "constant": true, "inputs": [], "name": "symbol", "outputs": [ { "name": "", "type": "string" } ], "payable": false, "stateMutability": "view", "type": "function" }, { "constant": false, "inputs": [ { "name": "_to", "type": "address" }, { "name": "_value", "type": "uint256" } ], "name": "transfer", "outputs": [ { "name": "", "type": "bool" } ], "payable": false, "stateMutability": "nonpayable", "type": "function" }, { "constant": true, "inputs": [ { "name": "_owner", "type": "address" }, { "name": "_spender", "type": "address" } ], "name": "allowance", "outputs": [ { "name": "", "type": "uint256" } ], "payable": false, "stateMutability": "view", "type": "function" }, { "payable": true, "stateMutability": "payable", "type": "fallback" }, { "anonymous": false, "inputs": [ { "indexed": true, "name": "owner", "type": "address" }, { "indexed": true, "name": "spender", "type": "address" }, { "indexed": false, "name": "value", "type": "uint256" } ], "name": "Approval", "type": "event" }, { "anonymous": false, "inputs": [ { "indexed": true, "name": "from", "type": "address" }, { "indexed": true, "name": "to", "type": "address" }, { "indexed": false, "name": "value", "type": "uint256" } ], "name": "Transfer", "type": "event" } ]';
 
@@ -32,7 +32,8 @@ class ERC20Helper {
 		return balance;
 	}
 
-	decimals = async (address) => { 
+	decimals = async () => { 
+		console.log("contract", this.contract);
 		let decimals = await this.contract.decimals();
 
 		return decimals;
@@ -48,18 +49,27 @@ class ERC20Helper {
 		// // Transfer 1.23 tokens to the ENS name "ricmoo.eth"
 		// tx = await erc20_rw.transfer("ricmoo.eth", parseUnits("1.23"));
 
-		const tx = this.contract.transfer(toAddress, 1);
+		//const tx = this.contract.transfer(toAddress, 1);
 
-		//console.log("tx", tx);
+		const decimals = await this.decimals();
+
+		const tx = this.contract.transfer(toAddress, utils.parseUnits(amount, decimals));
 	}
 
 	transferPopulateTransaction = async (toAddress, amount) => { 
 		// // Transfer 1.23 tokens to the ENS name "ricmoo.eth"
 		// tx = await erc20_rw.transfer("ricmoo.eth", parseUnits("1.23"));
 
-		const tx = this.contract.populateTransaction.transfer(toAddress, amount);
+		//const tx = this.contract.populateTransaction.transfer(toAddress, amount);
 
-		return tx;
+		console.log("transferPopulateTransaction", toAddress, amount);
+
+		const decimals = await this.decimals();
+		console.log("decimals", decimals);
+
+		const populatedTx = this.contract.populateTransaction.transfer(toAddress, utils.parseUnits(amount.toString(), decimals));
+
+		return populatedTx;
 	}
 }
 

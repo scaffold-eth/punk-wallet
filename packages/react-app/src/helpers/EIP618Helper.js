@@ -10,11 +10,12 @@ const { confirm } = Modal;
 const { BigNumber, ethers } = require("ethers");
 
 export class EIP618Helper {
-	constructor(tx, provider, chainId, address) {
+	constructor(tx, provider, chainId, address, userProvider) {
 		this.tx = tx;
 		this.provider = provider;
 		this.chainId = chainId;
 		this.address = address;
+		this.userProvider = userProvider;
 	}
 
 	confirmTxModal = async (eipURL) => {
@@ -22,7 +23,20 @@ export class EIP618Helper {
 
 		console.log("parsedObject", parsedObject);
 
-		
+		const erc20TokenAddress = parsedObject.target_address;
+		console.log("parsedObject", parsedObject);
+
+		const erc20Helper = new ERC20Helper(erc20TokenAddress, this.userProvider.getSigner());
+		console.log("erc20Helper", erc20Helper);
+
+		const toAddress = parsedObject.parameters.address;
+		console.log("toAddress", toAddress);
+
+		const amount = parsedObject.parameters.uint256;
+		console.log("amount", amount);
+
+		let populatedTx = await erc20Helper.transferPopulateTransaction(toAddress, amount);
+		console.log("populatedTx", populatedTx);
 
 		confirm({
 			width: "90%",
@@ -53,9 +67,19 @@ export class EIP618Helper {
 	      };
 	*/
 
-		const erc20Helper = new ERC20Helper(parsedObject.target_address);
+		const erc20TokenAddress = parsedObject.target_address;
+		console.log("parsedObject", parsedObject);
 
-		let populatedTx = await erc20Helper.transferPopulateTransaction(parsedObject.parameters.address, parsedObject.parameters.uint256);
+		const erc20Helper = new ERC20Helper(erc20TokenAddress, this.userProvider.getSigner());
+		console.log("erc20Helper", erc20Helper);
+
+		const toAddress = parsedObject.parameters.address;
+		console.log("toAddress", toAddress);
+
+		const amount = parsedObject.parameters.uint256;
+		console.log("amount", amount);
+
+		let populatedTx = await erc20Helper.transferPopulateTransaction(toAddress, amount);
 		console.log("populatedTx", populatedTx);
 
 		populatedTx.chainId = this.chainId;
