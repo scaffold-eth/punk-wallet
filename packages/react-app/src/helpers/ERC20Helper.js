@@ -39,7 +39,7 @@ class ERC20Helper {
 		return decimals;
 	}
 
-	symbol = async (address) => { 
+	symbol = async () => { 
 		let symbol = await this.contract.symbol();
 
 		return symbol;
