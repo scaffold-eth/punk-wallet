@@ -40,9 +40,17 @@ class ERC20Helper {
 	}
 
 	symbol = async () => { 
-		let symbol = await this.contract.symbol();
+		try {
+			let symbol = await this.contract.symbol();
 
-		return symbol;
+			return symbol;	
+		}
+		catch (error) {
+			console.log("Coudn't get symbol, returning the tokenAddress", error);
+
+			return this.tokenAddress
+		}
+		
 	}
 
 	transfer = async (toAddress, amount) => { 
