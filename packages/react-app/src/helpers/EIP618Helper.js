@@ -18,25 +18,66 @@ export class EIP618Helper {
 		this.userProvider = userProvider;
 	}
 
+
+
 	confirmTxModal = async (eipURL) => {
 		const parsedObject = parse(eipURL);
 
+/*  Sending ERC-20 example
+	{
+	    "scheme": "ethereum",
+	    "target_address": "0x2791bca1f2de4661ed88a30c99a7a9449aa84174",
+	    "function_name": "transfer",
+	    "parameters": {
+	        "address": "0x8c9D11cE64289701eFEB6A68c16e849E9A2e781d",
+	        "uint256": "0.33"
+	 	}
+	}
+}
+*/
+
+/* Sending ETH example
+	{
+	    "scheme": "ethereum",
+	    "target_address": "0x8c9D11cE64289701eFEB6A68c16e849E9A2e781d",
+	    "parameters": {
+	        "value": "100000000000000000"
+	    }
+	}
+*/
+
 		console.log("parsedObject", parsedObject);
 
-		const erc20TokenAddress = parsedObject.target_address;
-		console.log("parsedObject", parsedObject);
+		let erc20Object = null;	
 
-		const erc20Helper = new ERC20Helper(erc20TokenAddress, this.userProvider.getSigner());
-		console.log("erc20Helper", erc20Helper);
+		if (parsedObject.function_name && parsedObject.function_name == "transfer") { // Assume this is an ERC-20 transfer, pobably a better validation will be needed
 
-		const toAddress = parsedObject.parameters.address;
-		console.log("toAddress", toAddress);
+			const erc20TokenAddress = parsedObject.target_address;
+			console.log("parsedObject", parsedObject);
 
-		const amount = parsedObject.parameters.uint256;
-		console.log("amount", amount);
+			const erc20Helper = new ERC20Helper(erc20TokenAddress, this.userProvider.getSigner());
+			console.log("erc20Helper", erc20Helper);
 
-		let populatedTx = await erc20Helper.transferPopulateTransaction(toAddress, amount);
-		console.log("populatedTx", populatedTx);
+			const toAddress = parsedObject.parameters.address;
+			console.log("toAddress", toAddress);
+
+			const amount = parsedObject.parameters.uint256;
+			console.log("amount", amount);
+
+			const decimalCorrectedAmountBigNumber = await erc20Helper.getDecimalCorrectedAmountBigNumber(amount);
+
+			let populatedTx = await erc20Helper.transferPopulateTransaction(toAddress, decimalCorrectedAmountBigNumber);
+			console.log("populatedTx", populatedTx);
+
+			erc20Object = {
+				erc20TokenAddress:erc20TokenAddress,
+				erc20Helper:erc20Helper,
+				toAddress:toAddress,
+				amount:amount,
+				decimalCorrectedAmountBigNumber:decimalCorrectedAmountBigNumber,
+				populatedTx:populatedTx
+			}
+		}
 
 		confirm({
 			width: "90%",
@@ -45,11 +86,11 @@ export class EIP618Helper {
 			icon: <SendOutlined />,
 
 			content: (
-				this.txDisplay(parsedObject)
+				this.txDisplay(parsedObject, erc20Object)
 			),
 			
 			onOk: async () => {
-				this.executeTx(parsedObject);
+				this.executeTx(parsedObject, erc20Object);
 			},
 			onCancel: () => {
 				console.log("Cancel");
@@ -57,47 +98,26 @@ export class EIP618Helper {
 		});
 	}
 
-	executeTx = async (parsedObject) => {
-	/*	
-		let txConfig = {
-	        to: parsedObject.target_address,
-	        //chainId: props.selectedChainId,
-	        chainId: this.chainId,
-	        value: BigNumber.from(parsedObject.parameters.value),
-	      };
-	*/
+	executeTx = async (parsedObject, erc20Object) => {
+		let txConfig;
 
-		const erc20TokenAddress = parsedObject.target_address;
-		console.log("parsedObject", parsedObject);
-
-		const erc20Helper = new ERC20Helper(erc20TokenAddress, this.userProvider.getSigner());
-		console.log("erc20Helper", erc20Helper);
-
-		const toAddress = parsedObject.parameters.address;
-		console.log("toAddress", toAddress);
-
-		const amount = parsedObject.parameters.uint256;
-		console.log("amount", amount);
-
-		let populatedTx = await erc20Helper.transferPopulateTransaction(toAddress, amount);
-		console.log("populatedTx", populatedTx);
-
-		populatedTx.chainId = this.chainId;
-		populatedTx.from = this.address;
-
-/*
-	    const tx =  {
-		  data: '0xa9059cbb0000000000000000000000008c9d11ce64289701efeb6a68c16e849e9a2e781d0000000000000000000000000000000000000000000000000000000000000001',
-		  to: '0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063',
-		  from: '0xc54C244200d657650087455869f1aD168537d3B3',
-		  chainId: this.chainId
+		if (erc20Object) {
+			txConfig = erc20Object.populatedTx;
 		}
-*/
-	    //this.tx(txConfig);
-	    this.tx(populatedTx);
+		else {
+			txConfig = {
+		        to: parsedObject.target_address,
+		        value: BigNumber.from(parsedObject.parameters.value),
+		    };
+		}
+
+		txConfig.chainId = this.chainId;
+		txConfig.from = this.address;
+
+	    this.tx(txConfig);
   }
 
-  txDisplay = (parsedObject) => {
+  txDisplay = (parsedObject, erc20Object) => {
 /*
   	{
     "id": 1673867274004124,
@@ -125,25 +145,33 @@ export class EIP618Helper {
         "uint256": "1"
     }
 }
-*/
-
-
-	const tx =  {
-	  data: '0xa9059cbb0000000000000000000000008c9d11ce64289701efeb6a68c16e849e9a2e781d0000000000000000000000000000000000000000000000000000000000000001',
-	  to: '0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063',
-	  from: '0x8c9D11cE64289701eFEB6A68c16e849E9A2e781d',
-	}
 
 	const payload = {
 		method: "eth_sendTransaction",
 		params: [{
 			from: this.address,
-			//to: parsedObject.target_address,
-			to: tx.to,
-			data: tx.data,
-			value: 0,
-			chainId:137
+			to: parsedObject.target_address,
+			value: BigNumber.from(parsedObject.parameters.value).toHexString()
 		}]
+	}	
+
+*/
+	const toAddress = erc20Object ? erc20Object.toAddress : parsedObject.target_address;
+
+
+	//value = ethers.utils.formatEther(payload?.params[0]?.value);
+	const value = erc20Object ? 0 : BigNumber.from(parsedObject.parameters.value).toHexString()
+
+	const payload = {
+		method: "eth_sendTransaction",
+		params: [{
+			from: this.address,
+			to: toAddress,
+			//data: tx.data,
+			value: value,
+			chainId:this.chainId
+		}],
+		erc20Object:erc20Object
 	}	
 
 	return (

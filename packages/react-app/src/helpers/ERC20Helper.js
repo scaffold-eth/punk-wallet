@@ -56,20 +56,23 @@ class ERC20Helper {
 		const tx = this.contract.transfer(toAddress, utils.parseUnits(amount, decimals));
 	}
 
-	transferPopulateTransaction = async (toAddress, amount) => { 
+	transferPopulateTransaction = async (toAddress, amountBigNumber) => { 
 		// // Transfer 1.23 tokens to the ENS name "ricmoo.eth"
 		// tx = await erc20_rw.transfer("ricmoo.eth", parseUnits("1.23"));
 
 		//const tx = this.contract.populateTransaction.transfer(toAddress, amount);
 
-		console.log("transferPopulateTransaction", toAddress, amount);
-
-		const decimals = await this.decimals();
-		console.log("decimals", decimals);
-
-		const populatedTx = this.contract.populateTransaction.transfer(toAddress, utils.parseUnits(amount.toString(), decimals));
+		const populatedTx = this.contract.populateTransaction.transfer(toAddress, amountBigNumber);
 
 		return populatedTx;
+	}
+
+	getDecimalCorrectedAmountBigNumber = async (amount) => { 
+		const decimals = await this.decimals();
+
+		const decimalCorrectedAmountBigNumber = utils.parseUnits(amount.toString(), decimals)
+
+		return decimalCorrectedAmountBigNumber;
 	}
 }
 
