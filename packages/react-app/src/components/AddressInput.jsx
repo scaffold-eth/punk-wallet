@@ -122,6 +122,20 @@ export default function AddressInput(props) {
         }}
         onScan={newValue => {
           if (newValue) {
+            // https://somedapp.io/pay?qr=ethereum%3Apay-0x4baB9ae28e0A45E3D6879190760C551c1E8d7F81%40324%2Ftransfer%3Faddress%3D0x01234567890abcdef00111111222222333333445
+            if (newValue.includes("pay") && newValue.includes("transfer")) {
+              const addressIndexStart = newValue.lastIndexOf("0x");
+
+              const address = newValue.substring(addressIndexStart);
+
+              console.log("address", address);
+
+              updateAddress(address);
+              setScan(false);
+
+              return;
+            }
+
             console.log("SCAN VALUE",newValue);
 
             try {

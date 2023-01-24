@@ -11,7 +11,7 @@ import moment from 'moment';
 
 const { BigNumber, ethers } = require("ethers");
 
-export default function TransactionResponseDisplay({transactionResponse, transactionManager, blockExplorer}) {
+export default function TransactionResponseDisplay({transactionResponse, transactionManager, blockExplorer, erc20TokenDisplayName}) {
   const [confirmations, setConfirmations] = useState();
   const [loadingSpeedUp, setLoadingSpeedUp] = useState(false);
   const [loadingCancel, setLoadingCancel] = useState(false);
@@ -108,6 +108,12 @@ export default function TransactionResponseDisplay({transactionResponse, transac
     }
 
     if (newTransactionResponse) {
+      if (transactionResponse?.ERC20Mode) {
+        newTransactionResponse.ERC20Mode = true;
+        newTransactionResponse.to = transactionResponse.to;
+        newTransactionResponse.erc20Value = transactionResponse.erc20Value;
+      }
+
       transactionManager.setTransactionResponse(newTransactionResponse);  
     }
     else {
@@ -164,7 +170,7 @@ export default function TransactionResponseDisplay({transactionResponse, transac
 
   return  (
     <div style={{ padding: 16 }}>
-      {(transactionResponse.hash && (transactionResponse.nonce || transactionResponse?.nonce == 0)) && <a style={{ color:'rgb(24, 144, 255)' }} href={blockExplorer + "tx/" + transactionResponse.hash}>{transactionResponse.nonce}</a>}
+      {(transactionResponse.hash && (transactionResponse.nonce || transactionResponse?.nonce == 0)) && <a style={{ color:'rgb(24, 144, 255)' }} href={blockExplorer + "tx/" + transactionResponse.hash}>{transactionResponse.ERC20Mode ? "View in explorer" : transactionResponse.nonce}</a>}
       {!isCancelTransaction(transactionResponse) ?
         <>
           <div style={{ position:"relative",left:-120, top:-30 }}>
@@ -174,7 +180,7 @@ export default function TransactionResponseDisplay({transactionResponse, transac
         
 
         
-        {(transactionResponse.value) && <p><b>Value:</b> {ethers.utils.formatEther(BigNumber.from(transactionResponse.value).toString())} Ξ</p>}
+        {(transactionResponse.value) && <p><b>{transactionResponse.ERC20Mode? "" : "Value:"}</b> {transactionResponse.ERC20Mode ? (Number(transactionResponse.erc20Value)).toFixed(2) : ethers.utils.formatEther(BigNumber.from(transactionResponse.value).toString())} {transactionResponse.ERC20Mode? (erc20TokenDisplayName + " sent") : "Ξ"}</p>}
         
         </>
 

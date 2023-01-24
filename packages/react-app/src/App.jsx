@@ -61,6 +61,14 @@ let targetNetwork = NETWORKS[cachedNetwork || "ethereum"]; // <------- select yo
 if (!targetNetwork) {
   targetNetwork = NETWORKS["ethereum"];
 }
+
+const storedERC20ModeString = window.localStorage.getItem("ERC20Mode" + targetNetwork?.name);
+let ERC20Mode = false;
+
+if (storedERC20ModeString && storedERC20ModeString == "true") {
+  ERC20Mode = true;
+}
+
 // 😬 Sorry for all the console logging
 const DEBUG = false;
 
@@ -214,7 +222,7 @@ function App(props) {
   // For more hooks, check out 🔗eth-hooks at: https://www.npmjs.com/package/eth-hooks
 
   // The transactor wraps transactions and provides notificiations
-  const tx = Transactor(userProvider, gasPrice, undefined, injectedProvider);
+  const tx = Transactor(userProvider, gasPrice, undefined, injectedProvider, ERC20Mode, address, targetNetwork);
 
   // Faucet Tx can be used to send funds from the faucet
   const faucetTx = Transactor(localProvider, gasPrice);
@@ -298,6 +306,10 @@ function App(props) {
     connector.on("call_request", async (error, payload) => {
       if (error) {
         throw error;
+      }
+
+      if (payload?.result) {
+        return;
       }
 
       console.log("REQUEST PERMISSION TO:", payload, payload.params[0]);
@@ -908,7 +920,15 @@ function App(props) {
       <div
         style={{ clear: "both", opacity: yourLocalBalance ? 1 : 0.2, width: 500, margin: "auto", position: "relative" }}
       >
-        <Balance value={yourLocalBalance} size={12 + window.innerWidth / 16} price={price} />
+        <Balance
+          value={yourLocalBalance}
+          size={12 + window.innerWidth / 16}
+          price={price}
+          userProvider={userProvider}
+          address={address}
+          targetNetwork={targetNetwork}
+          ERC20Mode={ERC20Mode}
+        />
         <span style={{ verticalAlign: "middle" }}>
           {networkSelect}
           {faucetHint}
@@ -977,6 +997,7 @@ function App(props) {
               address={address}
               provider={localProvider}
               gasPrice={gasPrice}
+              ERC20Mode={ERC20Mode}
               onChange={value => {
                 setAmount(value);
               }}
@@ -1008,14 +1029,14 @@ function App(props) {
               let value;
               try {
                 console.log("PARSE ETHER", amount);
-                value = parseEther("" + amount);
+                value =  !ERC20Mode ? parseEther("" + amount) : amount;
                 console.log("PARSEDVALUE", value);
               } catch (e) {
                 const floatVal = parseFloat(amount).toFixed(8);
 
                 console.log("floatVal", floatVal);
                 // failed to parseEther, try something else
-                value = parseEther("" + floatVal);
+                value = !ERC20Mode ? parseEther("" + floatVal) : amount;
                 console.log("PARSEDfloatVALUE", value);
               }
 
@@ -1172,14 +1193,16 @@ function App(props) {
 */}
 
       <div style={{ padding: 16, backgroundColor: "#FFFFFF", width: 420, margin: "auto" }}>
-        <TransactionResponses
+        {<TransactionResponses
           provider={userProvider}
           signer={userProvider.getSigner()}
           injectedProvider={injectedProvider}
           address={address}
           chainId={targetNetwork.chainId}
           blockExplorer={blockExplorer}
-        />
+          ERC20Mode={ERC20Mode}
+          erc20TokenDisplayName={targetNetwork?.erc20TokenDisplayName}
+        />}
       </div>
 
       <div style={{ zIndex: -1, paddingTop: 20, opacity: 0.5, fontSize: 12 }}>

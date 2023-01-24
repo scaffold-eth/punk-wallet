@@ -41,7 +41,7 @@
     "dotenv": "^8.2.0",
     "eth-hooks": "^1.1.2",
     "eth-url-parser": "^1.0.4",
-    "ethers": "^5.0.31",
+    "ethers": "^5.7.2",
     "graphiql": "^1.0.5",
     "graphql": "^15.3.0",
     "isomorphic-fetch": "^3.0.0",
@@ -58,7 +58,8 @@
     "react-router-dom": "^5.2.0",
     "react-scripts": "^3.4.3",
     "typescript": "^4.9.4",
-    "web3modal": "^1.9.11"
+    "web3modal": "^1.9.11",
+    "zksync-web3": "^0.13.4"
   },
   "devDependencies": {
     "@testing-library/dom": "^6.12.2",

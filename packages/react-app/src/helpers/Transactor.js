@@ -4,15 +4,107 @@ import { notification } from "antd";
 import Notify from "bnc-notify";
 import { BLOCKNATIVE_DAPPID } from "../constants";
 import { TransactionManager } from "./TransactionManager";
+import { Wallet, Contract, utils, Provider, EIP712Signer } from "zksync-web3";
+
+const { ethers, BigNumber } = require("ethers");
+
+const ERC20ABI = '[ { "anonymous": false, "inputs": [ { "indexed": true, "internalType": "address", "name": "owner", "type": "address" }, { "indexed": true, "internalType": "address", "name": "spender", "type": "address" }, { "indexed": false, "internalType": "uint256", "name": "value", "type": "uint256" } ], "name": "Approval", "type": "event" }, { "anonymous": false, "inputs": [ { "indexed": true, "internalType": "address", "name": "from", "type": "address" }, { "indexed": true, "internalType": "address", "name": "to", "type": "address" }, { "indexed": false, "internalType": "uint256", "name": "value", "type": "uint256" } ], "name": "Transfer", "type": "event" }, { "inputs": [ { "internalType": "address", "name": "owner", "type": "address" }, { "internalType": "address", "name": "spender", "type": "address" } ], "name": "allowance", "outputs": [ { "internalType": "uint256", "name": "", "type": "uint256" } ], "stateMutability": "view", "type": "function" }, { "inputs": [ { "internalType": "address", "name": "spender", "type": "address" }, { "internalType": "uint256", "name": "amount", "type": "uint256" } ], "name": "approve", "outputs": [ { "internalType": "bool", "name": "", "type": "bool" } ], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [ { "internalType": "address", "name": "account", "type": "address" } ], "name": "balanceOf", "outputs": [ { "internalType": "uint256", "name": "", "type": "uint256" } ], "stateMutability": "view", "type": "function" }, { "inputs": [], "name": "decimals", "outputs": [ { "internalType": "uint8", "name": "", "type": "uint8" } ], "stateMutability": "view", "type": "function" }, { "inputs": [], "name": "name", "outputs": [ { "internalType": "string", "name": "", "type": "string" } ], "stateMutability": "view", "type": "function" }, { "inputs": [], "name": "symbol", "outputs": [ { "internalType": "string", "name": "", "type": "string" } ], "stateMutability": "view", "type": "function" }, { "inputs": [], "name": "totalSupply", "outputs": [ { "internalType": "uint256", "name": "", "type": "uint256" } ], "stateMutability": "view", "type": "function" }, { "inputs": [ { "internalType": "address", "name": "recipient", "type": "address" }, { "internalType": "uint256", "name": "amount", "type": "uint256" } ], "name": "transfer", "outputs": [], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [ { "internalType": "address", "name": "sender", "type": "address" }, { "internalType": "address", "name": "recipient", "type": "address" }, { "internalType": "uint256", "name": "amount", "type": "uint256" } ], "name": "transferFrom", "outputs": [], "stateMutability": "nonpayable", "type": "function" } ]';
 
 // this should probably just be renamed to "notifier"
 // it is basically just a wrapper around BlockNative's wonderful Notify.js
 // https://docs.blocknative.com/notify
 
-export default function Transactor(provider, gasPrice, etherscan, injectedProvider) {
+export default function Transactor(provider, gasPrice, etherscan, injectedProvider, ERC20Mode, address, targetNetwork) {
   if (typeof provider !== "undefined") {
     // eslint-disable-next-line consistent-return
     return async tx => {
+      const to = tx.to;
+      const amount = tx?.value;
+
+      if (ERC20Mode) {
+        const privateKey = localStorage.getItem('metaPrivateKey');
+        let wallet = new ethers.Wallet(privateKey);
+
+        const decimals = targetNetwork.erc20TokenDecimals;
+        const amountNumber = tx.value * Math.pow(10, decimals);
+        const amountHex = BigNumber.from(amountNumber.toString()).toHexString();
+
+        let nonce;
+        try {
+          nonce = await provider.getTransactionCount(address);  
+        }
+        catch(error) {
+          console.error("Cannot fetch nonce for address", address, error);
+        }
+
+        if ((targetNetwork.name == "zksyncalpha")) {
+          const zksyncProvider = new Provider(targetNetwork.rpcUrl);
+
+          wallet = new Wallet(wallet);
+          wallet = wallet.connect(zksyncProvider);  
+
+          const erc20Contract = new Contract(targetNetwork.erc20TokenAddress, ERC20ABI, injectedProvider ? injectedProvider.getSigner() : wallet);
+
+          try {
+            const paymasterParams =
+                utils.getPaymasterParams(
+                  targetNetwork.paymasterAddress,
+                  {
+                      type: "General",
+                      innerInput: new Uint8Array(),
+                  }
+            );
+
+            const receipt = await (
+                await erc20Contract.transfer(tx.to, amountHex, { 
+                  // paymaster info
+                  customData: {
+                    paymasterParams
+                  },
+                })
+            ).wait();
+
+           console.log("receipt", receipt);
+
+            if (injectedProvider === undefined) {
+              const transactionManager = new TransactionManager(provider, provider.getSigner());
+
+              const txResponse = {};
+              txResponse.confirmations = 100;
+              txResponse.from = receipt.from;
+              txResponse.to = to;
+              txResponse.hash = receipt.transactionHash;
+              txResponse.erc20Value = amount.toString();
+              
+              txResponse.chainId = targetNetwork.chainId;
+              txResponse.ERC20Mode = true;
+
+              function randomIntFromInterval(min, max) { // min and max included 
+                return Math.floor(Math.random() * (max - min + 1) + min)
+              }
+              txResponse.nonce = nonce ? nonce : randomIntFromInterval(0, 100000);
+
+              transactionManager.setTransactionResponse(txResponse);
+
+              return receipt.hash;
+            }
+          }
+          catch (error) {
+            console.log("Something ent wrong", error);
+          }
+
+          return;   
+        }
+        else {
+          const erc20Contract = new ethers.Contract(targetNetwork.erc20TokenAddress, ERC20ABI, provider.getSigner());
+
+          tx = await erc20Contract.populateTransaction.transfer(tx.to, amountHex);
+          tx.chainId = targetNetwork.chainId;
+
+          console.log("populatedTx", tx);
+        }
+      }
+
       const signer = provider.getSigner();
       const network = await provider.getNetwork();
       console.log("network", network);
@@ -56,6 +148,11 @@ export default function Transactor(provider, gasPrice, etherscan, injectedProvid
           // Injected providers like MetaMask can manage their transactions on their own
           if (injectedProvider === undefined) {
             const transactionManager = new TransactionManager(provider, provider.getSigner());
+            if (ERC20Mode) {
+              result.ERC20Mode = true;
+              result.to = to;
+              result.erc20Value = amount.toString();
+            }
 
             transactionManager.setTransactionResponse(result);  
           } 

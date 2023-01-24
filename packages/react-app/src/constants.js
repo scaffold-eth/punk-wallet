@@ -363,6 +363,10 @@ export const NETWORKS = {
     rpcUrl: "https://polygon-mainnet.g.alchemy.com/v2/7ls4W5wc3Cu-4-Zq2QaQxgUhJKjUIDay",
     faucet: "https://faucet.matic.network/",
     blockExplorer: "https://polygonscan.com/",
+    erc20TokenAddress:"0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063",
+    erc20TokenDisplayName:"DAI", // Todo: Maybe check erc20 symbol instead of hardcoding
+    erc20TokenDecimals:18, // Todo: Same
+    networkETHName:"MATIC"
   },
   goerli: {
     name: "goerli",
@@ -400,6 +404,11 @@ export const NETWORKS = {
     rpcUrl: "https://zksync2-testnet.zksync.dev",
     blockExplorer: "https://goerli.explorer.zksync.io/",
     gasPrice: 100000000,
+    erc20TokenAddress:"0xf551954D449eA3Ae4D6A2656a42d9B9081B137b4",
+    erc20TokenDisplayName:"Buxx", // Todo: Maybe check erc20 symbol instead of hardcoding
+    erc20TokenDecimals:2, // Todo: Same
+    paymasterAddress:"0x7F904e350F27aF4D4A70994AE1f3bBC1dAfEe665",
+    networkETHName:"ZK ETH"
   },
   canto: {
     name: "canto",

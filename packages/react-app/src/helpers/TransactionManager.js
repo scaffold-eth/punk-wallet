@@ -70,6 +70,13 @@ export class TransactionManager {
 	async updateTransactionResponse(transactionResponse) {
 		let newTransactionResponse = await this.provider.getTransaction(transactionResponse.hash);
 
+		if (newTransactionResponse && transactionResponse?.ERC20Mode) {
+			newTransactionResponse.ERC20Mode = true;
+			newTransactionResponse.to = transactionResponse.to;
+			newTransactionResponse.erc20Value = transactionResponse.erc20Value;
+
+		}
+
 		this.setTransactionResponse(newTransactionResponse ? newTransactionResponse : transactionResponse);
 	}
 

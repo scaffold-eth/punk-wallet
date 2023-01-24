@@ -5,7 +5,7 @@ import InfiniteScroll from 'react-infinite-scroll-component';
 
 import { TransactionResponseDisplay } from "./";
 
-export default function TransactionHistory({ transactionResponsesArray, transactionManager, blockExplorer, useInfiniteScroll = false }) {
+export default function TransactionHistory({ transactionResponsesArray, transactionManager, blockExplorer, useInfiniteScroll = false, erc20TokenDisplayName }) {
 
   const transactionList = (
     <List
@@ -15,7 +15,7 @@ export default function TransactionHistory({ transactionResponsesArray, transact
         <List.Item>
           <List.Item.Meta
             description=
-              {<TransactionResponseDisplay transactionResponse={transactionResponse} transactionManager={transactionManager} blockExplorer={blockExplorer}/>}
+              {<TransactionResponseDisplay transactionResponse={transactionResponse} transactionManager={transactionManager} blockExplorer={blockExplorer} erc20TokenDisplayName={erc20TokenDisplayName}/>}
           />
         </List.Item>
       )}
