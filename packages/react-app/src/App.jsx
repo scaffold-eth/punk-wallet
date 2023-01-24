@@ -13,6 +13,7 @@ import {
   Address,
   AddressInput,
   Balance,
+  ERC20Balance,
   EtherInput,
   Faucet,
   GasGauge,
@@ -23,7 +24,7 @@ import {
   Wallet,
   WalletConnectTransactionDisplay,
 } from "./components";
-import { INFURA_ID, NETWORK, NETWORKS } from "./constants";
+import { INFURA_ID, NETWORK, NETWORKS, ZKSYNC_NETWORK_ID } from "./constants";
 import { Transactor } from "./helpers";
 import { useBalance, useExchangePrice, useGasPrice, useLocalStorage, usePoller, useUserProvider } from "./hooks";
 
@@ -906,7 +907,8 @@ function App(props) {
       <div
         style={{ clear: "both", opacity: yourLocalBalance ? 1 : 0.2, width: 500, margin: "auto", position: "relative" }}
       >
-        <Balance value={yourLocalBalance} size={12 + window.innerWidth / 16} price={price} />
+        {(targetNetwork?.chainId != ZKSYNC_NETWORK_ID) && <Balance value={yourLocalBalance} size={12 + window.innerWidth / 16} price={price} />}
+        {(targetNetwork?.chainId == ZKSYNC_NETWORK_ID) && <ERC20Balance size={12 + window.innerWidth / 16} /> }
         <span style={{ verticalAlign: "middle" }}>
           {networkSelect}
           {faucetHint}

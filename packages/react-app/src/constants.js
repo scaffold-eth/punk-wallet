@@ -296,6 +296,8 @@ export const NETWORK = chainId => {
   }
 };
 
+export const ZKSYNC_NETWORK_ID = 280;
+
 export const NETWORKS = {
   ethereum: {
     name: "ethereum",
