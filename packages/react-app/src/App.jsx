@@ -908,7 +908,7 @@ function App(props) {
         style={{ clear: "both", opacity: yourLocalBalance ? 1 : 0.2, width: 500, margin: "auto", position: "relative" }}
       >
         {(targetNetwork?.chainId != ZKSYNC_NETWORK_ID) && <Balance value={yourLocalBalance} size={12 + window.innerWidth / 16} price={price} />}
-        {(targetNetwork?.chainId == ZKSYNC_NETWORK_ID) && <ERC20Balance size={12 + window.innerWidth / 16} /> }
+        {(targetNetwork?.chainId == ZKSYNC_NETWORK_ID) && <ERC20Balance size={12 + window.innerWidth / 16} userProvider={userProvider} rpcURL={targetNetwork.rpcUrl} address={address} /> }
         <span style={{ verticalAlign: "middle" }}>
           {networkSelect}
           {faucetHint}

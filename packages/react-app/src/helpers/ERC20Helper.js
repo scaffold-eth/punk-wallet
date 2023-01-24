@@ -20,10 +20,17 @@ const abi = [
 
 
 class ERC20Helper {
-	constructor(tokenAddress, wallet) {
+	constructor(tokenAddress, wallet, rpcURL) {
 		this.tokenAddress = tokenAddress;
 		this.wallet = wallet;
-		this.contract = new ethers.Contract(tokenAddress, abi, wallet);
+
+		let provider;
+
+		if (!wallet) {
+			provider = new ethers.providers.StaticJsonRpcProvider(rpcURL);
+		}
+
+		this.contract = new ethers.Contract(tokenAddress, abi, wallet ? wallet : provider);
 	}
 
 	balanceOf = async (address) => { 
@@ -81,6 +88,14 @@ class ERC20Helper {
 		const decimalCorrectedAmountBigNumber = utils.parseUnits(amount.toString(), decimals)
 
 		return decimalCorrectedAmountBigNumber;
+	}
+
+	getInverseDecimalCorrectedAmountNumber = async (amount) => { 
+		const decimals = await this.decimals();
+
+		const decimalCorrectedAmountString = utils.formatUnits(amount.toString(), decimals)
+
+		return Number(decimalCorrectedAmountString);
 	}
 }
 
