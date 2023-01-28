@@ -311,7 +311,7 @@ export const NETWORKS = {
     price: 1,
     chainId: 80216,
     rpcUrl: `https://chain.buidlguidl.com:8545`,
-    //gasPrice: 1000000000,// TODO ASK RPC
+    blockExplorer: "https://etherscan.io/",
   },
   optimism: {
     name: "optimism",
