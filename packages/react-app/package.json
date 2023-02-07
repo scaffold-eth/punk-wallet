@@ -57,7 +57,7 @@
     "react-router-dom": "^5.2.0",
     "react-scripts": "^3.4.3",
     "typescript": "^4.9.4",
-    "web3modal": "^1.9.1"
+    "web3modal": "^1.9.11"
   },
   "devDependencies": {
     "@testing-library/dom": "^6.12.2",
@@ -88,9 +88,9 @@
     "extends": "react-app"
   },
   "scripts": {
-    "build": "react-scripts build",
+    "build": "react-scripts --openssl-legacy-provider build",
     "eject": "react-scripts eject",
-    "start": "react-scripts start",
+    "start": "react-scripts --openssl-legacy-provider start",
     "test": "react-scripts test",
     "lint": "eslint --config ./.eslintrc.js --ignore-path ./.eslintignore ./src/**/*",
     "ipfs": "node ./scripts/ipfs.js",

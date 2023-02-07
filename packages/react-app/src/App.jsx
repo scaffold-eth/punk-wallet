@@ -101,9 +101,11 @@ const web3Modal = new Web3Modal({
           10: "https://mainnet.optimism.io", // xDai
           100: "https://rpc.gnosischain.com", // xDai
           137: "https://polygon-rpc.com",
+          280: "https://zksync2-testnet.zksync.dev", // zksync alpha tesnet
           31337: "http://localhost:8545",
           42161: "https://arb1.arbitrum.io/rpc",
           80001: "https://rpc-mumbai.maticvigil.com",
+          80216: "https://chain.buidlguidl.com:8545",
         },
       },
     },
