@@ -4,6 +4,7 @@ import { ThemeSwitcherProvider } from "react-css-theme-switcher";
 import ReactDOM from "react-dom";
 import App from "./App";
 import "./index.css";
+import { SafeInjectProvider } from "./contexts/SafeInjectContext";
 
 const themes = {
   dark: `${process.env.PUBLIC_URL}/dark-theme.css`,
@@ -22,7 +23,9 @@ const client = new ApolloClient({
 ReactDOM.render(
   <ApolloProvider client={client}>
     <ThemeSwitcherProvider themeMap={themes} defaultTheme={prevTheme || "light"}>
-      <App subgraphUri={subgraphUri} />
+      <SafeInjectProvider>
+        <App subgraphUri={subgraphUri} />
+      </SafeInjectProvider>
     </ThemeSwitcherProvider>
   </ApolloProvider>,
   document.getElementById("root"),
