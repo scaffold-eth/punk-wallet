@@ -1199,7 +1199,7 @@ function App(props) {
         </Button>
       </div>
 
-      <div style={{ clear: "both", width: 975, margin: "auto", marginTop: 32, position: "relative" }}>
+      <div style={{ clear: "both", maxWidth: "100%", width: 975, margin: "auto", marginTop: 32, position: "relative" }}>
         {wallectConnectConnector && !wallectConnectConnector.connected && (
           <div>
             <Spin />

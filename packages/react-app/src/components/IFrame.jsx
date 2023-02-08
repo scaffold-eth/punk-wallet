@@ -11,7 +11,7 @@ const { confirm } = Modal;
 
 export default function IFrame({ address, userProvider, mainnetProvider }) {
   const cachedNetwork = window.localStorage.getItem("network");
-  const targetNetwork = NETWORKS[cachedNetwork || "mainnet"];
+  const targetNetwork = NETWORKS[cachedNetwork || "ethereum"];
 
   const { setAddress, appUrl, setAppUrl, setRpcUrl, iframeRef, newTx } = useSafeInject();
 
@@ -140,7 +140,7 @@ export default function IFrame({ address, userProvider, mainnetProvider }) {
 
   return (
     <div style={{ marginTop: 16 }}>
-      <div style={{ width: "44rem" }}>Connect via iframe:</div>
+      <div>Connect via iframe:</div>
       <div
         className="flex flex-col items-center"
         style={{
@@ -278,6 +278,7 @@ export default function IFrame({ address, userProvider, mainnetProvider }) {
             height="500rem"
             style={{
               marginTop: "1rem",
+              maxWidth: "100%",
             }}
             ref={iframeRef}
             onLoad={() => setIsIFrameLoading(false)}
