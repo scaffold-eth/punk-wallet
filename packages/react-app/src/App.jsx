@@ -17,6 +17,7 @@ import {
   Faucet,
   GasGauge,
   Header,
+  IFrame,
   QRPunkBlockie,
   Ramp,
   TransactionResponses,
@@ -1198,7 +1199,7 @@ function App(props) {
         </Button>
       </div>
 
-      <div style={{ clear: "both", width: 500, margin: "auto", marginTop: 32, position: "relative" }}>
+      <div style={{ clear: "both", width: 975, margin: "auto", marginTop: 32, position: "relative" }}>
         {wallectConnectConnector && !wallectConnectConnector.connected && (
           <div>
             <Spin />
@@ -1227,7 +1228,7 @@ function App(props) {
           ""
         )}
         <Input
-          style={{ width: "70%" }}
+          style={{ width: "40%" }}
           placeholder={"wallet connect url (or use the scanner-->)"}
           value={walletConnectUrl}
           disabled={walletConnectConnected}
@@ -1250,6 +1251,7 @@ function App(props) {
         ) : (
           ""
         )}
+        <IFrame address={address} userProvider={userProvider} mainnetProvider={mainnetProvider} />
       </div>
 
       {targetNetwork.name == "ethereum" ? (
