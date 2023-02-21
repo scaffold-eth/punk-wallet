@@ -128,7 +128,7 @@ export default function Wallet(props) {
         </div>
         <div style={{ float: "left", position: "relative", width: punkSize, height: punkSize, overflow: "hidden" }}>
           <img
-            src="/punks.png"
+            src="/buidlcastles.png"
             style={{
               position: "absolute",
               left: -punkSize * myx,
@@ -166,7 +166,7 @@ export default function Wallet(props) {
                   style={{ float: "left", position: "relative", width: punkSize, height: punkSize, overflow: "hidden" }}
                 >
                   <img
-                    src="/punks.png"
+                    src="/buidlcastles.png"
                     style={{
                       position: "absolute",
                       left: -punkSize * x,
@@ -273,7 +273,7 @@ export default function Wallet(props) {
 
           <div style={{ float: "left", position: "relative", width: punkSize, height: punkSize, overflow: "hidden" }}>
             <img
-              src="/punks.png"
+              src="/buidlcastles.png"
               style={{
                 position: "absolute",
                 left: -punkSize * myx,

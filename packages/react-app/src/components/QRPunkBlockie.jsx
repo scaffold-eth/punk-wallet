@@ -48,7 +48,7 @@ export default function QRPunkBlockie(props) {
           Copied Address
           <div style={{position:"absolute",left:-60,top:-14}}>
             <div style={{position:"relative",width:iconPunkSize, height:iconPunkSize-1, overflow: "hidden"}}>
-              <img src="/punks.png" style={{position:"absolute",left:-iconPunkSize*x,top:(-iconPunkSize*y),width:iconPunkSize*100, height:iconPunkSize*100,imageRendering:"pixelated"}} />
+              <img src="/buidlcastles.png" style={{position:"absolute",left:-iconPunkSize*x,top:(-iconPunkSize*y),width:iconPunkSize*100, height:iconPunkSize*100,imageRendering:"pixelated"}} />
             </div>
           </div>
          </span>
@@ -57,14 +57,17 @@ export default function QRPunkBlockie(props) {
 
       <div style={{position:"absolute",opacity:0.5,left:hardcodedSizeForNow/2-46,top:hardcodedSizeForNow/2-46}}>
         <Blockie address={props.address} scale={11.5}/>
-      </div>
-
-      <div style={{position:"absolute",left:hardcodedSizeForNow/2-53,top:hardcodedSizeForNow/2-65}}>
+      </div>  
+      
+      
+      <div style={{position:"absolute",left:hardcodedSizeForNow/2-56,top:hardcodedSizeForNow/2-55,transform:"scale(.82)"}}>
         <div style={{position:"relative",width:punkSize, height:punkSize-1, overflow: "hidden"}}>
-          <img src="/punks.png" style={{position:"absolute",left:-punkSize*x,top:(-punkSize*y)-1,width:punkSize*100, height:punkSize*100,imageRendering:"pixelated"}} />
+          <img src="/buidlcastles.png" style={{position:"absolute",left:-punkSize*x,top:(-punkSize*y)-1,width:punkSize*100, height:punkSize*100,imageRendering:"pixelated"}} />
         </div>
       </div>
 
+
+    
       {props.withQr ? <QR
         level={"H"}
         includeMargin={false}
