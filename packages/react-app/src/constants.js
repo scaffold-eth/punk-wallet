@@ -313,6 +313,15 @@ export const NETWORKS = {
     rpcUrl: `https://chain.buidlguidl.com:8545`,
     blockExplorer: "https://etherscan.io/",
   },
+  zksync: {
+    name: "zksync",
+    color: "#45488f",
+    price: "uniswap",
+    chainId: 324,
+    rpcUrl: "https://zksync2-mainnet.zksync.io",
+    blockExplorer: "https://explorer.zksync.io/",
+    gasPrice: 10000000,
+  },
   optimism: {
     name: "optimism",
     color: "#f01a37",
