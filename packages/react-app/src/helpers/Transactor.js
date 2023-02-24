@@ -43,6 +43,7 @@ export default function Transactor(provider, gasPrice, etherscan, injectedProvid
           console.log("AWAITING TX", tx);
           result = await tx;
         } else {
+          console.log("TX WITH GAS",tx)
           //if (!tx.gasPrice) {
           //  tx.gasPrice = gasPrice || parseUnits("4.1", "gwei");
           //}

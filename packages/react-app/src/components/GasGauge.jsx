@@ -33,7 +33,7 @@ export default function GasGauge(props) {
           ⛽️
         </span>
       </span>
-      {typeof props.gasPrice === "undefined" ? 0 : parseInt(props.gasPrice, 10) / 10 ** 9}g
+      {typeof props.gasPrice === "undefined" ? 0 : (parseInt(props.gasPrice, 10) / 10 ** 9).toFixed(2)}g
     </Button>
   );
 }

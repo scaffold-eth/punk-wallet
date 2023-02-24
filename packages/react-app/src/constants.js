@@ -319,8 +319,7 @@ export const NETWORKS = {
     price: "uniswap",
     chainId: 324,
     rpcUrl: "https://zksync2-mainnet.zksync.io",
-    blockExplorer: "https://explorer.zksync.io/",
-    gasPrice: 10000000,
+    blockExplorer: "https://explorer.zksync.io/"
   },
   optimism: {
     name: "optimism",
