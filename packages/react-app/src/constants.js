@@ -321,6 +321,12 @@ export const NETWORKS = {
     rpcUrl: "https://zksync2-mainnet.zksync.io",
     blockExplorer: "https://explorer.zksync.io/",
     gasPrice: 10000000,
+    erc20TokenAddress:"0x1bbA25233556a7C3b41913F35A035916DbeD1664",
+    erc20TokenDisplayName:"Buxx", // Todo: Maybe check erc20 symbol instead of hardcoding
+    erc20TokenDecimals:2, // Todo: Same
+    paymasterAddress:"0xfC5B07a5dd1b80cf271D35642f75cC0500fF1e2C",
+    networkETHName:"ZK ETH"
+    
   },
   optimism: {
     name: "optimism",
