@@ -1,13 +1,20 @@
 import { Divider, Spin } from "antd";
 import React, { useEffect, useState } from "react";
-import { convertHexToNumber, convertHexToUtf8 } from "@walletconnect/utils";
 import axios from "axios";
 
 const { BigNumber, ethers } = require("ethers");
 
 const convertHexToUtf8IfPossible = (hex) => {
   try {
-    return convertHexToUtf8(hex);
+    return ethers.utils.toUtf8String(hex);
+  } catch (e) {
+    return hex;
+  }
+}
+
+const convertHexToNumber = (hex) => {
+  try {
+    return BigNumber.from(hex).toNumber();
   } catch (e) {
     return hex;
   }

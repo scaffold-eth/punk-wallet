@@ -30,6 +30,11 @@ import { useBalance, useExchangePrice, useGasPrice, useLocalStorage, usePoller, 
 
 import WalletConnect from "@walletconnect/client";
 
+// Wallet Connect V2 imports
+import { Core } from "@walletconnect/core";
+import { Web3Wallet } from "@walletconnect/web3wallet";
+import { isWalletConnectV2Connected, disconnectWallectConnectV2Sessions, connectWalletConnectV2 } from "./helpers/WalletConnectV2Helper";
+
 import { TransactionManager } from "./helpers/TransactionManager";
 import { sendTransaction } from "./helpers/EIP1559Helper";
 
@@ -453,16 +458,43 @@ function App(props) {
       }
       console.log("disconnect");
 
-      localStorage.removeItem("walletConnectUrl");
-      localStorage.removeItem("wallectConnectConnectorSession");
-
-      setTimeout(() => {
-        window.location.reload();
-      }, 1);
-
-      // Delete connector
+      disconnectFromWalletConnect();
     });
   };
+
+  const disconnectFromWalletConnect = async (wallectConnectConnector, web3wallet) => {
+    try {
+      if (wallectConnectConnector) {
+        console.log("Disconnect from Wallet Connect V1");
+        await wallectConnectConnector.killSession();
+      }   
+    }
+    catch (error) {
+      console.error("Coudn't disconnect from Wallet Connect V1", error)
+    }
+
+    try {
+      if (web3wallet && isWalletConnectV2Connected(web3wallet)) {
+        console.log("Disconnect from Wallet Connect V2");
+        await disconnectWallectConnectV2Sessions(web3wallet);
+      }
+    }
+    catch (error) {
+      console.error("Coudn't disconnect from Wallet Connect V2", error)
+
+      // This is a hack to remove the session manually
+      // Otherwise if an old session is stuck, we cannot delete it
+      localStorage.removeItem("wc@2:client:0.3//session");
+    }    
+    
+    setWalletConnectUrl("");
+    setWalletConnectPeerMeta();
+    setWallectConnectConnector();
+    setWallectConnectConnectorSession("");
+
+    // This has to be the last, so we don't try to reconnect in "Wallet Connect Hook" too early
+    setWalletConnectConnected(false);
+  }
 
   const [walletConnectUrl, setWalletConnectUrl] = useLocalStorage("walletConnectUrl");
   const [walletConnectConnected, setWalletConnectConnected] = useState();
@@ -473,6 +505,110 @@ function App(props) {
   const [wallectConnectConnectorSession, setWallectConnectConnectorSession] = useLocalStorage(
     "wallectConnectConnectorSession",
   );
+
+  const [web3wallet, setWeb3wallet] = useState();
+  // Wallet Connect V2 initialization and listeners
+  useEffect(() => {
+    if (!address) {
+      return;
+    }
+
+    async function initWeb3wallet() {
+      const core = new Core({
+        logger: 'debug',
+        projectId: process.env.REACT_APP_WALLET_CONNECT_PROJECT_ID,
+      });
+
+      const web3wallet = await Web3Wallet.init({
+        core, // <- pass the shared `core` instance
+        metadata: {
+          description: "Forkable web wallet for small/quick transactions.",
+          url: "https://punkwallet.io",
+          icons: ["https://punkwallet.io/punk.png"],
+          name: "🧑‍🎤 PunkWallet.io",
+        },
+      });
+
+      web3wallet.on("session_proposal", async (proposal) => {
+        console.log("proposal", proposal);
+
+        if (isWalletConnectV2Connected(web3wallet)) {
+          await disconnectFromWalletConnect(undefined, web3wallet);
+        }
+
+        const { id, params } = proposal;
+        const { proposer, requiredNamespaces, relays } = params;
+
+        const namespaces = {}
+        Object.keys(requiredNamespaces).forEach(key => {
+          const accounts = []
+          requiredNamespaces[key].chains.map(chain => {
+            [address].map((acc) => accounts.push(`${chain}:${acc}`));
+          })
+          namespaces[key] = {
+            accounts,
+            methods: requiredNamespaces[key].methods,
+            events: requiredNamespaces[key].events
+          }
+        })
+
+        await web3wallet.approveSession({
+          id,
+          relayProtocol: relays[0].protocol,
+          namespaces
+        })
+
+        connectWalletConnectV2(web3wallet, setWalletConnectConnected, setWalletConnectPeerMeta);
+      });
+
+      web3wallet.on("session_request", async (event) => {
+        console.log("session_request event", event);
+      });
+
+      web3wallet.on("session_delete", async (event) => {
+        console.log("session_delete event", event);
+
+        await disconnectFromWalletConnect(undefined, web3wallet);
+      });
+
+      web3wallet.on("session_event", async (event) => {
+        console.log("session_event event", event);
+      });
+
+      setWeb3wallet(web3wallet);
+    }
+
+    initWeb3wallet();
+  }, [address]);
+
+  useEffect(() => {
+    if (!web3wallet) {
+      return;
+    }
+
+    connectWalletConnectV2(web3wallet, setWalletConnectConnected, setWalletConnectPeerMeta);
+  }, [web3wallet]);
+
+  // Add an event listener to kill Wallet Connect V1 session when V2 Dapp reconnects
+  // and there was an existing V1 session
+  useEffect(() => {
+    if (!web3wallet || !wallectConnectConnector) {
+      return;
+    }
+
+    const listener = () => {
+      if (wallectConnectConnector) {
+        console.log("Kill Wallet Connect V1 session");
+        wallectConnectConnector.killSession();
+      }
+    }
+
+    web3wallet.on("session_proposal", listener);
+
+    return () => {
+      web3wallet.off("session_proposal", listener);      
+    }
+  }, [web3wallet, wallectConnectConnector]);
 
   useEffect(() => {
     if (wallectConnectConnector && wallectConnectConnector.connected && address && localChainId) {
@@ -511,18 +647,19 @@ function App(props) {
     });
   };
 
+  // "Wallet Connect Hook"
   useEffect(() => {
     if (!walletConnectConnected && address) {
-      let nextSession = localStorage.getItem("wallectConnectNextSession");
-      if (nextSession) {
-        localStorage.removeItem("wallectConnectNextSession");
-        console.log("FOUND A NEXT SESSION IN CACHE");
-        setWalletConnectUrl(nextSession);
-      } else if (wallectConnectConnectorSession) {
+      if (wallectConnectConnectorSession) {
         console.log("NOT CONNECTED AND wallectConnectConnectorSession", wallectConnectConnectorSession);
         connectWallet(wallectConnectConnectorSession);
         setWalletConnectConnected(true);
-      } else if (walletConnectUrl /*&&!walletConnectUrlSaved*/) {
+      } else if (walletConnectUrl ) {
+        // Version 2 is handled separately
+        if (walletConnectUrl.includes("@2")) {
+          return;
+        }
+
         //CLEAR LOCAL STORAGE?!?
         console.log("clear local storage and connect...");
         localStorage.removeItem("walletconnect"); // lololol
@@ -549,7 +686,20 @@ function App(props) {
         );
       }
     }
-  }, [walletConnectUrl, address]);
+  }, [walletConnectUrl, address, walletConnectConnected, wallectConnectConnectorSession]);
+
+  useEffect(() => {
+    if (walletConnectUrl && walletConnectUrl.includes("@2") && web3wallet && !isWalletConnectV2Connected(web3wallet)) {
+      console.log(" 📡 Connecting to Wallet Connect V2....", walletConnectUrl);
+      try {
+        web3wallet.core.pairing.pair({ uri:walletConnectUrl })  
+      }
+      catch (error) {
+        console.log("Cannot create pairing", error);
+        setWalletConnectUrl("");
+      }
+    }
+  }, [walletConnectUrl, web3wallet]);
 
   useMemo(() => {
     if (address && window.location.pathname) {
@@ -932,7 +1082,7 @@ function App(props) {
             hoistScanner={toggle => {
               scanner = toggle;
             }}
-            walletConnect={wcLink => {
+            walletConnect={async wcLink => {
               //if(walletConnectUrl){
               /*try{
                   //setWalletConnectConnected(false);
@@ -950,16 +1100,11 @@ function App(props) {
                 window.location.replace('/wc?uri='+wcLink);
               },500)*/
 
-              if (walletConnectUrl) {
-                //existing session... need to kill it and then connect new one....
-                setWalletConnectConnected(false);
-                if (wallectConnectConnector) wallectConnectConnector.killSession();
-                localStorage.removeItem("walletConnectUrl");
-                localStorage.removeItem("wallectConnectConnectorSession");
-                localStorage.setItem("wallectConnectNextSession", wcLink);
-              } else {
-                setWalletConnectUrl(wcLink);
+              if (walletConnectConnected) {
+                await disconnectFromWalletConnect(wallectConnectConnector, web3wallet);
               }
+
+              setWalletConnectUrl(wcLink);
             }}
           />
         </div>
@@ -1229,9 +1374,9 @@ function App(props) {
           ""
         )}
         <Input
-          style={{ width: "40%" }}
+          style={{ width: "40%", textAlign: "center" }}
           placeholder={"wallet connect url (or use the scanner-->)"}
-          value={walletConnectUrl}
+          value={walletConnectPeerMeta?.name ? walletConnectPeerMeta.name : walletConnectUrl}
           disabled={walletConnectConnected}
           onChange={e => {
             setWalletConnectUrl(e.target.value);
@@ -1241,10 +1386,7 @@ function App(props) {
           <span
             style={{ cursor: "pointer", padding: 10, fontSize: 30, position: "absolute", top: -18 }}
             onClick={() => {
-              setWalletConnectConnected(false);
-              if (wallectConnectConnector) wallectConnectConnector.killSession();
-              localStorage.removeItem("walletConnectUrl");
-              localStorage.removeItem("wallectConnectConnectorSession");
+              disconnectFromWalletConnect(wallectConnectConnector, web3wallet);
             }}
           >
             🗑
