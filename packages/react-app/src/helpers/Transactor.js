@@ -4,6 +4,7 @@ import { notification } from "antd";
 import Notify from "bnc-notify";
 import { BLOCKNATIVE_DAPPID } from "../constants";
 import { TransactionManager } from "./TransactionManager";
+import { sendTransaction } from "./EIP1559Helper";
 
 // this should probably just be renamed to "notifier"
 // it is basically just a wrapper around BlockNative's wonderful Notify.js
@@ -51,7 +52,7 @@ export default function Transactor(provider, gasPrice, etherscan, injectedProvid
           //  tx.gasLimit = hexlify(120000);
           //}
           console.log("RUNNING TX", tx);
-          result = await signer.sendTransaction(tx);
+          result = await sendTransaction(tx, signer, injectedProvider)
 
           // Store transactionResponse in localStorage, so we can speed up the transaction if needed
           // Injected providers like MetaMask can manage their transactions on their own
