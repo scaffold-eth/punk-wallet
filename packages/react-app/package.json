@@ -24,6 +24,8 @@
     "@uniswap/sdk": "^3.0.3",
     "@uniswap/v2-periphery": "^1.1.0-beta.0",
     "@walletconnect/web3-provider": "^1.6.5",
+    "@walletconnect/web3wallet": "^1.7.0",
+    "@walletconnect/utils": "^2.7.2",
     "antd": "^4.7.0",
     "apollo-boost": "^0.4.9",
     "apollo-client": "^2.6.10",
