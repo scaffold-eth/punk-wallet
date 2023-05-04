@@ -31,6 +31,7 @@ import { useBalance, useExchangePrice, useGasPrice, useLocalStorage, usePoller, 
 import WalletConnect from "@walletconnect/client";
 
 import { TransactionManager } from "./helpers/TransactionManager";
+import { sendTransaction } from "./helpers/EIP1559Helper";
 
 const { confirm } = Modal;
 
@@ -396,7 +397,7 @@ function App(props) {
                 delete params.data;
               }
 
-              result = await signer.sendTransaction(params);
+              result = await sendTransaction(params, signer);
 
               const transactionManager = new TransactionManager(userProvider, signer, true);
               transactionManager.setTransactionResponse(result);

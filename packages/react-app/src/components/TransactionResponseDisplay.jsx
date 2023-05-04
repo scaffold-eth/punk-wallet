@@ -39,11 +39,15 @@ export default function TransactionResponseDisplay({transactionResponse, transac
   useEffect(() => {
     updateConfirmations();
 
+    // Skip estimation, transactions are confirmed on mainnet quickly, in the next 1 or two blocks.
+    // https://github.com/ethers-io/ethers.js/issues/2828#issuecomment-1283014250
+    /*
     if ((transactionResponse.confirmations > 0) || (transactionResponse?.chainId != NETWORKS.ethereum.chainId)) {
       return;
     }
 
     getConfirmationEstimation(transactionResponse.gasPrice);
+    */
   },[transactionResponse, transactionManager]);
 
   useEffect(() => {
@@ -84,7 +88,6 @@ export default function TransactionResponseDisplay({transactionResponse, transac
       setLoadingSpeedUp(true);
     }
     
-
     let newTransactionResponse;
     try {
       if (cancelTransaction) {
@@ -95,6 +98,16 @@ export default function TransactionResponseDisplay({transactionResponse, transac
       }
 
       transactionManager.log("handleSpeedUp", newTransactionResponse, transactionResponse.hash);  
+
+      // Sleep a little bit, the previous tx might have been confirmed in the meantime
+      await new Promise(r => setTimeout(r, 6000));
+
+      let confirmations = await transactionManager.getConfirmations(transactionResponse);
+
+      if (confirmations > 0) {
+        console.log("Previous tx has been confirmed");
+        newTransactionResponse = undefined;
+      }
     }
     catch(error){
       transactionManager.log("speedUpTransaction failed, previous transactionHash was probably comfirmed in the meantime", transactionResponse.hash, error);
@@ -191,7 +204,7 @@ export default function TransactionResponseDisplay({transactionResponse, transac
             <Popover placement="right" content={getTransactionPopoverContent()} trigger="click">
               <Button style={{ padding: 0 }}type="link" >Transaction</Button>
             </Popover>
-            <b> {transactionResponse.nonce} </b> is pending, <b> gasPrice: {getGasPriceGwei()} </b>            
+            <b> {transactionResponse.nonce} </b> is pending, <b> {transactionResponse.gasPrice ? "gasPrice:" : "priorityFee:"} {getGasPriceGwei()} </b>            
           </div>
 
           <div>
