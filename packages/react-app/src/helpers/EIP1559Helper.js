@@ -28,9 +28,17 @@ export const getEthersWallet = (txParams) => {
 
 	const ethersProvider = new ethers.providers.StaticJsonRpcProvider(rpcUrl);
 
+	return createEthersWallet(ethersProvider);
+}
+
+export const createEthersWallet = (ethersProvider) => {
 	const privakeKey = localStorage.getItem('metaPrivateKey');
 
-	return new ethers.Wallet(privakeKey, ethersProvider);
+	if (ethersProvider) {
+		return new ethers.Wallet(privakeKey, ethersProvider);
+	}
+
+	return new ethers.Wallet(privakeKey);
 }
 
 // Create EIP-1559 type-2 transactions on mainnet and polygon

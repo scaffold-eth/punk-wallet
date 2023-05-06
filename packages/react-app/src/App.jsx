@@ -22,7 +22,8 @@ import {
   Ramp,
   TransactionResponses,
   Wallet,
-  WalletConnectTransactionDisplay,
+  WalletConnectTransactionPopUp,
+  WalletConnectV2ConnectionError
 } from "./components";
 import { INFURA_ID, NETWORK, NETWORKS } from "./constants";
 import { Transactor } from "./helpers";
@@ -30,10 +31,14 @@ import { useBalance, useExchangePrice, useGasPrice, useLocalStorage, usePoller, 
 
 import WalletConnect from "@walletconnect/client";
 
-// Wallet Connect V2 imports
-import { Core } from "@walletconnect/core";
-import { Web3Wallet } from "@walletconnect/web3wallet";
-import { isWalletConnectV2Connected, disconnectWallectConnectV2Sessions, connectWalletConnectV2 } from "./helpers/WalletConnectV2Helper";
+import {
+  isWalletConnectV2Connected,
+  disconnectWallectConnectV2Sessions,
+  connectWalletConnectV2,
+  updateWalletConnectSession,
+  createWeb3wallet,
+  onSessionProposal
+} from "./helpers/WalletConnectV2Helper";
 
 import { TransactionManager } from "./helpers/TransactionManager";
 import { sendTransaction } from "./helpers/EIP1559Helper";
@@ -305,151 +310,11 @@ function App(props) {
         throw error;
       }
 
-      console.log("REQUEST PERMISSION TO:", payload, payload.params[0]);
-      // Handle Call Request
-      //console.log("SETTING TO",payload.params[0].to)
+      console.log("call_request payload", payload);
 
-      //setWalletConnectTx(true)
-
-      //setToAddress(payload.params[0].to)
-      //setData(payload.params[0].data?payload.params[0].data:"0x0000")
-
-      //let bigNumber = ethers.BigNumber.from(payload.params[0].value)
-      //console.log("bigNumber",bigNumber)
-
-      //let newAmount = ethers.utils.formatEther(bigNumber)
-      //console.log("newAmount",newAmount)
-      //if(props.price){
-      //  newAmount = newAmount.div(props.price)
-      //}
-      //setAmount(newAmount)
-
-      /* payload:
-      {
-        id: 1,
-        jsonrpc: '2.0'.
-        method: 'eth_sign',
-        params: [
-          "0xbc28ea04101f03ea7a94c1379bc3ab32e65e62d3",
-          "My email is john@doe.com - 1537836206101"
-        ]
-      }
-      */
-
-      //setWalletModalData({payload:payload,connector: connector})
-
-      // https://github.com/WalletConnect/walletconnect-test-wallet/blob/7b209c10f02014ed5644fc9991de94f9d96dcf9d/src/engines/ethereum.ts#L45-L104
-      let title;
-
-      switch (payload.method) {
-        case "eth_sendTransaction":
-          title = "Send Transaction?";
-          break;
-        case "eth_signTransaction":
-          title = "Sign Transaction?";
-          break;
-        case "eth_sign":
-        case "personal_sign":
-          title = "Sign Message?";
-          break;
-        case "eth_signTypedData":
-          title = "Sign Typed Data?";
-          break;
-        default:
-          title = "Unknown method";
-          break;
-      }
-
-      confirm({
-        width: "90%",
-        size: "large",
-        title: title,
-        icon: <SendOutlined />,
-        content: (
-          <WalletConnectTransactionDisplay
-            payload={payload}
-            provider={mainnetProvider}
-            chainId={targetNetwork.chainId}
-          />
-        ),
-        onOk: async () => {
-          let result;
-
-          if (payload.method === "eth_sendTransaction") {
-            try {
-              let signer = userProvider.getSigner();
-
-              // I'm not sure if all the Dapps send an array or not
-              let params = payload.params;
-              if (Array.isArray(params)) {
-                params = params[0];
-              }
-
-              // Ethers uses gasLimit instead of gas
-              let gasLimit = params.gas;
-              params.gasLimit = gasLimit;
-              delete params.gas;
-
-              // Speed up transaction list is filtered by chainId
-              if (!params.chainId) {
-                params.chainId = targetNetwork.chainId;
-              }
-
-              // Remove empty data
-              // I assume wallet connect adds "data" here: https://github.com/WalletConnect/walletconnect-monorepo/blob/7573fa9e1d91588d4af3409159b4fd2f9448a0e2/packages/helpers/utils/src/ethereum.ts#L78
-              // And ethers cannot hexlify this: https://github.com/ethers-io/ethers.js/blob/8b62aeff9cce44cbd16ff41f8fc01ebb101f8265/packages/providers/src.ts/json-rpc-provider.ts#L694
-              if (params.data === "") {
-                delete params.data;
-              }
-
-              result = await sendTransaction(params, signer);
-
-              const transactionManager = new TransactionManager(userProvider, signer, true);
-              transactionManager.setTransactionResponse(result);
-            } catch (error) {
-              // Fallback to original code without the speed up option
-              console.error("Coudn't create transaction which can be speed up", error);
-              result = await userProvider.send(payload.method, payload.params);
-            }
-          } else {
-            result = await userProvider.send(payload.method, payload.params);
-          }
-
-          //console.log("MSG:",ethers.utils.toUtf8Bytes(msg).toString())
-
-          //console.log("payload.params[0]:",payload.params[1])
-          //console.log("address:",address)
-
-          //let userSigner = userProvider.getSigner()
-          //let result = await userSigner.signMessage(msg)
-          console.log("RESULT:", result);
-
-          let wcRecult = result.hash ? result.hash : result.raw ? result.raw : result;
-
-          connector.approveRequest({
-            id: payload.id,
-            result: wcRecult,
-          });
-
-          notification.info({
-            message: "Wallet Connect Transaction Sent",
-            description: wcRecult,
-            placement: "bottomRight",
-          });
-        },
-        onCancel: () => {
-          console.log("Cancel");
-          connector.rejectRequest({
-            id: payload.id,
-            error: { message: "User rejected" },
-          });
-        },
-      });
-      //setIsWalletModalVisible(true)
-      //if(payload.method == "personal_sign"){
-      //  console.log("SIGNING A MESSAGE!!!")
-      //const msg = payload.params[0]
-      //}
+      WalletConnectTransactionPopUp(
+        payload, userProvider, connector, undefined,
+        targetNetwork.chainId);
     });
 
     connector.on("disconnect", (error, payload) => {
@@ -514,55 +379,32 @@ function App(props) {
     }
 
     async function initWeb3wallet() {
-      const core = new Core({
-        logger: 'debug',
-        projectId: process.env.REACT_APP_WALLET_CONNECT_PROJECT_ID,
-      });
+      const web3wallet = await createWeb3wallet();
 
-      const web3wallet = await Web3Wallet.init({
-        core, // <- pass the shared `core` instance
-        metadata: {
-          description: "Forkable web wallet for small/quick transactions.",
-          url: "https://punkwallet.io",
-          icons: ["https://punkwallet.io/punk.png"],
-          name: "🧑‍🎤 PunkWallet.io",
-        },
-      });
-
-      web3wallet.on("session_proposal", async (proposal) => {
-        console.log("proposal", proposal);
-
-        if (isWalletConnectV2Connected(web3wallet)) {
-          await disconnectFromWalletConnect(undefined, web3wallet);
+      web3wallet.on(
+        "session_proposal",
+        (proposal) => {
+          onSessionProposal(
+            web3wallet,
+            address,
+            proposal,
+            disconnectFromWalletConnect,
+            setWalletConnectUrl,
+            setWalletConnectConnected,
+            setWalletConnectPeerMeta);
         }
+      )
 
-        const { id, params } = proposal;
-        const { proposer, requiredNamespaces, relays } = params;
+      web3wallet.on("session_request", async (requestEvent) => {
+        console.log("session_request requestEvent", requestEvent);
 
-        const namespaces = {}
-        Object.keys(requiredNamespaces).forEach(key => {
-          const accounts = []
-          requiredNamespaces[key].chains.map(chain => {
-            [address].map((acc) => accounts.push(`${chain}:${acc}`));
-          })
-          namespaces[key] = {
-            accounts,
-            methods: requiredNamespaces[key].methods,
-            events: requiredNamespaces[key].events
-          }
-        })
-
-        await web3wallet.approveSession({
-          id,
-          relayProtocol: relays[0].protocol,
-          namespaces
-        })
-
-        connectWalletConnectV2(web3wallet, setWalletConnectConnected, setWalletConnectPeerMeta);
+        WalletConnectTransactionPopUp(
+        requestEvent, userProvider, undefined, web3wallet,
+        targetNetwork.chainId);
       });
 
-      web3wallet.on("session_request", async (event) => {
-        console.log("session_request event", event);
+      web3wallet.on("session_update", async (event) => {
+        console.log("session_update event", event);
       });
 
       web3wallet.on("session_delete", async (event) => {
@@ -572,7 +414,23 @@ function App(props) {
       });
 
       web3wallet.on("session_event", async (event) => {
-        console.log("session_event event", event);
+        console.log("session_event", event);
+      });
+
+      web3wallet.on("session_ping", async (event) => {
+        console.log("session_ping", event);
+      });
+
+      web3wallet.on("session_expire", async (event) => {
+        console.log("session_expire", event);
+      });
+
+      web3wallet.on("session_extend", async (event) => {
+        console.log("session_extend", event);
+      });
+
+      web3wallet.on("proposal_expire", async (event) => {
+        console.log("proposal_expire", event);
       });
 
       setWeb3wallet(web3wallet);
@@ -638,14 +496,7 @@ function App(props) {
         updateWalletConnectSession(wallectConnectConnector, address, localChainId);
       }
     }
-  }, [address, localChainId]);
-
-  const updateWalletConnectSession = (wallectConnectConnector, address, chainId) => {
-    wallectConnectConnector.updateSession({
-      accounts: [address],
-      chainId: localChainId,
-    });
-  };
+  }, [address, localChainId, wallectConnectConnector]);
 
   // "Wallet Connect Hook"
   useEffect(() => {
@@ -689,21 +540,28 @@ function App(props) {
   }, [walletConnectUrl, address, walletConnectConnected, wallectConnectConnectorSession]);
 
   useEffect(() => {
-    if (walletConnectUrl && walletConnectUrl.includes("@2") && web3wallet && !isWalletConnectV2Connected(web3wallet)) {
-      console.log(" 📡 Connecting to Wallet Connect V2....", walletConnectUrl);
-      try {
-        web3wallet.core.pairing.pair({ uri:walletConnectUrl })  
-      }
-      catch (error) {
-        console.log("Cannot create pairing", error);
-        setWalletConnectUrl("");
+    async function pairWalletConnectV2() {
+      if (walletConnectUrl && walletConnectUrl.includes("@2") && web3wallet && !isWalletConnectV2Connected(web3wallet)) {
+        console.log(" 📡 Connecting to Wallet Connect V2....", walletConnectUrl);
+        try {
+         await web3wallet.core.pairing.pair({ uri:walletConnectUrl })  
+        }
+        catch (error) {
+          console.log("Cannot create pairing", error);
+          WalletConnectV2ConnectionError(error, undefined);
+          setWalletConnectUrl("");
+        }
       }
     }
+
+    pairWalletConnectV2();
+    
   }, [walletConnectUrl, web3wallet]);
 
   useMemo(() => {
     if (address && window.location.pathname) {
       if (window.location.pathname.indexOf("/wc") >= 0) {
+        // ToDo
         console.log("WALLET CONNECT!!!!!", window.location.search);
         let uri = window.location.search.replace("?uri=", "");
         console.log("WC URI:", uri);
@@ -1394,7 +1252,7 @@ function App(props) {
         ) : (
           ""
         )}
-        <IFrame address={address} userProvider={userProvider} mainnetProvider={mainnetProvider} />
+        <IFrame address={address} userProvider={userProvider} />
       </div>
 
       {targetNetwork.name == "ethereum" ? (
