@@ -2,7 +2,7 @@ import { CameraOutlined, QrcodeOutlined } from "@ant-design/icons";
 import { Badge, Input, message, Spin } from "antd";
 import { useLookupAddress } from "eth-hooks";
 import React, { useCallback, useState } from "react";
-import QrReader from "react-qr-reader";
+import QrReader from "react-qr-reader-es6";
 import { QRPunkBlockie } from ".";
 
 // probably we need to change value={toAddress} to address={toAddress}
