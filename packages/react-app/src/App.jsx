@@ -22,13 +22,23 @@ import {
   Ramp,
   TransactionResponses,
   Wallet,
-  WalletConnectTransactionDisplay,
+  WalletConnectTransactionPopUp,
+  WalletConnectV2ConnectionError
 } from "./components";
 import { INFURA_ID, NETWORK, NETWORKS } from "./constants";
 import { Transactor } from "./helpers";
 import { useBalance, useExchangePrice, useGasPrice, useLocalStorage, usePoller, useUserProvider } from "./hooks";
 
 import WalletConnect from "@walletconnect/client";
+
+import {
+  isWalletConnectV2Connected,
+  disconnectWallectConnectV2Sessions,
+  connectWalletConnectV2,
+  updateWalletConnectSession,
+  createWeb3wallet,
+  onSessionProposal
+} from "./helpers/WalletConnectV2Helper";
 
 import { TransactionManager } from "./helpers/TransactionManager";
 import { sendTransaction } from "./helpers/EIP1559Helper";
@@ -300,151 +310,11 @@ function App(props) {
         throw error;
       }
 
-      console.log("REQUEST PERMISSION TO:", payload, payload.params[0]);
-      // Handle Call Request
-      //console.log("SETTING TO",payload.params[0].to)
+      console.log("call_request payload", payload);
 
-      //setWalletConnectTx(true)
-
-      //setToAddress(payload.params[0].to)
-      //setData(payload.params[0].data?payload.params[0].data:"0x0000")
-
-      //let bigNumber = ethers.BigNumber.from(payload.params[0].value)
-      //console.log("bigNumber",bigNumber)
-
-      //let newAmount = ethers.utils.formatEther(bigNumber)
-      //console.log("newAmount",newAmount)
-      //if(props.price){
-      //  newAmount = newAmount.div(props.price)
-      //}
-      //setAmount(newAmount)
-
-      /* payload:
-      {
-        id: 1,
-        jsonrpc: '2.0'.
-        method: 'eth_sign',
-        params: [
-          "0xbc28ea04101f03ea7a94c1379bc3ab32e65e62d3",
-          "My email is john@doe.com - 1537836206101"
-        ]
-      }
-      */
-
-      //setWalletModalData({payload:payload,connector: connector})
-
-      // https://github.com/WalletConnect/walletconnect-test-wallet/blob/7b209c10f02014ed5644fc9991de94f9d96dcf9d/src/engines/ethereum.ts#L45-L104
-      let title;
-
-      switch (payload.method) {
-        case "eth_sendTransaction":
-          title = "Send Transaction?";
-          break;
-        case "eth_signTransaction":
-          title = "Sign Transaction?";
-          break;
-        case "eth_sign":
-        case "personal_sign":
-          title = "Sign Message?";
-          break;
-        case "eth_signTypedData":
-          title = "Sign Typed Data?";
-          break;
-        default:
-          title = "Unknown method";
-          break;
-      }
-
-      confirm({
-        width: "90%",
-        size: "large",
-        title: title,
-        icon: <SendOutlined />,
-        content: (
-          <WalletConnectTransactionDisplay
-            payload={payload}
-            provider={mainnetProvider}
-            chainId={targetNetwork.chainId}
-          />
-        ),
-        onOk: async () => {
-          let result;
-
-          if (payload.method === "eth_sendTransaction") {
-            try {
-              let signer = userProvider.getSigner();
-
-              // I'm not sure if all the Dapps send an array or not
-              let params = payload.params;
-              if (Array.isArray(params)) {
-                params = params[0];
-              }
-
-              // Ethers uses gasLimit instead of gas
-              let gasLimit = params.gas;
-              params.gasLimit = gasLimit;
-              delete params.gas;
-
-              // Speed up transaction list is filtered by chainId
-              if (!params.chainId) {
-                params.chainId = targetNetwork.chainId;
-              }
-
-              // Remove empty data
-              // I assume wallet connect adds "data" here: https://github.com/WalletConnect/walletconnect-monorepo/blob/7573fa9e1d91588d4af3409159b4fd2f9448a0e2/packages/helpers/utils/src/ethereum.ts#L78
-              // And ethers cannot hexlify this: https://github.com/ethers-io/ethers.js/blob/8b62aeff9cce44cbd16ff41f8fc01ebb101f8265/packages/providers/src.ts/json-rpc-provider.ts#L694
-              if (params.data === "") {
-                delete params.data;
-              }
-
-              result = await sendTransaction(params, signer);
-
-              const transactionManager = new TransactionManager(userProvider, signer, true);
-              transactionManager.setTransactionResponse(result);
-            } catch (error) {
-              // Fallback to original code without the speed up option
-              console.error("Coudn't create transaction which can be speed up", error);
-              result = await userProvider.send(payload.method, payload.params);
-            }
-          } else {
-            result = await userProvider.send(payload.method, payload.params);
-          }
-
-          //console.log("MSG:",ethers.utils.toUtf8Bytes(msg).toString())
-
-          //console.log("payload.params[0]:",payload.params[1])
-          //console.log("address:",address)
-
-          //let userSigner = userProvider.getSigner()
-          //let result = await userSigner.signMessage(msg)
-          console.log("RESULT:", result);
-
-          let wcRecult = result.hash ? result.hash : result.raw ? result.raw : result;
-
-          connector.approveRequest({
-            id: payload.id,
-            result: wcRecult,
-          });
-
-          notification.info({
-            message: "Wallet Connect Transaction Sent",
-            description: wcRecult,
-            placement: "bottomRight",
-          });
-        },
-        onCancel: () => {
-          console.log("Cancel");
-          connector.rejectRequest({
-            id: payload.id,
-            error: { message: "User rejected" },
-          });
-        },
-      });
-      //setIsWalletModalVisible(true)
-      //if(payload.method == "personal_sign"){
-      //  console.log("SIGNING A MESSAGE!!!")
-      //const msg = payload.params[0]
-      //}
+      WalletConnectTransactionPopUp(
+        payload, userProvider, connector, undefined,
+        targetNetwork.chainId);
     });
 
     connector.on("disconnect", (error, payload) => {
@@ -453,16 +323,43 @@ function App(props) {
       }
       console.log("disconnect");
 
-      localStorage.removeItem("walletConnectUrl");
-      localStorage.removeItem("wallectConnectConnectorSession");
-
-      setTimeout(() => {
-        window.location.reload();
-      }, 1);
-
-      // Delete connector
+      disconnectFromWalletConnect();
     });
   };
+
+  const disconnectFromWalletConnect = async (wallectConnectConnector, web3wallet) => {
+    try {
+      if (wallectConnectConnector) {
+        console.log("Disconnect from Wallet Connect V1");
+        await wallectConnectConnector.killSession();
+      }   
+    }
+    catch (error) {
+      console.error("Coudn't disconnect from Wallet Connect V1", error)
+    }
+
+    try {
+      if (web3wallet && isWalletConnectV2Connected(web3wallet)) {
+        console.log("Disconnect from Wallet Connect V2");
+        await disconnectWallectConnectV2Sessions(web3wallet);
+      }
+    }
+    catch (error) {
+      console.error("Coudn't disconnect from Wallet Connect V2", error)
+
+      // This is a hack to remove the session manually
+      // Otherwise if an old session is stuck, we cannot delete it
+      localStorage.removeItem("wc@2:client:0.3//session");
+    }    
+    
+    setWalletConnectUrl("");
+    setWalletConnectPeerMeta();
+    setWallectConnectConnector();
+    setWallectConnectConnectorSession("");
+
+    // This has to be the last, so we don't try to reconnect in "Wallet Connect Hook" too early
+    setWalletConnectConnected(false);
+  }
 
   const [walletConnectUrl, setWalletConnectUrl] = useLocalStorage("walletConnectUrl");
   const [walletConnectConnected, setWalletConnectConnected] = useState();
@@ -473,6 +370,103 @@ function App(props) {
   const [wallectConnectConnectorSession, setWallectConnectConnectorSession] = useLocalStorage(
     "wallectConnectConnectorSession",
   );
+
+  const [web3wallet, setWeb3wallet] = useState();
+  // Wallet Connect V2 initialization and listeners
+  useEffect(() => {
+    if (!address) {
+      return;
+    }
+
+    async function initWeb3wallet() {
+      const web3wallet = await createWeb3wallet();
+
+      web3wallet.on(
+        "session_proposal",
+        (proposal) => {
+          onSessionProposal(
+            web3wallet,
+            address,
+            proposal,
+            disconnectFromWalletConnect,
+            setWalletConnectUrl,
+            setWalletConnectConnected,
+            setWalletConnectPeerMeta);
+        }
+      )
+
+      web3wallet.on("session_request", async (requestEvent) => {
+        console.log("session_request requestEvent", requestEvent);
+
+        WalletConnectTransactionPopUp(
+        requestEvent, userProvider, undefined, web3wallet,
+        targetNetwork.chainId);
+      });
+
+      web3wallet.on("session_update", async (event) => {
+        console.log("session_update event", event);
+      });
+
+      web3wallet.on("session_delete", async (event) => {
+        console.log("session_delete event", event);
+
+        await disconnectFromWalletConnect(undefined, web3wallet);
+      });
+
+      web3wallet.on("session_event", async (event) => {
+        console.log("session_event", event);
+      });
+
+      web3wallet.on("session_ping", async (event) => {
+        console.log("session_ping", event);
+      });
+
+      web3wallet.on("session_expire", async (event) => {
+        console.log("session_expire", event);
+      });
+
+      web3wallet.on("session_extend", async (event) => {
+        console.log("session_extend", event);
+      });
+
+      web3wallet.on("proposal_expire", async (event) => {
+        console.log("proposal_expire", event);
+      });
+
+      setWeb3wallet(web3wallet);
+    }
+
+    initWeb3wallet();
+  }, [address]);
+
+  useEffect(() => {
+    if (!web3wallet) {
+      return;
+    }
+
+    connectWalletConnectV2(web3wallet, setWalletConnectConnected, setWalletConnectPeerMeta);
+  }, [web3wallet]);
+
+  // Add an event listener to kill Wallet Connect V1 session when V2 Dapp reconnects
+  // and there was an existing V1 session
+  useEffect(() => {
+    if (!web3wallet || !wallectConnectConnector) {
+      return;
+    }
+
+    const listener = () => {
+      if (wallectConnectConnector) {
+        console.log("Kill Wallet Connect V1 session");
+        wallectConnectConnector.killSession();
+      }
+    }
+
+    web3wallet.on("session_proposal", listener);
+
+    return () => {
+      web3wallet.off("session_proposal", listener);      
+    }
+  }, [web3wallet, wallectConnectConnector]);
 
   useEffect(() => {
     if (wallectConnectConnector && wallectConnectConnector.connected && address && localChainId) {
@@ -502,27 +496,21 @@ function App(props) {
         updateWalletConnectSession(wallectConnectConnector, address, localChainId);
       }
     }
-  }, [address, localChainId]);
+  }, [address, localChainId, wallectConnectConnector]);
 
-  const updateWalletConnectSession = (wallectConnectConnector, address, chainId) => {
-    wallectConnectConnector.updateSession({
-      accounts: [address],
-      chainId: localChainId,
-    });
-  };
-
+  // "Wallet Connect Hook"
   useEffect(() => {
     if (!walletConnectConnected && address) {
-      let nextSession = localStorage.getItem("wallectConnectNextSession");
-      if (nextSession) {
-        localStorage.removeItem("wallectConnectNextSession");
-        console.log("FOUND A NEXT SESSION IN CACHE");
-        setWalletConnectUrl(nextSession);
-      } else if (wallectConnectConnectorSession) {
+      if (wallectConnectConnectorSession) {
         console.log("NOT CONNECTED AND wallectConnectConnectorSession", wallectConnectConnectorSession);
         connectWallet(wallectConnectConnectorSession);
         setWalletConnectConnected(true);
-      } else if (walletConnectUrl /*&&!walletConnectUrlSaved*/) {
+      } else if (walletConnectUrl ) {
+        // Version 2 is handled separately
+        if (walletConnectUrl.includes("@2")) {
+          return;
+        }
+
         //CLEAR LOCAL STORAGE?!?
         console.log("clear local storage and connect...");
         localStorage.removeItem("walletconnect"); // lololol
@@ -549,11 +537,31 @@ function App(props) {
         );
       }
     }
-  }, [walletConnectUrl, address]);
+  }, [walletConnectUrl, address, walletConnectConnected, wallectConnectConnectorSession]);
+
+  useEffect(() => {
+    async function pairWalletConnectV2() {
+      if (walletConnectUrl && walletConnectUrl.includes("@2") && web3wallet && !isWalletConnectV2Connected(web3wallet)) {
+        console.log(" 📡 Connecting to Wallet Connect V2....", walletConnectUrl);
+        try {
+         await web3wallet.core.pairing.pair({ uri:walletConnectUrl })  
+        }
+        catch (error) {
+          console.log("Cannot create pairing", error);
+          WalletConnectV2ConnectionError(error, undefined);
+          setWalletConnectUrl("");
+        }
+      }
+    }
+
+    pairWalletConnectV2();
+    
+  }, [walletConnectUrl, web3wallet]);
 
   useMemo(() => {
     if (address && window.location.pathname) {
       if (window.location.pathname.indexOf("/wc") >= 0) {
+        // ToDo
         console.log("WALLET CONNECT!!!!!", window.location.search);
         let uri = window.location.search.replace("?uri=", "");
         console.log("WC URI:", uri);
@@ -932,7 +940,7 @@ function App(props) {
             hoistScanner={toggle => {
               scanner = toggle;
             }}
-            walletConnect={wcLink => {
+            walletConnect={async wcLink => {
               //if(walletConnectUrl){
               /*try{
                   //setWalletConnectConnected(false);
@@ -950,16 +958,11 @@ function App(props) {
                 window.location.replace('/wc?uri='+wcLink);
               },500)*/
 
-              if (walletConnectUrl) {
-                //existing session... need to kill it and then connect new one....
-                setWalletConnectConnected(false);
-                if (wallectConnectConnector) wallectConnectConnector.killSession();
-                localStorage.removeItem("walletConnectUrl");
-                localStorage.removeItem("wallectConnectConnectorSession");
-                localStorage.setItem("wallectConnectNextSession", wcLink);
-              } else {
-                setWalletConnectUrl(wcLink);
+              if (walletConnectConnected) {
+                await disconnectFromWalletConnect(wallectConnectConnector, web3wallet);
               }
+
+              setWalletConnectUrl(wcLink);
             }}
           />
         </div>
@@ -1229,9 +1232,9 @@ function App(props) {
           ""
         )}
         <Input
-          style={{ width: "40%" }}
+          style={{ width: "40%", textAlign: "center" }}
           placeholder={"wallet connect url (or use the scanner-->)"}
-          value={walletConnectUrl}
+          value={walletConnectPeerMeta?.name ? walletConnectPeerMeta.name : walletConnectUrl}
           disabled={walletConnectConnected}
           onChange={e => {
             setWalletConnectUrl(e.target.value);
@@ -1241,10 +1244,7 @@ function App(props) {
           <span
             style={{ cursor: "pointer", padding: 10, fontSize: 30, position: "absolute", top: -18 }}
             onClick={() => {
-              setWalletConnectConnected(false);
-              if (wallectConnectConnector) wallectConnectConnector.killSession();
-              localStorage.removeItem("walletConnectUrl");
-              localStorage.removeItem("wallectConnectConnectorSession");
+              disconnectFromWalletConnect(wallectConnectConnector, web3wallet);
             }}
           >
             🗑
@@ -1252,7 +1252,7 @@ function App(props) {
         ) : (
           ""
         )}
-        <IFrame address={address} userProvider={userProvider} mainnetProvider={mainnetProvider} />
+        <IFrame address={address} userProvider={userProvider} />
       </div>
 
       {targetNetwork.name == "ethereum" ? (

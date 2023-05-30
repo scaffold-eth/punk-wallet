@@ -1,13 +1,22 @@
 import { Divider, Spin } from "antd";
 import React, { useEffect, useState } from "react";
-import { convertHexToNumber, convertHexToUtf8 } from "@walletconnect/utils";
 import axios from "axios";
+
+import { NETWORKS, NETWORK } from "../constants";
 
 const { BigNumber, ethers } = require("ethers");
 
 const convertHexToUtf8IfPossible = (hex) => {
   try {
-    return convertHexToUtf8(hex);
+    return ethers.utils.toUtf8String(hex);
+  } catch (e) {
+    return hex;
+  }
+}
+
+const convertHexToNumber = (hex) => {
+  try {
+    return BigNumber.from(hex).toNumber();
   } catch (e) {
     return hex;
   }
@@ -24,7 +33,7 @@ const OPTS = {
   }
 }
 
-export default function WalletConnectTransactionDisplay({payload, provider, chainId}) {
+export default function WalletConnectTransactionDisplay({payload, chainId, currentlySelectedChainId}) {
   const [paramsArray, setParamsArray] = useState([]);
   const [simulated, setSimulated] = useState(false);
   const [simulationFailed, setSimulationFailed] = useState(false);
@@ -55,11 +64,11 @@ export default function WalletConnectTransactionDisplay({payload, provider, chai
         }
 
         const body = {
-          "network_id": params.chainId ? params.chainId.toString() : chainId.toString(),
+          "network_id": params.chainId ? BigNumber.from(params.chainId.toString()).toNumber() : BigNumber.from(chainId.toString()).toNumber(), // Tenderly doesn't like hex
           "from": params.from,
           "to": params.to,
           "input": params.data ? params.data : "",
-          "gas": BigNumber.from(params.gas).toNumber(),
+          "gas": params.gasLimit ? BigNumber.from(params.gasLimit).toNumber() : (params.gas ? BigNumber.from(params.gas).toNumber() : undefined),
           "gas_price": "0",
           "value": params.value ? BigNumber.from(params.value).toString() : "0",
           // simulation config (tenderly specific)
@@ -93,7 +102,10 @@ export default function WalletConnectTransactionDisplay({payload, provider, chai
       let value = param.value;
 
       if ((label == "From") || (label == "To")) {
-        provider.lookupAddress(value).then((ensName) => {
+        // Use mainner provider to lookup ENS names
+        const mainnetProvider = new ethers.providers.StaticJsonRpcProvider(NETWORKS.ethereum.rpcUrl);
+
+        mainnetProvider.lookupAddress(value).then((ensName) => {
           if (ensName) {
             paramsArray[i] = {label: label, value: ensName};
             setParamsArray(JSON.parse(JSON.stringify(paramsArray)));
@@ -106,6 +118,29 @@ export default function WalletConnectTransactionDisplay({payload, provider, chai
     }
   },[]);
 
+  const getColoredNetworkName = (chainId) =>  {
+    const networkName = NETWORK(chainId).name;
+    const networkColor = NETWORK(chainId).color;
+
+    return(
+      <span style={{ color: networkColor}}>{networkName}</span>
+    )
+  }
+
+  const network = (
+    <div key={"network"} style={{ display: "flex", justifyContent:"center", marginTop: "0.5em", marginBottom:  "0.5em" }}>
+      You are on {getColoredNetworkName(chainId)}.
+    </div>
+  );
+
+  const networkWarning = (
+    <div key={"network"} style={{ display: "flex", justifyContent:"center", marginTop: "0.5em", marginBottom:  "0.5em" }}>
+      <div style={{ textAlign:"center"}}>
+        You have {getColoredNetworkName(currentlySelectedChainId)} selected,<br />but this is a {getColoredNetworkName(chainId)} request!
+      </div>
+    </div>
+  );
+
 try {  
   if (!payload || !payload.params) {
     return (
@@ -117,6 +152,14 @@ try {
 
   if (paramsArray.length > 0) {
     const options = [];
+    
+    if (chainId == currentlySelectedChainId) {
+      options.push(network);
+    }
+    else {
+      options.push(networkWarning);  
+    }
+    
     paramsArray.forEach((param) => {
         if (param.value) {
           let marginBottom = "0em";
@@ -136,12 +179,14 @@ try {
       <pre>
         {shouldSimulate(payload) &&
           <div style={{ textAlign: "center"}}>
-              {!simulated && !simulationUnexpectedError && <>Simulating on Tenderly... <Spin/></>}
+              {!simulated && !simulationUnexpectedError && <> Simulating on Tenderly... <Spin/></>}
               {simulated && simulationId && <>Simulating on <a target="_blank" rel="noopener noreferrer" href={`https://dashboard.tenderly.co/public/${TENDERLY_USER}/${TENDERLY_PROJECT}/simulator/${simulationId}`}>Tenderly</a> {!simulationFailed ? "was successful!" : "has failed!"}</>}
               {simulationUnexpectedError && <>Couldn't simulate on <a target="_blank" rel="noopener noreferrer" href="https://tenderly.co/">Tenderly</a> because of an unexpected error.</>}
+              <img style={{height: "2em", width: "2em"}} src="/tenderly.png"/>
               <Divider/>
            </div>
          }
+
         <div style={{ display: "flex", flexDirection: "column", justifyContent:"space-around"}}>
           {options}
         </div>
