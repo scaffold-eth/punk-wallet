@@ -1210,48 +1210,50 @@ function App(props) {
             <div>Connecting to the Dapp...</div>
           </div>
         )}
-        {walletConnectConnected ? (
-          <>
-            {walletConnectPeerMeta?.icons[0] ? (
-              <span>
-                {walletConnectPeerMeta?.icons[0] && (
-                  <img
-                    style={{ width: 40, top: -4, position: "absolute", left: 26 }}
-                    src={walletConnectPeerMeta.icons[0]}
-                    alt={walletConnectPeerMeta.name ? walletConnectPeerMeta.name : ""}
-                  />
-                )}
-              </span>
-            ) : (
-              <span style={{ cursor: "pointer", padding: 8, fontSize: 30, position: "absolute", top: -16, left: 28 }}>
-                ✅
-              </span>
-            )}
-          </>
-        ) : (
-          ""
-        )}
-        <Input
-          style={{ width: "40%", textAlign: "center" }}
-          placeholder={"wallet connect url (or use the scanner-->)"}
-          value={walletConnectPeerMeta?.name ? walletConnectPeerMeta.name : walletConnectUrl}
-          disabled={walletConnectConnected}
-          onChange={e => {
-            setWalletConnectUrl(e.target.value);
-          }}
-        />
-        {walletConnectConnected ? (
-          <span
-            style={{ cursor: "pointer", padding: 10, fontSize: 30, position: "absolute", top: -18 }}
-            onClick={() => {
-              disconnectFromWalletConnect(wallectConnectConnector, web3wallet);
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
+          {walletConnectConnected ? (
+            <>
+              {walletConnectPeerMeta?.icons[0] ? (
+                <span style={{ paddingRight: 10 }}>
+                  {walletConnectPeerMeta?.icons[0] && (
+                    <img
+                      style={{ width: 40 }}
+                      src={walletConnectPeerMeta.icons[0]}
+                      alt={walletConnectPeerMeta.name ? walletConnectPeerMeta.name : ""}
+                    />
+                  )}
+                </span>
+              ) : (
+                <span style={{ fontSize: 30, paddingRight: 10 }}>
+                  ✅
+                </span>
+              )}
+            </>
+          ) : (
+            ""
+          )}
+          <Input
+            style={{ width: "40%", textAlign: "center" }}
+            placeholder={"wallet connect url (or use the scanner-->)"}
+            value={walletConnectPeerMeta?.name ? walletConnectPeerMeta.name : walletConnectUrl}
+            disabled={walletConnectConnected}
+            onChange={e => {
+              setWalletConnectUrl(e.target.value);
             }}
-          >
-            🗑
-          </span>
-        ) : (
-          ""
-        )}
+          />
+          {walletConnectConnected ? (
+            <span
+              style={{ cursor: "pointer", fontSize: 30, paddingLeft: 10 }}
+              onClick={() => {
+                disconnectFromWalletConnect(wallectConnectConnector, web3wallet);
+              }}
+            >
+              🗑
+            </span>
+          ) : (
+            ""
+          )}
+        </div>
         <IFrame address={address} userProvider={userProvider} />
       </div>
 
