@@ -313,12 +313,12 @@ export const NETWORKS = {
     rpcUrl: `https://chain.buidlguidl.com:8545`,
     blockExplorer: "https://etherscan.io/",
   },
-  zksync: {
-    name: "zksync",
+  zkSyncEra: {
+    name: "zkSyncEra",
     color: "#45488f",
     price: "uniswap",
     chainId: 324,
-    rpcUrl: "https://zksync2-mainnet.zksync.io",
+    rpcUrl: "https://mainnet.era.zksync.io",
     blockExplorer: "https://explorer.zksync.io/"
   },
   optimism: {
@@ -391,12 +391,12 @@ export const NETWORKS = {
     blockExplorer: "",
     rpcUrl: "http://localhost:8545",
   },
-  zksyncalpha: {
-    name: "zksyncalpha",
+  zkSyncTest: {
+    name: "zkSyncTest",
     color: "#45488f",
     price: "uniswap",
     chainId: 280,
-    rpcUrl: "https://zksync2-testnet.zksync.dev",
+    rpcUrl: "https://testnet.era.zksync.dev",
     blockExplorer: "https://goerli.explorer.zksync.io/",
     gasPrice: 100000000,
   },
