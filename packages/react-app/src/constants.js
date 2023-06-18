@@ -398,7 +398,6 @@ export const NETWORKS = {
     chainId: 280,
     rpcUrl: "https://testnet.era.zksync.dev",
     blockExplorer: "https://goerli.explorer.zksync.io/",
-    gasPrice: 100000000,
   },
   canto: {
     name: "canto",
