@@ -11,7 +11,11 @@ const { confirm } = Modal;
 
 export default function IFrame({ address, userProvider }) {
   const cachedNetwork = window.localStorage.getItem("network");
-  const targetNetwork = NETWORKS[cachedNetwork || "ethereum"];
+  let targetNetwork = NETWORKS[cachedNetwork || "ethereum"];
+
+  if (!targetNetwork) {
+    targetNetwork = NETWORKS["ethereum"];
+  }
 
   const { setAddress, appUrl, setAppUrl, setRpcUrl, iframeRef, newTx } = useSafeInject();
 
