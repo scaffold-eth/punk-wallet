@@ -5,6 +5,7 @@ import Notify from "bnc-notify";
 import { BLOCKNATIVE_DAPPID } from "../constants";
 import { TransactionManager } from "./TransactionManager";
 import { sendTransaction } from "./EIP1559Helper";
+import { getTransferTxParams } from "./ERC20Helper";
 
 // this should probably just be renamed to "notifier"
 // it is basically just a wrapper around BlockNative's wonderful Notify.js
@@ -44,19 +45,27 @@ export default function Transactor(provider, gasPrice, etherscan, injectedProvid
           console.log("AWAITING TX", tx);
           result = await tx;
         } else {
-          console.log("TX WITH GAS",tx)
-          //if (!tx.gasPrice) {
-          //  tx.gasPrice = gasPrice || parseUnits("4.1", "gwei");
-          //}
-          //if (!tx.gasLimit) {
-          //  tx.gasLimit = hexlify(120000);
-          //}
+          const erc20 = tx.erc20;
+
+          if (erc20) {
+            const transferTxParams = await getTransferTxParams(erc20.token, erc20.to, erc20.amount);
+
+            tx.to = transferTxParams.to;
+            tx.data = transferTxParams.data;
+
+            delete tx.erc20;
+          }
+
           console.log("RUNNING TX", tx);
           result = await sendTransaction(tx, signer, injectedProvider)
 
           // Store transactionResponse in localStorage, so we can speed up the transaction if needed
           // Injected providers like MetaMask can manage their transactions on their own
           if (injectedProvider === undefined) {
+            if (erc20) {
+                result.erc20 = erc20;
+            }
+
             const transactionManager = new TransactionManager(provider, provider.getSigner());
 
             transactionManager.setTransactionResponse(result);  

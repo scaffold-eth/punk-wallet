@@ -4,7 +4,7 @@ import { TransactionManager } from "./TransactionManager";
 const axios = require("axios");
 const { ethers, BigNumber, utils } = require("ethers");
 
-const POLYGON_GAS_API_URL = "https://gasstation-mainnet.matic.network/v2";
+const POLYGON_GAS_API_URL = "https://gasstation.polygon.technology/v2";
 
 // Create an ethers wallet from the localStorage private key, for EIP-1559 type-2 transactions
 // Mainnet and polygon only
@@ -44,8 +44,6 @@ export const createEthersWallet = (ethersProvider) => {
 // Create EIP-1559 type-2 transactions on mainnet and polygon
 // Other networks use legacy transactions with gasPrice
 export const sendTransaction =  (txParams, signer, injectedProvider) => {
-	console.log("RUNNING TX", txParams);
-
 	const chainId = getChainIdNumber(txParams);
 
 	let result;

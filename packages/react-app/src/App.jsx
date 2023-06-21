@@ -13,6 +13,9 @@ import {
   Address,
   AddressInput,
   Balance,
+  ERC20Balance,
+  ERC20Input,
+  ERC20Selector,
   EtherInput,
   Faucet,
   GasGauge,
@@ -233,6 +236,9 @@ function App(props) {
   const yourLocalBalance = useBalance(localProvider, address);
 
   const balance = yourLocalBalance && formatEther(yourLocalBalance);
+
+  const [tokenName, setTokenName] = useLocalStorage(targetNetwork.name + "TokenName");
+  const token = targetNetwork?.erc20Tokens ? targetNetwork.erc20Tokens.find(token => token.name === tokenName) : undefined;
 
   // if you don't have any money, scan the other networks for money
   // lol this poller is a bad idea why does it keep
@@ -709,8 +715,10 @@ function App(props) {
   const options = [];
   for (const id in NETWORKS) {
     options.push(
-      <Select.Option key={id} value={NETWORKS[id].name}>
-        <span style={{ color: NETWORKS[id].color, fontSize: 24 }}>{NETWORKS[id].name}</span>
+      <Select.Option key={id} value={NETWORKS[id].name} style={{lineHeight:1.1}}>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "center", color: NETWORKS[id].color, fontSize: 24 }}>
+          {NETWORKS[id].name}
+        </div>
       </Select.Option>,
     );
   }
@@ -719,7 +727,7 @@ function App(props) {
     <Select
       size="large"
       defaultValue={targetNetwork.name}
-      style={{ textAlign: "left", width: 170, fontSize: 30 }}
+      style={{ width: 170 }}
       listHeight={1024}
       onChange={value => {
         if (targetNetwork.chainId != NETWORKS[value].chainId) {
@@ -807,6 +815,7 @@ function App(props) {
   }
   // console.log("startingAddress",startingAddress)
   const [amount, setAmount] = useState();
+
   const [data, setData] = useState();
   const [toAddress, setToAddress] = useLocalStorage("punkWalletToAddress", startingAddress, 120000);
 
@@ -916,9 +925,31 @@ function App(props) {
       <div
         style={{ clear: "both", opacity: yourLocalBalance ? 1 : 0.2, width: 500, margin: "auto", position: "relative" }}
       >
-        <Balance value={yourLocalBalance} size={12 + window.innerWidth / 16} price={price} />
+        <div>
+          {token ?
+            <ERC20Balance
+              token={token}
+              rpcURL={targetNetwork.rpcUrl}
+              size={12 + window.innerWidth / 16}
+              address={address}
+            />
+            :
+            <Balance
+              value={yourLocalBalance}
+              size={12 + window.innerWidth / 16}
+              price={price} />
+          }
+        </div>
+        
         <span style={{ verticalAlign: "middle" }}>
-          {networkSelect}
+          <div style={{ display: "flex", justifyContent: targetNetwork.erc20Tokens ? "space-evenly" : "center", alignItems: "center" }}>
+            <div>
+              {networkSelect}
+            </div>
+            <div>
+              {targetNetwork.erc20Tokens && <ERC20Selector token={token} setTokenName={setTokenName} targetNetwork={targetNetwork} />}
+            </div>
+          </div>
           {faucetHint}
         </span>
       </div>
@@ -970,19 +1001,28 @@ function App(props) {
         <div style={{ padding: 10 }}>
           {walletConnectTx ? (
             <Input disabled={true} value={amount} />
-          ) : (
-            <EtherInput
-              price={price || targetNetwork.price}
-              value={amount}
-              token={targetNetwork.token || "ETH"}
-              address={address}
-              provider={localProvider}
-              gasPrice={gasPrice}
-              onChange={value => {
-                setAmount(value);
-              }}
-            />
-          )}
+          ) : 
+            (
+            token ? 
+              <ERC20Input
+                token={token}
+                amount={amount}
+                setAmount={setAmount}
+              />
+            :
+              <EtherInput
+                price={price || targetNetwork.price}
+                value={amount}
+                token={targetNetwork.token || "ETH"}
+                address={address}
+                provider={localProvider}
+                gasPrice={gasPrice}
+                onChange={value => {
+                  setAmount(value);
+                }}
+              />
+            )
+          }
         </div>
         {/*
           <div style={{ padding: 10 }}>
@@ -1006,25 +1046,37 @@ function App(props) {
             onClick={async () => {
               setLoading(true);
 
-              let value;
-              try {
-                console.log("PARSE ETHER", amount);
-                value = parseEther("" + amount);
-                console.log("PARSEDVALUE", value);
-              } catch (e) {
-                const floatVal = parseFloat(amount).toFixed(8);
-
-                console.log("floatVal", floatVal);
-                // failed to parseEther, try something else
-                value = parseEther("" + floatVal);
-                console.log("PARSEDfloatVALUE", value);
-              }
-
               let txConfig = {
-                to: toAddress,
-                chainId: selectedChainId,
-                value,
+                chainId: selectedChainId
               };
+
+              if (!token) {
+                let value;
+                try {
+                  console.log("PARSE ETHER", amount);
+                  value = parseEther("" + amount);
+                  console.log("PARSEDVALUE", value);
+                } catch (e) {
+                  const floatVal = parseFloat(amount).toFixed(8);
+
+                  console.log("floatVal", floatVal);
+                  // failed to parseEther, try something else
+                  value = parseEther("" + floatVal);
+                  console.log("PARSEDfloatVALUE", value);
+                }
+
+                txConfig.to = toAddress;
+                txConfig.value = value;
+              }
+              else {
+                if (token) {
+                  txConfig.erc20 = {
+                    token: token,
+                    to: toAddress,
+                    amount: amount
+                  }
+                }
+              }
 
               if (targetNetwork.name == "arbitrum") {
                 //txConfig.gasLimit = 21000;
@@ -1044,6 +1096,7 @@ function App(props) {
               }
 
               console.log("SEND AND NETWORK", targetNetwork);
+
               let result = tx(txConfig);
               // setToAddress("")
               setAmount("");
