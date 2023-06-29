@@ -10,6 +10,8 @@ import { WalletConnectV2ConnectionError } from "../components";
 import { TransactionManager } from "./TransactionManager";
 import { sendTransaction, createEthersWallet } from "./EIP1559Helper";
 
+import { ethers } from 'ethers'
+
 export const createWeb3wallet = async () => {
     const core = new Core({
         logger: 'debug',
@@ -198,6 +200,16 @@ export const signTransaction = (txParams) => {
     }
 
     return ethersWallet.signTransaction(txParams);
+}
+
+export const signMessage = (message) => {
+    const ethersWallet = createEthersWallet();
+
+    if (ethers.utils.isHexString(message)) {
+        message = ethers.utils.toUtf8String(message)
+    }
+
+    return ethersWallet.signMessage(message);
 }
 
 export const sendWalletConnectTx = async (userProvider, payload, chainId) => {
