@@ -5,7 +5,7 @@ import { SendOutlined } from "@ant-design/icons";
 
 import { WalletConnectTransactionDisplay } from "./";
 
-import { sendWalletConnectTx, approveRequestV1, approveRequestV2, rejectRequestV1, rejectRequestV2, signTransaction } from "../helpers/WalletConnectV2Helper";
+import { sendWalletConnectTx, approveRequestV1, approveRequestV2, rejectRequestV1, rejectRequestV2, signTransaction, signMessage } from "../helpers/WalletConnectV2Helper";
 import { getChainIdNumber } from "../helpers/EIP1559Helper";
 
 export default function WalletConnectTransactionPopUp(
@@ -43,7 +43,10 @@ export default function WalletConnectTransactionPopUp(
                 }
                 else if (payload.method === "eth_signTransaction") {                    // eth_signTransaction didn't work with userProvider, sign with ethersWallet
                     result = await signTransaction(payload.params[0]);
-                }                                                                       
+                }
+                else if (payload.method === "personal_sign") {                          // another exception
+                    result = await signMessage(payload.params[0]);
+                }                                                                                                                                              
                 else {                                                                  // We could use ethers to sign these messages as well,
                     result = await userProvider.send(payload.method, payload.params);   // but I didn't want to change what is working
                 }
