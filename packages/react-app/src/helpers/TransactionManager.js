@@ -73,6 +73,10 @@ export class TransactionManager {
 	async updateTransactionResponse(transactionResponse) {
 		let newTransactionResponse = await this.provider.getTransaction(transactionResponse.hash);
 
+		if (newTransactionResponse && transactionResponse?.erc20) {
+			newTransactionResponse.erc20 = transactionResponse.erc20;
+		}
+
 		this.setTransactionResponse(newTransactionResponse ? newTransactionResponse : transactionResponse);
 	}
 

@@ -9,6 +9,8 @@ import axios from "axios";
 
 import moment from 'moment';
 
+import {tokenDisplay} from "./ERC20Selector";
+
 const { BigNumber, ethers } = require("ethers");
 
 export default function TransactionResponseDisplay({transactionResponse, transactionManager, blockExplorer}) {
@@ -16,6 +18,8 @@ export default function TransactionResponseDisplay({transactionResponse, transac
   const [loadingSpeedUp, setLoadingSpeedUp] = useState(false);
   const [loadingCancel, setLoadingCancel] = useState(false);
   const [estimatedConfirmationSeconds, setEstimatedConfirmationSeconds] = useState(0);
+
+  const erc20 = transactionResponse?.erc20;
 
   const updateConfirmations = async () => {
     if (transactionResponse.confirmations > 0) {
@@ -121,6 +125,10 @@ export default function TransactionResponseDisplay({transactionResponse, transac
     }
 
     if (newTransactionResponse) {
+      if (erc20) {
+        newTransactionResponse.erc20 = erc20;
+      }
+      
       transactionManager.setTransactionResponse(newTransactionResponse);  
     }
     else {
@@ -181,16 +189,22 @@ export default function TransactionResponseDisplay({transactionResponse, transac
       {!isCancelTransaction(transactionResponse) ?
         <>
           <div style={{ position:"relative",left:-120, top:-30 }}>
-            <QRPunkBlockie scale={0.4} address={transactionResponse.to} />
-         </div>
+            <QRPunkBlockie scale={0.4} address={erc20?.to ? erc20.to : transactionResponse.to} />
+          </div>
 
-        
-
-        
-        {(transactionResponse.value) && <p><b>Value:</b> {ethers.utils.formatEther(BigNumber.from(transactionResponse.value).toString())} Ξ</p>}
-        
+          {erc20 ?
+              <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                  <div style={{ marginRight: '10px' }}>
+                    <b>{erc20.amount}</b>
+                  </div>
+                <div>
+                   {tokenDisplay(erc20.token.name, erc20.token.imgSrc)}
+                </div>
+              </div>
+            :
+              (transactionResponse.value) && <p><b> {ethers.utils.formatEther(BigNumber.from(transactionResponse.value).toString())}</b> Ξ</p>
+          }
         </>
-
         :
         <p>
           Transaction cancelled
