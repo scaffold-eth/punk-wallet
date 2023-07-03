@@ -339,6 +339,36 @@ export const NETWORKS = {
     blockExplorer: "https://arbiscan.io/",
     rpcUrl: `https://arb-mainnet.g.alchemy.com/v2/tYM-Tr8c9dHV5a8AgvXnVmS9e-xvoxeM`,
     //gasPrice: 1000000000,// TODO ASK RPC
+    erc20Tokens: [
+      {
+        name: "ARB",
+        address: "0x912CE59144191C1204E64559FE8253a0e49E6548",
+        decimals: 18,
+        imgSrc: "/ARB.png"
+      },
+      {
+        name: "USDC",
+        address: "0xaf88d065e77c8cC2239327C5EDb3A432268e5831",
+        decimals: 6,
+        imgSrc: "/USDC.png"
+      },
+      {
+        name: "USDT",
+        address: "0xFd086bC7CD5C481DCC9C85ebE478A1C0b69FCbb9",
+        decimals: 6,
+        imgSrc: "/USDT.png"
+      },
+      {
+        name: "DAI",
+        address: "0xda10009cbd5d07dd0cecc66161fc93d7c9000da1",
+        decimals: 18,
+        imgSrc: "/DAI.png"
+      },
+    ],
+    nativeToken: {
+      name:"ETH",
+      imgSrc:"/ETH.png"
+    }
   },
   gnosis: {
     name: "gnosis",
