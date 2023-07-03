@@ -304,6 +304,30 @@ export const NETWORKS = {
     price: "uniswap",
     rpcUrl: `https://rpc2.scaffoldeth.io:48544`,
     blockExplorer: "https://etherscan.io/",
+    erc20Tokens: [
+      {
+        name: "USDC",
+        address: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+        decimals: 6,
+        imgSrc: "/USDC.png"
+      },
+      {
+        name: "USDT",
+        address: "0xdAC17F958D2ee523a2206206994597C13D831ec7",
+        decimals: 6,
+        imgSrc: "/USDT.png"
+      },
+      {
+        name: "DAI",
+        address: "0x6B175474E89094C44Da98b954EedeAC495271d0F",
+        decimals: 18,
+        imgSrc: "/DAI.png"
+      },
+    ],
+    nativeToken: {
+      name:"ETH",
+      imgSrc:"/ETH.png"
+    }
   },
   buidlguidl: {
     name: "buidlguidl",
