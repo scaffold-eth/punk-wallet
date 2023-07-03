@@ -330,6 +330,36 @@ export const NETWORKS = {
     rpcUrl: `https://opt-mainnet.g.alchemy.com/v2/gzr_xuzv2SPwbPchC9Z41qmfodlDglKp`,
     //rpcUrl: `https://mainnet.optimism.io`,
     //gasPrice: 1000000,
+    erc20Tokens: [
+      {
+        name: "OP",
+        address: "0x4200000000000000000000000000000000000042",
+        decimals: 18,
+        imgSrc: "/OP.png"
+      },
+      {
+        name: "USDC",
+        address: "0x7F5c764cBc14f9669B88837ca1490cCa17c31607",
+        decimals: 6,
+        imgSrc: "/USDC.png"
+      },
+      {
+        name: "USDT",
+        address: "0x94b008aA00579c1307B0EF2c499aD98a8ce58e58",
+        decimals: 6,
+        imgSrc: "/USDT.png"
+      },
+      {
+        name: "DAI",
+        address: "0xDA10009cBd5D07dd0CeCc66161FC93D7c9000da1",
+        decimals: 18,
+        imgSrc: "/DAI.png"
+      },
+    ],
+    nativeToken: {
+      name:"ETH",
+      imgSrc:"/ETH.png"
+    }
   },
   arbitrum: {
     name: "arbitrum",
