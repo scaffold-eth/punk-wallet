@@ -506,6 +506,18 @@ export const NETWORKS = {
     chainId: 280,
     rpcUrl: "https://testnet.era.zksync.dev",
     blockExplorer: "https://goerli.explorer.zksync.io/",
+    erc20Tokens: [
+      {
+        name: "USDC",
+        address: "0x0faF6df7054946141266420b43783387A78d82A9",
+        decimals: 6,
+        imgSrc: "/USDC.png"
+      }
+    ],
+    nativeToken: {
+      name:"ETH",
+      imgSrc:"/ETH.png"
+    }
   },
   canto: {
     name: "canto",
