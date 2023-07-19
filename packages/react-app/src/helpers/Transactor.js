@@ -6,6 +6,8 @@ import { BLOCKNATIVE_DAPPID } from "../constants";
 import { TransactionManager } from "./TransactionManager";
 import { sendTransaction } from "./EIP1559Helper";
 import { getTransferTxParams } from "./ERC20Helper";
+import { transferViaPaymaster } from "./zkSyncTestnetHelper";
+import { ZK_TESTNET_USDC_ADDRESS } from "../constants";
 
 // this should probably just be renamed to "notifier"
 // it is basically just a wrapper around BlockNative's wonderful Notify.js
@@ -48,16 +50,25 @@ export default function Transactor(provider, gasPrice, etherscan, injectedProvid
           const erc20 = tx.erc20;
 
           if (erc20) {
-            const transferTxParams = await getTransferTxParams(erc20.token, erc20.to, erc20.amount);
+            if (erc20?.token?.address == ZK_TESTNET_USDC_ADDRESS) {
+              const zkResult = await transferViaPaymaster(erc20.to, erc20.amount * 1000000);
+              console.log("zkResult", zkResult);
+              result = await provider.getTransaction(zkResult.transactionHash);
+            }
+            else {
+              const transferTxParams = await getTransferTxParams(erc20.token, erc20.to, erc20.amount);
 
-            tx.to = transferTxParams.to;
-            tx.data = transferTxParams.data;
+              tx.to = transferTxParams.to;
+              tx.data = transferTxParams.data;
 
-            delete tx.erc20;
+              delete tx.erc20;
+            }
           }
 
-          console.log("RUNNING TX", tx);
-          result = await sendTransaction(tx, signer, injectedProvider)
+          if (!result) {
+            console.log("RUNNING TX", tx);
+            result = await sendTransaction(tx, signer, injectedProvider)
+          }
 
           // Store transactionResponse in localStorage, so we can speed up the transaction if needed
           // Injected providers like MetaMask can manage their transactions on their own

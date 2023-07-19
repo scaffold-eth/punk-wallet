@@ -11,6 +11,8 @@ export const BLOCKNATIVE_DAPPID = "0b58206a-f3c0-4701-a62f-73c7243e8c77";
 
 export const DAI_ADDRESS = "0x6B175474E89094C44Da98b954EedeAC495271d0F";
 
+export const ZK_TESTNET_USDC_ADDRESS = "0x0faF6df7054946141266420b43783387A78d82A9";
+
 export const DAI_ABI = [
   {
     inputs: [{ internalType: "uint256", name: "chainId_", type: "uint256" }],
@@ -509,7 +511,7 @@ export const NETWORKS = {
     erc20Tokens: [
       {
         name: "USDC",
-        address: "0x0faF6df7054946141266420b43783387A78d82A9",
+        address: ZK_TESTNET_USDC_ADDRESS,
         decimals: 6,
         imgSrc: "/USDC.png"
       }
