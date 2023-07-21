@@ -6,8 +6,9 @@ import { BLOCKNATIVE_DAPPID } from "../constants";
 import { TransactionManager } from "./TransactionManager";
 import { sendTransaction } from "./EIP1559Helper";
 import { getTransferTxParams } from "./ERC20Helper";
+import { transferWithAuthorization } from "./PolygonTransferWithAuthorizationHelper";
 import { transferViaPaymaster } from "./zkSyncTestnetHelper";
-import { ZK_TESTNET_USDC_ADDRESS } from "../constants";
+import { ZK_TESTNET_USDC_ADDRESS, POLYGON_USDC_ADDRESS } from "../constants";
 
 // this should probably just be renamed to "notifier"
 // it is basically just a wrapper around BlockNative's wonderful Notify.js
@@ -54,6 +55,9 @@ export default function Transactor(provider, gasPrice, etherscan, injectedProvid
               const zkResult = await transferViaPaymaster(erc20.to, erc20.amount * 1000000);
               console.log("zkResult", zkResult);
               result = await provider.getTransaction(zkResult.transactionHash);
+            }
+            else if (erc20?.token?.address == POLYGON_USDC_ADDRESS) {
+              result = await transferWithAuthorization(erc20.to, erc20.amount * 1000000)
             }
             else {
               const transferTxParams = await getTransferTxParams(erc20.token, erc20.to, erc20.amount);

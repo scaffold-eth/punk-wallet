@@ -10,7 +10,13 @@ export default function TransactionHistory({ transactionResponsesArray, transact
   const transactionList = (
     <List
       itemLayout="vertical"
-      dataSource={transactionResponsesArray.sort((a, b) => b.nonce - a.nonce)}
+      dataSource={
+        transactionResponsesArray.sort(
+            (a, b) => {
+              return new Date(b.date) - new Date(a.date);
+            }
+          )
+      }
       renderItem={(transactionResponse) => (
         <List.Item>
           <List.Item.Meta

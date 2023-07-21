@@ -77,6 +77,10 @@ export class TransactionManager {
 			newTransactionResponse.erc20 = transactionResponse.erc20;
 		}
 
+		if (newTransactionResponse && transactionResponse?.origin) {
+			newTransactionResponse.origin = transactionResponse.origin;
+		}
+
 		this.setTransactionResponse(newTransactionResponse ? newTransactionResponse : transactionResponse);
 	}
 

@@ -61,7 +61,7 @@ export const sendTransaction =  (txParams, signer, injectedProvider) => {
 		return sendTransactionMainnet(txParams);
 	}
 	else if (chainId == NETWORKS.polygon.chainId) {
-		return sendTransactionPolygon(txParams);
+		return sendTransactionPolygon(txParams, signer);
 	}
 }
 
@@ -87,7 +87,7 @@ const sendTransactionMainnet = (txParams) => {
 
 // Ethers cannot figure out maxFeePerGas and maxPriorityFeePerGas properly
 // https://github.com/ethers-io/ethers.js/issues/2828#issuecomment-1283014250
-const sendTransactionPolygon = async (txParams) => {
+const sendTransactionPolygon = async (txParams, signer) => {
 	let gasData = (await axios.get(POLYGON_GAS_API_URL)).data;
 
 		/* Example response
@@ -116,7 +116,7 @@ const sendTransactionPolygon = async (txParams) => {
 	txParams.maxPriorityFeePerGas = getHexStringFromGasNumber(maxPriorityFee);
 	console.log("updated txParams", txParams);
 
-	const ethersWallet = getEthersWallet(txParams);
+	const ethersWallet = signer ? signer : getEthersWallet(txParams);
 	return ethersWallet.sendTransaction(txParams);
 }
 

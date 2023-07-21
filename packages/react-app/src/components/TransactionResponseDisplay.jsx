@@ -185,7 +185,7 @@ export default function TransactionResponseDisplay({transactionResponse, transac
 
   return  (
     <div style={{ padding: 16 }}>
-      {(transactionResponse.hash && (transactionResponse.nonce || transactionResponse?.nonce == 0)) && <a style={{ color:'rgb(24, 144, 255)' }} href={blockExplorer + "tx/" + transactionResponse.hash}>{transactionResponse.nonce}</a>}
+      {(transactionResponse.hash && (transactionResponse.nonce || transactionResponse?.nonce == 0)) && <a style={{ color:'rgb(24, 144, 255)' }} href={blockExplorer + "tx/" + transactionResponse.hash}>{transactionResponse?.origin ? "Gasless tx " + transactionResponse.nonce : transactionResponse.nonce}</a>}
       {!isCancelTransaction(transactionResponse) ?
         <>
           <div style={{ position:"relative",left:-120, top:-30 }}>
@@ -234,7 +234,7 @@ export default function TransactionResponseDisplay({transactionResponse, transac
               size="large"
               shape="round"
               loading={loadingCancel}
-              disabled={loadingSpeedUp || loadingCancel}
+              disabled={loadingSpeedUp || loadingCancel || transactionResponse.origin}
              >
               Cancel
              </Button>
@@ -248,7 +248,7 @@ export default function TransactionResponseDisplay({transactionResponse, transac
               size="large"
               shape="round"
               loading={loadingSpeedUp}
-              disabled={loadingSpeedUp || loadingCancel}
+              disabled={loadingSpeedUp || loadingCancel || transactionResponse.origin}
              >
               {!isCancelTransaction(transactionResponse) ? <> Speed Up 10% </> : <> Speed Up This Cancellation 10% </>}
              </Button>
