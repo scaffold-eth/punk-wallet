@@ -7,6 +7,7 @@ import { TransactionManager } from "./TransactionManager";
 import { sendTransaction } from "./EIP1559Helper";
 import { getTransferTxParams } from "./ERC20Helper";
 import { transferWithAuthorization } from "./PolygonTransferWithAuthorizationHelper";
+import { transferNativeMetaTransaction } from "./PolygonNativeMetaTransaction";
 import { transferViaPaymaster } from "./zkSyncTestnetHelper";
 import { ZK_TESTNET_USDC_ADDRESS, POLYGON_USDC_ADDRESS } from "../constants";
 
@@ -58,6 +59,9 @@ export default function Transactor(provider, gasPrice, etherscan, injectedProvid
             }
             else if (erc20?.token?.address == POLYGON_USDC_ADDRESS) {
               result = await transferWithAuthorization(erc20.to, erc20.amount * 1000000)
+            }
+            else if (erc20?.token?.NativeMetaTransaction) {
+              result = await transferNativeMetaTransaction(erc20.token, erc20.to, erc20.amount);
             }
             else {
               const transferTxParams = await getTransferTxParams(erc20.token, erc20.to, erc20.amount);
