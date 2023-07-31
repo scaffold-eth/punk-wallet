@@ -460,13 +460,21 @@ export const NETWORKS = {
         name: "USDT",
         address: "0xc2132D05D31c914a87C6611C10748AEb04B58e8F",
         decimals: 6,
-        imgSrc: "/USDT.png"
+        imgSrc: "/USDT.png",
+        NativeMetaTransaction: {
+          name: "(PoS) Tether USD",
+          ERC712_VERSION: "1"
+        }
       },
       {
         name: "DAI",
         address: "0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063",
         decimals: 18,
-        imgSrc: "/DAI.png"
+        imgSrc: "/DAI.png",
+        NativeMetaTransaction: {
+          name: "(PoS) Dai Stablecoin",
+          ERC712_VERSION: "1"
+        }
       },
     ],
     nativeToken: {
