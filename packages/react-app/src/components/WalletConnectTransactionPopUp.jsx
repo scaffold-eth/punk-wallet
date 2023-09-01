@@ -123,6 +123,7 @@ const getTitle = (method) => {
             title = "Sign Message?";
             break;
         case "eth_signTypedData":
+        case "eth_signTypedData_v4":
             title = "Sign Typed Data?";
             break;
         default:
