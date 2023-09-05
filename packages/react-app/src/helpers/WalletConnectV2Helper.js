@@ -51,7 +51,7 @@ export const onSessionProposal = async (
                 supportedNamespaces: {
                 eip155: {
                 chains: getSupportedChainIds().map(chainId => "eip155:" + chainId), // ["eip155:1", "eip155:137", ...] 
-                methods: ["eth_sendTransaction", "eth_signTransaction", "eth_sign", "personal_sign", "eth_signTypedData"],
+                methods: ["eth_sendTransaction", "eth_signTransaction", "eth_sign", "personal_sign", "eth_signTypedData", "eth_signTypedData_v4"],
                 events: ["accountsChanged", "chainChanged"],
                 accounts:getSupportedChainIds().map(chainId => "eip155:" + chainId + ":" + address) // ["eip155:1:0x8c9D11cE64289701eFEB6A68c16e849E9A2e781d", "eip155:137:0x8c9D11cE64289701eFEB6A68c16e849E9A2e781d", ...] 
                 },
