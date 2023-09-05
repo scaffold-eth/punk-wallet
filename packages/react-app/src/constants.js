@@ -388,6 +388,14 @@ export const NETWORKS = {
       imgSrc:"/ETH.png"
     }
   },
+  base: {
+    name: "base",
+    color: "#0052ff",
+    price: "uniswap",
+    chainId: 8453,
+    rpcUrl: "https://mainnet.base.org",
+    blockExplorer: "https://basescan.org/"
+  },
   arbitrum: {
     name: "arbitrum",
     color: "#50a0ea",
