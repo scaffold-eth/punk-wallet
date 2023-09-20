@@ -454,6 +454,18 @@ export const NETWORKS = {
     rpcUrl: "https://rpc.gnosischain.com/",
     faucet: "https://xdai-faucet.top/",
     blockExplorer: "https://blockscout.com/poa/xdai/",
+    erc20Tokens: [
+      {
+        name: "EURe",
+        address: "0xcB444e90D8198415266c6a2724b7900fb12FC56E",
+        decimals: 18,
+        imgSrc: "/EURe.png"
+      },
+    ],
+    nativeToken: {
+      name:"xDAI",
+      imgSrc:"/xDAI.png"
+    }
   },
   polygon: {
     name: "polygon",
