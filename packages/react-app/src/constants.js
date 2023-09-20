@@ -465,6 +465,12 @@ export const NETWORKS = {
     blockExplorer: "https://polygonscan.com/",
     erc20Tokens: [
       {
+        name: "EURe",
+        address: "0x18ec0A6E18E5bc3784fDd3a3634b31245ab704F6",
+        decimals: 18,
+        imgSrc: "/EURe.png"
+      },
+      {
         name: "USDC",
         address: POLYGON_USDC_ADDRESS,
         decimals: 6,
