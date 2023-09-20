@@ -309,6 +309,12 @@ export const NETWORKS = {
     blockExplorer: "https://etherscan.io/",
     erc20Tokens: [
       {
+        name: "EURe",
+        address: "0x3231cb76718cdef2155fc47b5286d82e6eda273f",
+        decimals: 18,
+        imgSrc: "/EURe.png"
+      },
+      {
         name: "USDC",
         address: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
         decimals: 6,
