@@ -3,11 +3,10 @@ import { Button, Popover } from "antd";
 import React, { useEffect, useState } from "react";
 
 import { TransactionManager } from "../helpers/TransactionManager";
-import { QRPunkBlockie } from "./";
+
+import { TransactionDisplay, QRPunkBlockie } from "./";
 
 import axios from "axios";
-
-import moment from 'moment';
 
 import {tokenDisplay} from "./ERC20Selector";
 
@@ -185,32 +184,29 @@ export default function TransactionResponseDisplay({transactionResponse, transac
 
   return  (
     <div style={{ padding: 16 }}>
-      {(transactionResponse.hash && (transactionResponse.nonce || transactionResponse?.nonce == 0)) && <a style={{ color:'rgb(24, 144, 255)' }} href={blockExplorer + "tx/" + transactionResponse.hash}>{transactionResponse?.origin ? "Gasless tx " + transactionResponse.nonce : transactionResponse.nonce}</a>}
       {!isCancelTransaction(transactionResponse) ?
-        <>
-          <div style={{ position:"relative",left:-120, top:-30 }}>
-            <QRPunkBlockie scale={0.4} address={erc20?.to ? erc20.to : transactionResponse.to} />
-          </div>
-
-          {erc20 ?
-              <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                  <div style={{ marginRight: '10px' }}>
-                    <b>{erc20.amount}</b>
-                  </div>
-                <div>
-                   {tokenDisplay(erc20.token.name, erc20.token.imgSrc)}
-                </div>
-              </div>
-            :
-              (transactionResponse.value) && <p><b> {ethers.utils.formatEther(BigNumber.from(transactionResponse.value).toString())}</b> Ξ</p>
-          }
-        </>
+          <TransactionDisplay 
+            toAddress={erc20?.to ? erc20.to : transactionResponse.to}
+            txHash={transactionResponse?.hash}
+            txDisplayName={transactionResponse?.origin ? "Gasless tx " + transactionResponse?.nonce : transactionResponse?.nonce}
+            erc20TokenName={erc20?.token?.name}
+            erc20ImgSrc={erc20?.token?.imgSrc}
+            amount={erc20?.amount ? erc20.amount : transactionResponse?.value}
+            blockExplorer={blockExplorer}
+            date={transactionResponse?.date}
+            showClearButton={transactionResponse.confirmations != 0}
+            clearButtonAction={
+              () => {
+                transactionManager.removeTransactionResponse(transactionResponse);
+              }
+            }
+            chainId = {transactionResponse.chainId}
+          />
         :
-        <p>
-          Transaction cancelled
-        </p>
+          <p>
+            Transaction cancelled
+          </p>
       }
-      {transactionResponse.date && <p> {moment(transactionResponse.date).fromNow()}</p>}
 
       {(confirmations == 0) &&    
         <div>        
@@ -254,20 +250,8 @@ export default function TransactionResponseDisplay({transactionResponse, transac
              </Button>
           </div>
         </div>
-        
-        
      }
 
-     {
-      (transactionResponse.confirmations != 0) && <Button
-       onClick={
-        () => {
-          transactionManager.removeTransactionResponse(transactionResponse);
-        }}
-       >
-       Clear  🗑
-       </Button>
-     }
     </div>
   );
 }
