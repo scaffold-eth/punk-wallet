@@ -309,6 +309,12 @@ export const NETWORKS = {
     blockExplorer: "https://etherscan.io/",
     erc20Tokens: [
       {
+        name: "EURe",
+        address: "0x3231cb76718cdef2155fc47b5286d82e6eda273f",
+        decimals: 18,
+        imgSrc: "/EURe.png"
+      },
+      {
         name: "USDC",
         address: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
         decimals: 6,
@@ -448,6 +454,18 @@ export const NETWORKS = {
     rpcUrl: "https://rpc.gnosischain.com/",
     faucet: "https://xdai-faucet.top/",
     blockExplorer: "https://blockscout.com/poa/xdai/",
+    erc20Tokens: [
+      {
+        name: "EURe",
+        address: "0xcB444e90D8198415266c6a2724b7900fb12FC56E",
+        decimals: 18,
+        imgSrc: "/EURe.png"
+      },
+    ],
+    nativeToken: {
+      name:"xDAI",
+      imgSrc:"/xDAI.png"
+    }
   },
   polygon: {
     name: "polygon",
@@ -458,6 +476,12 @@ export const NETWORKS = {
     faucet: "https://faucet.matic.network/",
     blockExplorer: "https://polygonscan.com/",
     erc20Tokens: [
+      {
+        name: "EURe",
+        address: "0x18ec0A6E18E5bc3784fDd3a3634b31245ab704F6",
+        decimals: 18,
+        imgSrc: "/EURe.png"
+      },
       {
         name: "USDC",
         address: POLYGON_USDC_ADDRESS,
