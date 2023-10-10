@@ -531,7 +531,8 @@ export const NETWORKS = {
     faucet: "https://faucet.sepolia.dev/",
     blockExplorer: "https://sepolia.etherscan.io/",
     //rpcUrl: `https://rpc.sepolia.dev`,
-    rpcUrl: `https://rpc.sepolia.org/`,
+    //rpcUrl: `https://rpc.sepolia.org/`,
+    rpcUrl: `https://eth-sepolia.g.alchemy.com/v2/4vFnzFt4K0gFDvYodzTuH9ZjbGI-awSf`,
 
   },
   localhost: {
