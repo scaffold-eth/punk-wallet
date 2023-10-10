@@ -236,7 +236,19 @@ const EUReBalances = ( {balances} ) => {
     return (
         <>
             <>
-                <LogoOnLogo src1={"MoneriumLogo.png"} src2={"greenCheckmark.svg"} showImage2={moneriumConnected} onClickAction={() => {setOpen(!open)}}/>
+                
+
+                <Button
+                    key="submit"
+                    type="primary"
+                    onClick={() => {
+                        setOpen(!open);
+                    }}
+                    //icon={<LogoOnLogo src1={"MoneriumLogo.png"} src2={"greenCheckmark.svg"} showImage2={moneriumConnected} onClickAction={() => {setOpen(!open)}}/>}
+                    icon={<LoginOutlined />}
+                >
+                    Login with Monerium
+                </Button>
             </>
             <Modal
                 visible={open}
