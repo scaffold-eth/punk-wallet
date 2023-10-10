@@ -1,9 +1,11 @@
-import { CameraOutlined, QrcodeOutlined } from "@ant-design/icons";
+import { CameraOutlined, QrcodeOutlined, SnippetsOutlined } from "@ant-design/icons";
 import { Badge, Input, message, Spin } from "antd";
 import { useLookupAddress } from "eth-hooks";
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useState, useEffect } from "react";
 import QrReader from "react-qr-reader-es6";
 import { QRPunkBlockie } from ".";
+
+import { isValidIban } from "../helpers/MoneriumHelper";
 
 // probably we need to change value={toAddress} to address={toAddress}
 
@@ -32,12 +34,70 @@ import { QRPunkBlockie } from ".";
                           or onChange={address => { setToAddress(address);}}
 */
 
+const PasteButton = ({ stateSetter }) => {
+  return (
+      <div
+          style={{ marginTop: 4, cursor: "pointer" }}
+          onClick={ async () => {
+              try {
+                  const text = await navigator.clipboard.readText();
+                  stateSetter(text);
+              } catch (err) {
+                  console.error('Failed to read clipboard:', err);
+              }
+          }}
+      >
+
+          <Badge>
+              <SnippetsOutlined style={{ color: "#000000", fontSize: 18 }} />
+          </Badge>{" "}
+
+          Paste
+      </div>
+      );
+  };
+
 export default function AddressInput(props) {
+  const { ensProvider, onChange, ibanAddressObject, setIbanAddressObject, isIbanTransferReady } = props;
+
   const [value, setValue] = useState(props.address);
   const [scan, setScan] = useState(false);
 
+  const [isIbanAddress, setIsIbanAddress] = useState(false);
+
+  const [ibanFirstName, setIbanFirstName] = useState("");
+  const [ibanLastName, setIbanLastName] = useState("");
+
   const currentValue = typeof props.value !== "undefined" ? props.value : value;
   const ens = useLookupAddress(props.ensProvider, currentValue);
+
+  useEffect(() => {
+    if (!isIbanTransferReady) {
+      return;
+    }
+
+    const iban = ens || currentValue;
+
+    if (isValidIban(iban)) {
+      setIsIbanAddress(true);
+
+      setIbanAddressObject({
+      ...ibanAddressObject,
+        iban: iban
+      });
+    }
+    else {
+      setIsIbanAddress(false);
+    }
+  }, [ens, currentValue, value, isIbanTransferReady]);
+
+  useEffect(() => {
+    setIbanAddressObject({
+      ...ibanAddressObject,
+      firstName: ibanFirstName,
+      lastName: ibanLastName,
+    });
+  }, [ibanFirstName, ibanLastName]);
 
   const scannerButton = (
     <div
@@ -53,7 +113,6 @@ export default function AddressInput(props) {
     </div>
   );
 
-  const { ensProvider, onChange } = props;
   const updateAddress = useCallback(
     async newValue => {
       if (typeof newValue !== "undefined") {
@@ -205,6 +264,33 @@ export default function AddressInput(props) {
           updateAddress(e.target.value);
         }}
       />
+
+      {isIbanAddress && 
+        <div style={{ display: 'flex',  flexDirection: 'column' }}>
+            <div style={{ padding: 10 }}>  
+                <Input
+                    addonAfter={<PasteButton stateSetter={setIbanFirstName}/>}
+                    id={"firstName"}
+                    onChange={e => {
+                      setIbanFirstName(e.target.value);
+                    }}
+                    placeholder={"First Name"}
+                    value={ibanFirstName}
+                  />
+            </div>
+            <div style={{ padding: 10 }}>  
+                <Input
+                    addonAfter={<PasteButton stateSetter={setIbanLastName}/>}
+                    id={"lastName"}
+                    onChange={e => {
+                      setIbanLastName(e.target.value);
+                    }}
+                    placeholder={"Last Name"}
+                    value={ibanLastName}
+                  />
+            </div>
+        </div>
+      }
     </div>
   );
 }

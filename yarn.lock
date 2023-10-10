@@ -2499,6 +2499,11 @@
   resolved "https://registry.yarnpkg.com/@metamask/safe-event-emitter/-/safe-event-emitter-2.0.0.tgz#af577b477c683fad17c619a78208cede06f9605c"
   integrity sha512-/kSXhY692qiV1MXu6EeOZvg5nECLclxNXcKCxJ3cXQgYuRymRHpdx/t7JXfsK+JLjwA1e1c1/SBrlQYpusC29Q==
 
+"@monerium/sdk@^2.6.1":
+  version "2.6.1"
+  resolved "https://registry.yarnpkg.com/@monerium/sdk/-/sdk-2.6.1.tgz#eee6f40ae15d70533910ab12025d58c423595a71"
+  integrity sha512-RYoTEW3Or8O34uXBQDr4v1RnLY50vT3TeipvESc+GrmsldES48bnE7MFF/DZBGWe+d8nhOF5wTh1YAigG1/Z3Q==
+
 "@mrmlnc/readdir-enhanced@^2.2.1":
   version "2.2.1"
   resolved "https://registry.yarnpkg.com/@mrmlnc/readdir-enhanced/-/readdir-enhanced-2.2.1.tgz#524af240d1a360527b730475ecfa1344aa540dde"
@@ -11250,6 +11255,11 @@ i@0.3.x:
   version "0.3.6"
   resolved "https://registry.yarnpkg.com/i/-/i-0.3.6.tgz#d96c92732076f072711b6b10fd7d4f65ad8ee23d"
   integrity sha1-2WyScyB28HJxG2sQ/X1PZa2O4j0=
+
+ibantools@^4.3.4:
+  version "4.3.4"
+  resolved "https://registry.yarnpkg.com/ibantools/-/ibantools-4.3.4.tgz#3307155e2354240ec2e4b494d5823c350e364801"
+  integrity sha512-Qs7vDo6IO0v1W78mh/fBwQafS4MVXEMXBlgRJxQ8Viaa4grA5zaOpb6iozSH4LlZeWt3EM/VZjej/c1TteghOw==
 
 iconv-lite@0.4.24, iconv-lite@^0.4.24:
   version "0.4.24"

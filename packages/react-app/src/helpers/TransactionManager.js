@@ -4,7 +4,7 @@ import { getChainIdNumber, getEthersWallet } from "./EIP1559Helper";
 const { BigNumber, ethers } = require("ethers");
 
 const STORAGE_KEY = "transactionResponses";
-const LOCAL_STORAGE_CHANGED_EVENT_NAME = "localStorageChanged";
+export const LOCAL_STORAGE_CHANGED_EVENT_NAME = "localStorageChanged";
 
 export class TransactionManager {
 	constructor(provider, signer, loggingEnabled) {

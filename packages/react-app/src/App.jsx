@@ -1,8 +1,8 @@
-import { CaretUpOutlined, ScanOutlined, SendOutlined, ReloadOutlined } from "@ant-design/icons";
+import { CaretUpOutlined, ScanOutlined, SendOutlined, ReloadOutlined, HistoryOutlined } from "@ant-design/icons";
 import { JsonRpcProvider, StaticJsonRpcProvider, Web3Provider } from "@ethersproject/providers";
 import { formatEther, parseEther } from "@ethersproject/units";
 import WalletConnectProvider from "@walletconnect/web3-provider";
-import { Alert, Button, Col, Row, Select, Spin, Input, Modal, notification } from "antd";
+import { Alert, Button, Checkbox, Col, Row, Select, Spin, Input, Modal, notification } from "antd";
 import "antd/dist/antd.css";
 import { useUserAddress } from "eth-hooks";
 import React, { useCallback, useEffect, useState, useMemo } from "react";
@@ -21,6 +21,7 @@ import {
   GasGauge,
   Header,
   IFrame,
+  Monerium,
   QRPunkBlockie,
   Ramp,
   TransactionResponses,
@@ -46,9 +47,14 @@ import {
 import { TransactionManager } from "./helpers/TransactionManager";
 import { sendTransaction } from "./helpers/EIP1559Helper";
 
+import { placeIbanOrder, getFilteredOrders, isValidIban } from "./helpers/MoneriumHelper";
+
 const { confirm } = Modal;
 
 const { ethers } = require("ethers");
+
+const { MoneriumClient } = require("@monerium/sdk");
+
 /*
     Welcome to 🏗 scaffold-eth !
 
@@ -239,6 +245,36 @@ function App(props) {
 
   const [tokenName, setTokenName] = useLocalStorage(targetNetwork.name + "TokenName");
   const token = targetNetwork?.erc20Tokens ? targetNetwork.erc20Tokens.find(token => token.name === tokenName) : undefined;
+
+  const [showHistory, setShowHistory] = useLocalStorage("showHistory", true);
+
+  const [moneriumClient, setMoneriumClient] = useState(new MoneriumClient('production'));
+  const [moneriumConnected, setMoneriumConnected] = useState(false);
+  const [punkConnectedToMonerium, setPunkConnectedToMonerium] = useState(false);
+  const [moneriumOrders, setMoneriumOrders] = useState(null);
+
+  useEffect(() => {
+    const getMoneriumOrders = async () => {
+      if (!punkConnectedToMonerium || !address) {
+        return;
+      }
+
+      try {
+        const moneriumOrders = await getFilteredOrders(moneriumClient, address);
+        setMoneriumOrders(moneriumOrders);  
+      }
+      catch(error) {
+        console.log("Something went wrong", error);
+      }      
+    }
+
+    getMoneriumOrders();
+    
+  }, [moneriumClient, punkConnectedToMonerium, address]);
+
+  const [ibanAddressObject, setIbanAddressObject] = useState({});
+
+  const isIbanTransferReady = moneriumConnected && punkConnectedToMonerium && token && token?.name == "EURe";
 
   // if you don't have any money, scan the other networks for money
   // lol this poller is a bad idea why does it keep
@@ -872,6 +908,14 @@ function App(props) {
       <div className="site-page-header-ghost-wrapper">
         <Header
           extra={[
+            <Monerium
+              moneriumClient={moneriumClient}
+              setMoneriumClient={setMoneriumClient}
+              moneriumConnected={moneriumConnected}
+              setMoneriumConnected={setMoneriumConnected}
+              setPunkConnectedToMonerium={setPunkConnectedToMonerium}
+              currentPunkAddress={address}
+            />,
             <Address
               key="address"
               fontSize={32}
@@ -964,13 +1008,16 @@ function App(props) {
         <div style={{ padding: 10 }}>
           <AddressInput
             ensProvider={mainnetProvider}
-            placeholder="to address"
+            placeholder={isIbanTransferReady ? "to address / IBAN" : "to address"}
             disabled={walletConnectTx}
             value={toAddress}
             onChange={setToAddress}
             hoistScanner={toggle => {
               scanner = toggle;
             }}
+            isIbanTransferReady={isIbanTransferReady}
+            ibanAddressObject={ibanAddressObject}
+            setIbanAddressObject={setIbanAddressObject}
             walletConnect={async wcLink => {
               //if(walletConnectUrl){
               /*try{
@@ -1046,63 +1093,74 @@ function App(props) {
             onClick={async () => {
               setLoading(true);
 
-              let txConfig = {
-                chainId: selectedChainId
-              };
-
-              if (!token) {
-                let value;
-                try {
-                  console.log("PARSE ETHER", amount);
-                  value = parseEther("" + amount);
-                  console.log("PARSEDVALUE", value);
-                } catch (e) {
-                  const floatVal = parseFloat(amount).toFixed(8);
-
-                  console.log("floatVal", floatVal);
-                  // failed to parseEther, try something else
-                  value = parseEther("" + floatVal);
-                  console.log("PARSEDfloatVALUE", value);
-                }
-
-                txConfig.to = toAddress;
-                txConfig.value = value;
+              if (isValidIban(toAddress)) {
+                const order = await placeIbanOrder(moneriumClient, address, ibanAddressObject, amount, targetNetwork.name);
+                const newMoneriumOrders = await getFilteredOrders(moneriumClient, address);
+                setMoneriumOrders(newMoneriumOrders);  
               }
               else {
-                if (token) {
-                  txConfig.erc20 = {
-                    token: token,
-                    to: toAddress,
-                    amount: amount
+                let txConfig = {
+                  chainId: selectedChainId
+                };
+
+                if (!token) {
+                  let value;
+                  try {
+                    console.log("PARSE ETHER", amount);
+                    value = parseEther("" + amount);
+                    console.log("PARSEDVALUE", value);
+                  } catch (e) {
+                    const floatVal = parseFloat(amount).toFixed(8);
+
+                    console.log("floatVal", floatVal);
+                    // failed to parseEther, try something else
+                    value = parseEther("" + floatVal);
+                    console.log("PARSEDfloatVALUE", value);
+                  }
+
+                  txConfig.to = toAddress;
+                  txConfig.value = value;
+                }
+                else {
+                  if (token) {
+                    txConfig.erc20 = {
+                      token: token,
+                      to: toAddress,
+                      amount: amount
+                    }
                   }
                 }
+
+                if (targetNetwork.name == "arbitrum") {
+                  //txConfig.gasLimit = 21000;
+                  //ask rpc for gas price
+                } else if (targetNetwork.name == "optimism") {
+                  //ask rpc for gas price
+                } else if (targetNetwork.name == "gnosis") {
+                  //ask rpc for gas price
+                } else if (targetNetwork.name == "polygon") {
+                  //ask rpc for gas price
+                } else if (targetNetwork.name == "goerli") {
+                  //ask rpc for gas price
+                } else if (targetNetwork.name == "sepolia") {
+                  //ask rpc for gas price
+                } else {
+                  txConfig.gasPrice = gasPrice;
+                }
+
+                console.log("SEND AND NETWORK", targetNetwork);
+
+                let result = tx(txConfig);
+                result = await result;
+                console.log(result);
               }
 
-              if (targetNetwork.name == "arbitrum") {
-                //txConfig.gasLimit = 21000;
-                //ask rpc for gas price
-              } else if (targetNetwork.name == "optimism") {
-                //ask rpc for gas price
-              } else if (targetNetwork.name == "gnosis") {
-                //ask rpc for gas price
-              } else if (targetNetwork.name == "polygon") {
-                //ask rpc for gas price
-              } else if (targetNetwork.name == "goerli") {
-                //ask rpc for gas price
-              } else if (targetNetwork.name == "sepolia") {
-                //ask rpc for gas price
-              } else {
-                txConfig.gasPrice = gasPrice;
-              }
-
-              console.log("SEND AND NETWORK", targetNetwork);
-
-              let result = tx(txConfig);
+              
               // setToAddress("")
               setAmount("");
               setData("");
-              result = await result;
-              console.log(result);
+              
+              setShowHistory(true);
               setLoading(false);
             }}
           >
@@ -1226,14 +1284,18 @@ function App(props) {
 */}
 
       <div style={{ padding: 16, backgroundColor: "#FFFFFF", width: 420, margin: "auto" }}>
-        <TransactionResponses
+        {<TransactionResponses
           provider={userProvider}
           signer={userProvider.getSigner()}
           injectedProvider={injectedProvider}
           address={address}
           chainId={targetNetwork.chainId}
           blockExplorer={blockExplorer}
-        />
+          moneriumOrders={moneriumOrders}
+          showHistory={showHistory}
+          setShowHistory={setShowHistory}
+        />}
+          
       </div>
 
       <div style={{ zIndex: -1, paddingTop: 20, opacity: 0.5, fontSize: 12 }}>

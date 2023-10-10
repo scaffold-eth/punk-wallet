@@ -1,20 +1,47 @@
 import React, { useEffect, useState } from "react";
-import { TransactionManager } from "../helpers/TransactionManager";
-import { TransactionHistory } from "./";
 
-export default function TransactionResponses({provider, signer, injectedProvider, address, chainId, blockExplorer}) {
+import { HistoryOutlined } from "@ant-design/icons";
+
+import { TransactionHistory } from "./";
+import { TransactionManager } from "../helpers/TransactionManager";
+
+import { getDeletedOrderIdsFromLocalStorage, getChainId } from "../helpers/MoneriumHelper";
+
+export default function TransactionResponses({provider, signer, injectedProvider, address, chainId, blockExplorer, moneriumOrders, showHistory, setShowHistory}) {
   const transactionManager = new TransactionManager(provider, signer, true);
 
   const [transactionResponsesArray, setTransactionResponsesArray] = useState([]);
 
+  let filteredMoneriumOrders = undefined;
+
   const initTransactionResponsesArray = () => {
+    const deletedOrderIdsFromLocalStorage = getDeletedOrderIdsFromLocalStorage();
+
+    if (moneriumOrders) {
+      filteredMoneriumOrders = moneriumOrders.filter(
+        moneriumOrder => {
+          return (getChainId(moneriumOrder) == chainId) && !deletedOrderIdsFromLocalStorage.includes(moneriumOrder.id);
+        })
+    }
+
     if (injectedProvider !== undefined) {
       setTransactionResponsesArray([]);
     }
     else {
-      setTransactionResponsesArray(
-        filterResponsesAddressAndChainId(
-          transactionManager.getTransactionResponsesArray()));    
+      if (!address || !chainId) {
+        return;
+      }
+
+      const onChainTransactions = filterResponsesAddressAndChainId(
+          transactionManager.getTransactionResponsesArray());
+
+      let onAndOffChainTransactions = onChainTransactions;
+
+      if (moneriumOrders) {
+        onAndOffChainTransactions = onChainTransactions.concat(filteredMoneriumOrders);
+      }
+
+      setTransactionResponsesArray(onAndOffChainTransactions);    
     }
   }
 
@@ -36,11 +63,24 @@ export default function TransactionResponses({provider, signer, injectedProvider
       window.removeEventListener("storage", initTransactionResponsesArray);
       window.removeEventListener(transactionManager.getLocalStorageChangedEventName(), initTransactionResponsesArray);
     }
-  }, [injectedProvider, address, chainId]);
+  }, [injectedProvider, address, chainId, moneriumOrders]);
   
     return (
       <>
-      {(transactionResponsesArray.length > 0) && <TransactionHistory transactionResponsesArray={transactionResponsesArray} transactionManager={transactionManager} blockExplorer={blockExplorer}/>}
+        {((transactionResponsesArray.length > 0) || (filteredMoneriumOrders && filteredMoneriumOrders.length > 0)) &&
+          <div 
+            style={{ display: "flex", justifyContent: "flex-end", alignItems: "center", fontSize:"2em", cursor: "pointer"}}
+            onClick={
+              () => {
+                setShowHistory(!showHistory)
+              } 
+            }
+          >
+              <HistoryOutlined style={{ color: showHistory ? "black" : "gray"}}/>
+          </div>
+        }
+
+        {(transactionResponsesArray.length > 0) && showHistory && <TransactionHistory transactionResponsesArray={transactionResponsesArray} transactionManager={transactionManager} blockExplorer={blockExplorer}/>}
       </>
     );  
   }
