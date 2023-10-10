@@ -257,7 +257,6 @@ export default function IFrame({ address, userProvider }) {
             minWidth: "18rem",
             maxWidth: "20rem",
           }}
-          autoFocus
           value={inputAppUrl}
           onChange={e => setInputAppUrl(e.target.value)}
         />
