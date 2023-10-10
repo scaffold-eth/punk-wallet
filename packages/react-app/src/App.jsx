@@ -908,14 +908,6 @@ function App(props) {
       <div className="site-page-header-ghost-wrapper">
         <Header
           extra={[
-            <Monerium
-              moneriumClient={moneriumClient}
-              setMoneriumClient={setMoneriumClient}
-              moneriumConnected={moneriumConnected}
-              setMoneriumConnected={setMoneriumConnected}
-              setPunkConnectedToMonerium={setPunkConnectedToMonerium}
-              currentPunkAddress={address}
-            />,
             <Address
               key="address"
               fontSize={32}
@@ -1370,6 +1362,18 @@ function App(props) {
           )}
         </div>
         <IFrame address={address} userProvider={userProvider} />
+
+        <div style={{ paddingTop:"2em" }}>
+          <Monerium
+              moneriumClient={moneriumClient}
+              setMoneriumClient={setMoneriumClient}
+              moneriumConnected={moneriumConnected}
+              setMoneriumConnected={setMoneriumConnected}
+              setPunkConnectedToMonerium={setPunkConnectedToMonerium}
+              currentPunkAddress={address}
+            />
+        </div>
+
       </div>
 
       {targetNetwork.name == "ethereum" ? (
