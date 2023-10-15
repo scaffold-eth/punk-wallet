@@ -236,19 +236,21 @@ const EUReBalances = ( {balances} ) => {
     return (
         <>
             <>
-                
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <LogoOnLogo src1={"MoneriumLogo.png"} src2={"greenCheckmark.svg"} sizeMultiplier1={2} showImage2={moneriumConnected} onClickAction={() => {setOpen(!open)}}/>
 
-                <Button
-                    key="submit"
-                    type="primary"
-                    onClick={() => {
-                        setOpen(!open);
-                    }}
-                    //icon={<LogoOnLogo src1={"MoneriumLogo.png"} src2={"greenCheckmark.svg"} showImage2={moneriumConnected} onClickAction={() => {setOpen(!open)}}/>}
-                    icon={<LoginOutlined />}
-                >
-                    Login with Monerium
-                </Button>
+                    <Button
+                        key="submit"
+                        type="primary"
+                        onClick={() => {
+                            setOpen(!open);
+                        }}
+                        //icon={<LogoOnLogo src1={"MoneriumLogo.png"} src2={"greenCheckmark.svg"} showImage2={moneriumConnected} onClickAction={() => {setOpen(!open)}}/>}
+                        //icon={<LoginOutlined />}
+                    >
+                        {!moneriumConnected ? "Login with Monerium" : "Monerium Connected"}
+                    </Button>
+                </div>
             </>
             <Modal
                 visible={open}
