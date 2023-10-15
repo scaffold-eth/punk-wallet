@@ -192,15 +192,14 @@ export const getMemo  = (address) => {
     return "Punk " + getShortAddress(address);
 }
 
-export const getFilteredOrders  = async (client, address) => {
-    const orders = await client.getOrders(
-        // Can be filtered by address, txHash, profile, memo, accountId and state
-        {
-            address: address,
-            memo: getMemo(address)
-        }
-    );
-
+export const getFilteredOrders  = async (client, filterObject) => {
+    const orders = await client.getOrders(filterObject);
+    // Can be filtered by address, txHash, profile, memo, accountId and state
+    //{
+    //    address: address,
+    //    memo: getMemo(address)
+    // }
+    
     return orders;
 }
 

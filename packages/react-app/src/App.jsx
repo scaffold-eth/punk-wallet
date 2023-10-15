@@ -47,13 +47,13 @@ import {
 import { TransactionManager } from "./helpers/TransactionManager";
 import { sendTransaction } from "./helpers/EIP1559Helper";
 
-import { placeIbanOrder, getFilteredOrders, isValidIban } from "./helpers/MoneriumHelper";
+import { placeIbanOrder, getFilteredOrders, getMemo, isValidIban } from "./helpers/MoneriumHelper";
 
 const { confirm } = Modal;
 
 const { ethers } = require("ethers");
 
-const { MoneriumClient } = require("@monerium/sdk");
+const { MoneriumClient, OrderState } = require("@monerium/sdk");
 
 /*
     Welcome to 🏗 scaffold-eth !
@@ -253,24 +253,53 @@ function App(props) {
   const [punkConnectedToMonerium, setPunkConnectedToMonerium] = useState(false);
   const [moneriumOrders, setMoneriumOrders] = useState(null);
 
-  useEffect(() => {
-    const getMoneriumOrders = async () => {
-      if (!punkConnectedToMonerium || !address) {
-        return;
-      }
-
-      try {
-        const moneriumOrders = await getFilteredOrders(moneriumClient, address);
-        setMoneriumOrders(moneriumOrders);  
-      }
-      catch(error) {
-        console.log("Something went wrong", error);
-      }      
+  const initMoneriumOrders = async (sleepMs) => {
+    if (sleepMs) {
+      await new Promise(r => setTimeout(r, sleepMs));
     }
 
-    getMoneriumOrders();
-    
+    const filterObject = {
+      address: address,
+      memo: getMemo(address)
+    }
+
+    try {
+      const moneriumOrders = await getFilteredOrders(moneriumClient, filterObject);
+      setMoneriumOrders(moneriumOrders);
+    }
+    catch(error) {
+      console.log("Something went wrong", error);
+    }      
+  }
+
+  useEffect(() => {
+    if (!punkConnectedToMonerium || !address) {
+      return;
+    }
+
+    initMoneriumOrders();
   }, [moneriumClient, punkConnectedToMonerium, address]);
+
+  useEffect(() => {
+    if (!moneriumOrders) {
+      return;
+    }
+
+    let pendingOrder = false;
+
+    for (const order of moneriumOrders) {
+      const state = order?.meta?.state;
+      if (state && (state == OrderState.placed) || (state == OrderState.pending)) {
+        console.log("There is a pending order", order)
+        pendingOrder = true;
+        break;
+      }
+    }
+
+    if (pendingOrder) {
+      initMoneriumOrders(3000);
+    }
+  }, [moneriumOrders]);
 
   const [ibanAddressObject, setIbanAddressObject] = useState({});
 
@@ -1087,8 +1116,7 @@ function App(props) {
 
               if (isValidIban(toAddress)) {
                 const order = await placeIbanOrder(moneriumClient, address, ibanAddressObject, amount, targetNetwork.name);
-                const newMoneriumOrders = await getFilteredOrders(moneriumClient, address);
-                setMoneriumOrders(newMoneriumOrders);  
+                await initMoneriumOrders();
               }
               else {
                 let txConfig = {

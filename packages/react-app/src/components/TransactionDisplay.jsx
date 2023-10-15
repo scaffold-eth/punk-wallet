@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 
-import { Button, Popover } from "antd";
+import { Button, Popover, Spin } from "antd";
 
 import moment from 'moment';
 
@@ -14,6 +14,7 @@ import { getShortAddress } from "../helpers/MoneriumHelper";
 import { NETWORKS } from "../constants";
 
 const { BigNumber, ethers } = require("ethers");
+const { OrderState } = require("@monerium/sdk");
 
 export default function TransactionDisplay({
     status,
@@ -39,17 +40,20 @@ export default function TransactionDisplay({
     let statusBackgroundColor = "#e0e0e0";
     let statusMessage = "In Progress";
     let statusMessageColor;
+    let pendingOrder = true;
 
-    if (status == "processed") {
+    if (status == OrderState.processed) {
         statusBackgroundColor = "#71d593";
         statusMessage = "Completed";
-        statusMessageColor = "white"
+        statusMessageColor = "white";
+        pendingOrder = false;
     }
 
-    if (status == "rejected") {
+    if (status == OrderState.rejected) {
         statusBackgroundColor = "black";
         statusMessage = "Rejected";
-        statusMessageColor = "white"
+        statusMessageColor = "white";
+        pendingOrder = false;
     }
 
     const options = { year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric'};
@@ -140,7 +144,9 @@ export default function TransactionDisplay({
                         <div style={{  color : statusMessageColor  }}  >
                             {statusMessage}
                         </div>
+                        {pendingOrder && <Spin size = "small"/>}
                     </div>
+                    
                 </div>
             }
 
