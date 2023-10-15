@@ -467,6 +467,12 @@ export const NETWORKS = {
         decimals: 6,
         imgSrc: "/USDT.png"
       },
+      {
+        name: "USDC",
+        address: "0xddafbb505ad214d7b80b1f830fccc89b60fb7a83",
+        decimals: 6,
+        imgSrc: "/USDC.png"
+      },
     ],
     nativeToken: {
       name:"xDAI",
