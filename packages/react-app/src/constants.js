@@ -456,6 +456,12 @@ export const NETWORKS = {
     blockExplorer: "https://blockscout.com/poa/xdai/",
     erc20Tokens: [
       {
+        name: "sDAI",
+        address: "0xaf204776c7245bf4147c2612bf6e5972ee483701",
+        decimals: 18,
+        imgSrc: "/sDAI.png"
+      },
+      {
         name: "EURe",
         address: "0xcB444e90D8198415266c6a2724b7900fb12FC56E",
         decimals: 18,
