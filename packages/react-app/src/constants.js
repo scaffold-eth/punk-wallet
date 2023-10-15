@@ -456,10 +456,28 @@ export const NETWORKS = {
     blockExplorer: "https://blockscout.com/poa/xdai/",
     erc20Tokens: [
       {
+        name: "sDAI",
+        address: "0xaf204776c7245bf4147c2612bf6e5972ee483701",
+        decimals: 18,
+        imgSrc: "/sDAI.png"
+      },
+      {
         name: "EURe",
         address: "0xcB444e90D8198415266c6a2724b7900fb12FC56E",
         decimals: 18,
         imgSrc: "/EURe.png"
+      },
+      {
+        name: "USDT",
+        address: "0x4ecaba5870353805a9f068101a40e0f32ed605c6",
+        decimals: 6,
+        imgSrc: "/USDT.png"
+      },
+      {
+        name: "USDC",
+        address: "0xddafbb505ad214d7b80b1f830fccc89b60fb7a83",
+        decimals: 6,
+        imgSrc: "/USDC.png"
       },
     ],
     nativeToken: {
