@@ -4,7 +4,7 @@ import { NETWORKS } from "../constants";
 
 import { LOCAL_STORAGE_CHANGED_EVENT_NAME } from "./TransactionManager";
 
-const { MoneriumClient, placeOrderMessage, constants } = require("@monerium/sdk");
+const { AccountState, MoneriumClient, placeOrderMessage, constants } = require("@monerium/sdk");
 
 const ibantools = require('ibantools');
 
@@ -20,6 +20,10 @@ const REDIRECT_URI = "https://punkwallet.io/";
 const KEY_CODE_VERIFIER = "moneriumCodeVerifier";
 const KEY_REFRESH_TOKEN = "moneriumRefreshToken";
 const KEY_DELETED_ODER_IDS = "moneriumDeletedOrderIds";
+
+export const getNewMoneriumClient = () => {
+    return new MoneriumClient('production');
+}
 
 export const getAuthFlowURI = async () => {
 	try {
@@ -92,15 +96,16 @@ export const getData = async (client, currentPunkAddress) => {
         const profileId = authContext.profiles[0].id;
 
         const profile = await client.getProfile(profileId);
+        const name = profile.name;
 
-        let accountIBAN;
+        const accountArrayIban = [];
         const addressesSet = new Set();
     
         for (const account of profile.accounts) {
             addressesSet.add(account.address.toLowerCase());
 
-            if (account.iban) {
-                accountIBAN = account;
+            if (account?.iban && (account?.state == AccountState.approved)) {
+                accountArrayIban.push(account)
             }
         }
         
@@ -131,10 +136,11 @@ export const getData = async (client, currentPunkAddress) => {
         }
 
         return {
-            accountIBAN,
+            name,
+            accountArrayIban,
             addressesArray,
             punkConnected,
-            punkBalances
+            punkBalances,
         };
     }
     catch(error) {
@@ -205,6 +211,8 @@ export const getFilteredOrders  = async (client, filterObject) => {
 
 export const placeIbanOrder = async (client, currentPunkAddress, ibanAddressObject, amount, chain) => {
     try {
+        amount = amount.toString();
+
         const placeOrderMessageString =  placeOrderMessage(amount, ibanAddressObject.iban);
 
         const signedPlaceOrderMessage = await signMessage(placeOrderMessageString);
@@ -243,10 +251,13 @@ export const placeIbanOrder = async (client, currentPunkAddress, ibanAddressObje
             signature: signedPlaceOrderMessage,
             address: currentPunkAddress,
             counterpart: counterpart,
-            memo: getMemo(currentPunkAddress),
             //chain: 'gnosis',
             chain: chain,
         }
+
+        if (ibanAddressObject?.memo) {
+            orderObject.memo = ibanAddressObject.memo
+        }        
 
         const order = await client.placeOrder(orderObject);
 
@@ -290,3 +301,37 @@ export const appendDeletedOrderIdToLocalStorage = (id) => {
     // StorageEvent doesn't work in the same window
     window.dispatchEvent(new CustomEvent("localStorageChanged"));
 };
+
+const isNameValid = (name) => {
+    if (!name) {
+        return false;
+    }
+
+    if (name.length < 2) {
+        return false;
+    }
+
+    return true;
+}
+
+const isMemoValid = (memo) => {
+    if (!memo) {
+        return true;
+    }
+
+    if (memo.length < 5) {
+        return false;
+    }
+
+    return true;
+}
+
+export const isIbanAddressObjectValid = (ibanAddressObject) => {
+    const firstName = ibanAddressObject.firstName;
+    const lastName = ibanAddressObject.lastName;
+    const memo = ibanAddressObject.memo;
+
+    return isNameValid(firstName) && isNameValid(lastName) && isMemoValid(memo);
+
+};
+

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 
 import { Button, Popover, Spin } from "antd";
+import { RiseOutlined, FallOutlined } from "@ant-design/icons";
 
 import moment from 'moment';
 
@@ -14,12 +15,12 @@ import { getShortAddress } from "../helpers/MoneriumHelper";
 import { NETWORKS } from "../constants";
 
 const { BigNumber, ethers } = require("ethers");
-const { OrderState } = require("@monerium/sdk");
+const { OrderState, OrderKind } = require("@monerium/sdk");
 
 export default function TransactionDisplay({
     status,
     toAddress,
-    iban, name,
+    iban, name, memo, kind,
     txHash, txDisplayName = "tx",
     amount = 0,
     erc20TokenName, erc20ImgSrc,
@@ -74,6 +75,11 @@ export default function TransactionDisplay({
         smallImageSrc = "gnosis-bgfill-icon.svg";
     }
 
+    let incomingOrder = false;
+    if (kind && (kind == OrderKind.issue)) {
+        incomingOrder = true;
+    }
+
     return (
         <div style={{ display: 'flex',  flexDirection: 'column', backgroundColor:""  }}>
             {txHash &&
@@ -85,26 +91,33 @@ export default function TransactionDisplay({
             }
 
             {erc20TokenName && erc20ImgSrc ?
-                <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', fontSize:"1.42em"}}>
-                        <div style={{  }}>
-                            <b>{Number(amount).toFixed(2)}</b>
+                <div style={{ display: 'flex', fontSize: "1.42em" }}>
+                    <div style={{ flex: '25%', backgroundColor:"" }}>
+                        {kind && <div style={{  color: incomingOrder ? "#71d593" : "#2c6ca7" }}>
+                            {incomingOrder ? <FallOutlined /> : <RiseOutlined />}
+                        </div>}
+                    </div>
+                    <div style={{ flex: '50%' }}>
+                        <div style={{ flex: 1, textAlign: 'center', backgroundColor:"" }}>
+                            <b>{(kind ? (incomingOrder ? "+" : "-") : "" ) + Number(amount).toFixed(2)}</b>
+                            {
+                                erc20TokenName.includes("EUR") ?
+                                    <LogoOnLogo
+                                        src1={"EURe.png"}
+                                        src2={smallImageSrc}
+                                        showImage2={smallImageSrc !== undefined}
+                                        sizeMultiplier1={1.24}
+                                        sizeMultiplier2={0.5}
+                                    />
+                                    :
+                                    tokenDisplay("", erc20ImgSrc)
+                            }
                         </div>
-                        <div>
-                        {
-                            erc20TokenName.includes("EUR") ?
-                                <LogoOnLogo
-                                    src1={"EURe.png"}
-                                    src2={smallImageSrc}
-                                    showImage2={smallImageSrc != undefined}
-                                    sizeMultiplier1={1.24}
-                                    sizeMultiplier2={0.5}
-                                />
-                                :
-                                tokenDisplay("", erc20ImgSrc)
-                        }
-                        </div>    
-                    
+                    </div>
+                    <div style={{ flex: '25%'}}></div>
                 </div>
+
+
             :
                 (amount) && 
                     <div>
@@ -122,7 +135,7 @@ export default function TransactionDisplay({
                     </div>
                 </div>
                 : iban &&
-                <div>
+                <div style={{ backgroundColor:""}}>
                     <div>
                         <b>
                             {iban}
@@ -135,11 +148,16 @@ export default function TransactionDisplay({
                             </b>
                         </div>
                     }
+                    {memo &&
+                        <div>
+                            {memo}
+                        </div>
+                    }
                 </div>
             }
 
             {status &&
-                <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', paddingTop:"1em" }}>
                     <div style={{  backgroundColor: statusBackgroundColor, borderRadius:'1em', padding:'0.4em' }}  >
                         <div style={{  color : statusMessageColor  }}  >
                             {statusMessage}

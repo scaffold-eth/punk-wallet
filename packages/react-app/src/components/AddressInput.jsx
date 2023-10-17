@@ -21,7 +21,7 @@ import { isValidIban } from "../helpers/MoneriumHelper";
     ensProvider={mainnetProvider}
     placeholder="Enter address"
     value={toAddress}
-    onChange={setToAddress}
+    setToAddress={setToAddress}
   />
 
   ~ Features ~
@@ -30,8 +30,6 @@ import { isValidIban } from "../helpers/MoneriumHelper";
               (ex. "0xa870" => "user.eth") or you can enter directly ENS name instead of address
   - Provide placeholder="Enter address" value for the input
   - Value of the address input is stored in value={toAddress}
-  - Control input change by onChange={setToAddress}
-                          or onChange={address => { setToAddress(address);}}
 */
 
 const PasteButton = ({ stateSetter }) => {
@@ -58,9 +56,10 @@ const PasteButton = ({ stateSetter }) => {
   };
 
 export default function AddressInput(props) {
-  const { ensProvider, onChange, ibanAddressObject, setIbanAddressObject, isIbanTransferReady } = props;
+  const { ensProvider, setAmount, setToAddress, ibanAddressObject, setIbanAddressObject, isIbanTransferReady } = props;
 
   const [value, setValue] = useState(props.address);
+
   const [scan, setScan] = useState(false);
 
   const [isIbanAddress, setIsIbanAddress] = useState(false);
@@ -68,7 +67,10 @@ export default function AddressInput(props) {
   const [ibanFirstName, setIbanFirstName] = useState("");
   const [ibanLastName, setIbanLastName] = useState("");
 
+  const [ibanMemo, setIbanMemo] = useState("");
+
   const currentValue = typeof props.value !== "undefined" ? props.value : value;
+
   const ens = useLookupAddress(props.ensProvider, currentValue);
 
   useEffect(() => {
@@ -96,8 +98,9 @@ export default function AddressInput(props) {
       ...ibanAddressObject,
       firstName: ibanFirstName,
       lastName: ibanLastName,
+      memo: ibanMemo,
     });
-  }, [ibanFirstName, ibanLastName]);
+  }, [ibanFirstName, ibanLastName, ibanMemo]);
 
   const scannerButton = (
     <div
@@ -118,6 +121,58 @@ export default function AddressInput(props) {
       if (typeof newValue !== "undefined") {
 
         console.log("SCAN",newValue)
+
+
+
+        try {
+          // EPC QR code
+          if (newValue.includes("BCD") && newValue.includes("SCT")) {
+            const elements = newValue.split('\n');
+
+            const name = elements[5];
+            const names = name.split(" ");
+            const firstName = names[0];
+            const lastName = names[1];
+
+            const iban = elements[6];
+
+            let amount;
+            const amountData = elements[7];
+
+            if (amountData) {
+              try {
+                amount = parseFloat(amountData.replace("EUR", ""));
+              }
+              catch(error) {
+                console.log("Couldn't parse amount", error);
+              }
+            }
+
+            const memo = elements[10];
+
+            setIbanAddressObject({
+              firstName:name,
+              iban:iban
+            })
+
+            setIbanFirstName(firstName);
+            setIbanLastName(lastName);
+            setToAddress(iban);
+
+            if (amount) {
+              setAmount(amount);
+            }
+
+            if (memo) {
+              setIbanMemo(memo);
+            }
+
+            return;
+          }
+        }
+        catch (error) {
+          console.log("Couldn't parse EPC QR", error);
+        }
 
         /*console.log("🔑 Incoming Private Key...");
         rawPK = incomingPK;
@@ -143,13 +198,11 @@ export default function AddressInput(props) {
             } catch (e) {}
           }
           setValue(address);
-          if (typeof onChange === "function") {
-            onChange(address);
-          }
+          setToAddress(address);
         }
       }
     },
-    [ensProvider, onChange],
+    [ensProvider, setToAddress],
   );
 
   const scanner = scan ? (
@@ -287,6 +340,17 @@ export default function AddressInput(props) {
                     }}
                     placeholder={"Last Name"}
                     value={ibanLastName}
+                  />
+            </div>
+            <div style={{ padding: 10 }}>  
+                <Input
+                    addonAfter={<PasteButton stateSetter={setIbanMemo}/>}
+                    id={"memo"}
+                    onChange={e => {
+                      setIbanMemo(e.target.value);
+                    }}
+                    placeholder={"Reference / Memo"}
+                    value={ibanMemo}
                   />
             </div>
         </div>
