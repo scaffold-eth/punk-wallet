@@ -314,47 +314,31 @@ export const NETWORKS = {
         name: "EURe",
         address: "0x3231cb76718cdef2155fc47b5286d82e6eda273f",
         decimals: 18,
-        imgSrc: "/EURe.png"
+        imgSrc: "/EURe.png",
       },
       {
         name: "USDC",
         address: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
         decimals: 6,
-        imgSrc: "/USDC.png"
+        imgSrc: "/USDC.png",
       },
       {
         name: "USDT",
         address: "0xdAC17F958D2ee523a2206206994597C13D831ec7",
         decimals: 6,
-        imgSrc: "/USDT.png"
+        imgSrc: "/USDT.png",
       },
       {
         name: "DAI",
         address: "0x6B175474E89094C44Da98b954EedeAC495271d0F",
         decimals: 18,
-        imgSrc: "/DAI.png"
+        imgSrc: "/DAI.png",
       },
     ],
     nativeToken: {
-      name:"ETH",
-      imgSrc:"/ETH.png"
-    }
-  },
-  buidlguidl: {
-    name: "buidlguidl",
-    color: "#1785ff",
-    price: 1,
-    chainId: 80216,
-    rpcUrl: `https://chain.buidlguidl.com:8545`,
-    blockExplorer: "https://etherscan.io/",
-  },
-  zkSyncEra: {
-    name: "zkSyncEra",
-    color: "#45488f",
-    price: "uniswap",
-    chainId: 324,
-    rpcUrl: "https://mainnet.era.zksync.io",
-    blockExplorer: "https://explorer.zksync.io/"
+      name: "ETH",
+      imgSrc: "/ETH.png",
+    },
   },
   optimism: {
     name: "optimism",
@@ -370,31 +354,31 @@ export const NETWORKS = {
         name: "OP",
         address: "0x4200000000000000000000000000000000000042",
         decimals: 18,
-        imgSrc: "/OP.png"
+        imgSrc: "/OP.png",
       },
       {
         name: "USDC",
         address: "0x7F5c764cBc14f9669B88837ca1490cCa17c31607",
         decimals: 6,
-        imgSrc: "/USDC.png"
+        imgSrc: "/USDC.png",
       },
       {
         name: "USDT",
         address: "0x94b008aA00579c1307B0EF2c499aD98a8ce58e58",
         decimals: 6,
-        imgSrc: "/USDT.png"
+        imgSrc: "/USDT.png",
       },
       {
         name: "DAI",
         address: "0xDA10009cBd5D07dd0CeCc66161FC93D7c9000da1",
         decimals: 18,
-        imgSrc: "/DAI.png"
+        imgSrc: "/DAI.png",
       },
     ],
     nativeToken: {
-      name:"ETH",
-      imgSrc:"/ETH.png"
-    }
+      name: "ETH",
+      imgSrc: "/ETH.png",
+    },
   },
   base: {
     name: "base",
@@ -402,7 +386,7 @@ export const NETWORKS = {
     price: "uniswap",
     chainId: 8453,
     rpcUrl: "https://mainnet.base.org",
-    blockExplorer: "https://basescan.org/"
+    blockExplorer: "https://basescan.org/",
   },
   arbitrum: {
     name: "arbitrum",
@@ -417,31 +401,86 @@ export const NETWORKS = {
         name: "ARB",
         address: "0x912CE59144191C1204E64559FE8253a0e49E6548",
         decimals: 18,
-        imgSrc: "/ARB.png"
+        imgSrc: "/ARB.png",
       },
       {
         name: "USDC",
         address: "0xaf88d065e77c8cC2239327C5EDb3A432268e5831",
         decimals: 6,
-        imgSrc: "/USDC.png"
+        imgSrc: "/USDC.png",
       },
       {
         name: "USDT",
         address: "0xFd086bC7CD5C481DCC9C85ebE478A1C0b69FCbb9",
         decimals: 6,
-        imgSrc: "/USDT.png"
+        imgSrc: "/USDT.png",
       },
       {
         name: "DAI",
         address: "0xda10009cbd5d07dd0cecc66161fc93d7c9000da1",
         decimals: 18,
-        imgSrc: "/DAI.png"
+        imgSrc: "/DAI.png",
       },
     ],
     nativeToken: {
-      name:"ETH",
-      imgSrc:"/ETH.png"
-    }
+      name: "ETH",
+      imgSrc: "/ETH.png",
+    },
+  },
+  polygon: {
+    name: "polygon",
+    color: "#2bbdf7",
+    price: "uniswap:0x7D1AfA7B718fb893dB30A3aBc0Cfc608AaCfeBB0",
+    chainId: 137,
+    rpcUrl: "https://polygon-mainnet.g.alchemy.com/v2/7ls4W5wc3Cu-4-Zq2QaQxgUhJKjUIDay",
+    faucet: "https://faucet.matic.network/",
+    blockExplorer: "https://polygonscan.com/",
+    erc20Tokens: [
+      {
+        name: "EURe",
+        address: "0x18ec0A6E18E5bc3784fDd3a3634b31245ab704F6",
+        decimals: 18,
+        imgSrc: "/EURe.png",
+      },
+      {
+        name: "USDC",
+        address: POLYGON_USDC_ADDRESS,
+        decimals: 6,
+        imgSrc: "/USDC.png",
+      },
+      {
+        name: "USDT",
+        address: "0xc2132D05D31c914a87C6611C10748AEb04B58e8F",
+        decimals: 6,
+        imgSrc: "/USDT.png",
+        NativeMetaTransaction: {
+          name: "(PoS) Tether USD",
+          ERC712_VERSION: "1",
+        },
+      },
+      {
+        name: "DAI",
+        address: "0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063",
+        decimals: 18,
+        imgSrc: "/DAI.png",
+        NativeMetaTransaction: {
+          name: "(PoS) Dai Stablecoin",
+          ERC712_VERSION: "1",
+        },
+      },
+    ],
+    nativeToken: {
+      name: "MATIC",
+      imgSrc: "/MATIC.png",
+    },
+  },
+  scroll: {
+    name: "scroll",
+    color: "#ffdbb0",
+    price: "uniswap",
+    chainId: 534352,
+    rpcUrl: "https://rpc.scroll.io",
+    blockExplorer: "https://scrollscan.com/",
   },
   gnosis: {
     name: "gnosis",
@@ -461,86 +500,56 @@ export const NETWORKS = {
         name: "sDAI",
         address: "0xaf204776c7245bf4147c2612bf6e5972ee483701",
         decimals: 18,
-        imgSrc: "/sDAI.png"
+        imgSrc: "/sDAI.png",
       },
       {
         name: "EURe",
         address: "0xcB444e90D8198415266c6a2724b7900fb12FC56E",
         decimals: 18,
-        imgSrc: "/EURe.png"
+        imgSrc: "/EURe.png",
       },
       {
         name: "USDT",
         address: "0x4ecaba5870353805a9f068101a40e0f32ed605c6",
         decimals: 6,
-        imgSrc: "/USDT.png"
+        imgSrc: "/USDT.png",
       },
       {
         name: "USDC",
         address: "0xddafbb505ad214d7b80b1f830fccc89b60fb7a83",
         decimals: 6,
-        imgSrc: "/USDC.png"
+        imgSrc: "/USDC.png",
       },
     ],
     nativeToken: {
-      name:"xDAI",
-      imgSrc:"/xDAI.png"
-    }
+      name: "xDAI",
+      imgSrc: "/xDAI.png",
+    },
   },
-  polygon: {
-    name: "polygon",
-    color: "#2bbdf7",
-    price: "uniswap:0x7D1AfA7B718fb893dB30A3aBc0Cfc608AaCfeBB0",
-    chainId: 137,
-    rpcUrl: "https://polygon-mainnet.g.alchemy.com/v2/7ls4W5wc3Cu-4-Zq2QaQxgUhJKjUIDay",
-    faucet: "https://faucet.matic.network/",
-    blockExplorer: "https://polygonscan.com/",
-    erc20Tokens: [
-      {
-        name: "EURe",
-        address: "0x18ec0A6E18E5bc3784fDd3a3634b31245ab704F6",
-        decimals: 18,
-        imgSrc: "/EURe.png"
-      },
-      {
-        name: "USDC",
-        address: POLYGON_USDC_ADDRESS,
-        decimals: 6,
-        imgSrc: "/USDC.png"
-      },
-      {
-        name: "USDT",
-        address: "0xc2132D05D31c914a87C6611C10748AEb04B58e8F",
-        decimals: 6,
-        imgSrc: "/USDT.png",
-        NativeMetaTransaction: {
-          name: "(PoS) Tether USD",
-          ERC712_VERSION: "1"
-        }
-      },
-      {
-        name: "DAI",
-        address: "0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063",
-        decimals: 18,
-        imgSrc: "/DAI.png",
-        NativeMetaTransaction: {
-          name: "(PoS) Dai Stablecoin",
-          ERC712_VERSION: "1"
-        }
-      },
-    ],
-    nativeToken: {
-      name:"MATIC",
-      imgSrc:"/MATIC.png"
-    }
+  canto: {
+    name: "canto",
+    color: "#00ff9b",
+    chainId: 7700,
+    gasPrice: 420000000000,
+    rpcUrl: "https://canto.slingshot.finance",
+    faucet: "https://cantofaucet.com/",
+    blockExplorer: "https://evm.explorer.canto.io/",
   },
-  scroll: {
-    name: "scroll",
-    color: "#ffdbb0",
+  zkSyncEra: {
+    name: "zkSyncEra",
+    color: "#45488f",
     price: "uniswap",
-    chainId: 534352,
-    rpcUrl: "https://rpc.scroll.io",
-    blockExplorer: "https://scrollscan.com/"
+    chainId: 324,
+    rpcUrl: "https://mainnet.era.zksync.io",
+    blockExplorer: "https://explorer.zksync.io/",
+  },
+  buidlguidl: {
+    name: "buidlguidl",
+    color: "#1785ff",
+    price: 1,
+    chainId: 80216,
+    rpcUrl: `https://chain.buidlguidl.com:8545`,
+    blockExplorer: "https://etherscan.io/",
   },
   goerli: {
     name: "goerli",
@@ -561,7 +570,6 @@ export const NETWORKS = {
     //rpcUrl: `https://rpc.sepolia.dev`,
     //rpcUrl: `https://rpc.sepolia.org/`,
     rpcUrl: `https://eth-sepolia.g.alchemy.com/v2/4vFnzFt4K0gFDvYodzTuH9ZjbGI-awSf`,
-
   },
   localhost: {
     name: "localhost",
@@ -583,22 +591,13 @@ export const NETWORKS = {
         name: "USDC",
         address: ZK_TESTNET_USDC_ADDRESS,
         decimals: 6,
-        imgSrc: "/USDC.png"
-      }
+        imgSrc: "/USDC.png",
+      },
     ],
     nativeToken: {
-      name:"ETH",
-      imgSrc:"/ETH.png"
-    }
-  },
-  canto: {
-    name: "canto",
-    color: "#00ff9b",
-    chainId: 7700,
-    gasPrice: 420000000000,
-    rpcUrl: "https://canto.slingshot.finance",
-    faucet: "https://cantofaucet.com/",
-    blockExplorer: "https://evm.explorer.canto.io/",
+      name: "ETH",
+      imgSrc: "/ETH.png",
+    },
   },
   mumbai: {
     name: "mumbai",
