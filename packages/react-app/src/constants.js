@@ -1,3 +1,5 @@
+const ALCHEMY_API_KEY_MAINNET = process.env.REACT_APP_ALCHEMY_API_KEY_MAINNET;
+
 // MY INFURA_ID, SWAP IN YOURS FROM https://infura.io/dashboard/ethereum
 export const INFURA_ID = "5b3aa68d82264f59bb6a1874cb3c23ea"; // trying the  emoji.support key
 
@@ -305,7 +307,7 @@ export const NETWORKS = {
     color: "#ceb0fa",
     chainId: 1,
     price: "uniswap",
-    rpcUrl: `https://rpc2.scaffoldeth.io:48544`,
+    rpcUrl: "https://eth-mainnet.g.alchemy.com/v2/" + ALCHEMY_API_KEY_MAINNET,
     blockExplorer: "https://etherscan.io/",
     erc20Tokens: [
       {

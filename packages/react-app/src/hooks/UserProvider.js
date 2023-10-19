@@ -1,7 +1,8 @@
 import { Web3Provider } from "@ethersproject/providers";
 import BurnerProvider from "burner-provider";
 import { useMemo } from "react";
-//import { INFURA_ID } from "../constants";
+
+import { NETWORKS } from "../constants";
 
 /*
   ~ What it does? ~
@@ -61,7 +62,7 @@ const useUserProvider = (injectedProvider, localProvider) =>
     }
     // eslint-disable-next-line no-underscore-dangle
     const networkName = localProvider._network && localProvider._network.name;
-    burnerConfig.rpcUrl = `https://rpc.scaffoldeth.io:48544`;
+    burnerConfig.rpcUrl = NETWORKS.ethereum.rpcUrl;
     return new Web3Provider(new BurnerProvider(burnerConfig));
   }, [injectedProvider, localProvider]);
 
