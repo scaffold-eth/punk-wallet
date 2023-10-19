@@ -534,6 +534,14 @@ export const NETWORKS = {
       imgSrc:"/MATIC.png"
     }
   },
+  scroll: {
+    name: "scroll",
+    color: "#ffdbb0",
+    price: "uniswap",
+    chainId: 534352,
+    rpcUrl: "https://rpc.scroll.io",
+    blockExplorer: "https://scrollscan.com/"
+  },
   goerli: {
     name: "goerli",
     color: "#0975F6",
