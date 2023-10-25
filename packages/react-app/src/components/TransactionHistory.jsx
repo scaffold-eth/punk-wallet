@@ -34,6 +34,8 @@ export default function TransactionHistory({ transactionResponsesArray, transact
                     status = {transactionResponse?.meta.state}
                     iban = {transactionResponse?.counterpart?.identifier?.iban}
                     name = {transactionResponse?.counterpart?.details?.name}
+                    memo = {transactionResponse?.memo}
+                    kind = {transactionResponse?.kind}
                     erc20TokenName = {"EURe"}
                     erc20ImgSrc = {"/EURe.png"}
                     amount = {transactionResponse.amount}

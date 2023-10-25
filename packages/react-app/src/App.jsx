@@ -47,13 +47,13 @@ import {
 import { TransactionManager } from "./helpers/TransactionManager";
 import { sendTransaction } from "./helpers/EIP1559Helper";
 
-import { placeIbanOrder, getFilteredOrders, getMemo, isValidIban } from "./helpers/MoneriumHelper";
+import { getMemo, getNewMoneriumClient, getFilteredOrders, isValidIban, placeIbanOrder, isIbanAddressObjectValid } from "./helpers/MoneriumHelper";
 
 const { confirm } = Modal;
 
 const { ethers } = require("ethers");
 
-const { MoneriumClient, OrderState } = require("@monerium/sdk");
+const { OrderState } = require("@monerium/sdk");
 
 /*
     Welcome to 🏗 scaffold-eth !
@@ -240,10 +240,22 @@ function App(props) {
 
   const [showHistory, setShowHistory] = useLocalStorage("showHistory", true);
 
-  const [moneriumClient, setMoneriumClient] = useState(new MoneriumClient('production'));
+  const [moneriumClient, setMoneriumClient] = useState(getNewMoneriumClient());
   const [moneriumConnected, setMoneriumConnected] = useState(false);
   const [punkConnectedToMonerium, setPunkConnectedToMonerium] = useState(false);
   const [moneriumOrders, setMoneriumOrders] = useState(null);
+
+  const memoizedMonerium = useMemo(
+    () => <Monerium
+          moneriumClient={moneriumClient}
+          setMoneriumClient={setMoneriumClient}
+          moneriumConnected={moneriumConnected}
+          setMoneriumConnected={setMoneriumConnected}
+          punkConnectedToMonerium={punkConnectedToMonerium}
+          setPunkConnectedToMonerium={setPunkConnectedToMonerium}
+          currentPunkAddress={address}
+        />, [moneriumClient, moneriumConnected, punkConnectedToMonerium, address]
+  );
 
   const initMoneriumOrders = async (sleepMs) => {
     if (sleepMs) {
@@ -252,7 +264,6 @@ function App(props) {
 
     const filterObject = {
       address: address,
-      memo: getMemo(address)
     }
 
     try {
@@ -265,12 +276,12 @@ function App(props) {
   }
 
   useEffect(() => {
-    if (!punkConnectedToMonerium || !address) {
+    if (!moneriumConnected || !punkConnectedToMonerium || !address) {
       return;
     }
 
     initMoneriumOrders();
-  }, [moneriumClient, punkConnectedToMonerium, address]);
+  }, [moneriumClient, moneriumConnected, punkConnectedToMonerium, address]);
 
   useEffect(() => {
     if (!moneriumOrders) {
@@ -1024,7 +1035,8 @@ function App(props) {
             placeholder={isIbanTransferReady ? "to address / IBAN" : "to address"}
             disabled={walletConnectTx}
             value={toAddress}
-            onChange={setToAddress}
+            setAmount={setAmount}
+            setToAddress={setToAddress}
             hoistScanner={toggle => {
               scanner = toggle;
             }}
@@ -1101,7 +1113,7 @@ function App(props) {
           <Button
             key="submit"
             type="primary"
-            disabled={loading || !amount || !toAddress}
+            disabled={loading || !amount || !toAddress || (isValidIban(toAddress) && !isIbanAddressObjectValid(ibanAddressObject))}
             loading={loading}
             onClick={async () => {
               setLoading(true);
@@ -1176,7 +1188,7 @@ function App(props) {
               setLoading(false);
             }}
           >
-            {loading || !amount || !toAddress ? <CaretUpOutlined /> : <SendOutlined style={{ color: "#FFFFFF" }} />}{" "}
+            {loading || !amount || !toAddress || (isValidIban(toAddress) && !isIbanAddressObjectValid(ibanAddressObject)) ? <CaretUpOutlined /> : <SendOutlined style={{ color: "#FFFFFF" }} />}{" "}
             Send
           </Button>
         </div>
@@ -1384,14 +1396,7 @@ function App(props) {
         <IFrame address={address} userProvider={userProvider} />
 
         <div style={{ paddingTop:"2em" }}>
-          <Monerium
-              moneriumClient={moneriumClient}
-              setMoneriumClient={setMoneriumClient}
-              moneriumConnected={moneriumConnected}
-              setMoneriumConnected={setMoneriumConnected}
-              setPunkConnectedToMonerium={setPunkConnectedToMonerium}
-              currentPunkAddress={address}
-            />
+          {memoizedMonerium}
         </div>
 
       </div>
