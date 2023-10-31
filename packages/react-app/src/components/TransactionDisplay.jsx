@@ -29,6 +29,11 @@ export default function TransactionDisplay({
     chainId,
     showClearButton, clearButtonAction,
 }) {
+    let digits = 2;
+    if (erc20TokenName == "WETH") {
+        digits = 4;
+    }
+
     const [dateDisplayMode, setDateDisplayMode] = useLocalStorage("dateDisplayMode", false);
 
     let part1 = toAddress && toAddress.substr(2,20)
@@ -99,7 +104,7 @@ export default function TransactionDisplay({
                     </div>
                     <div style={{ flex: '50%' }}>
                         <div style={{ flex: 1, textAlign: 'center', backgroundColor:"" }}>
-                            <b>{(kind ? (incomingOrder ? "+" : "-") : "" ) + Number(amount).toFixed(2)}</b>
+                            <b>{(kind ? (incomingOrder ? "+" : "-") : "" ) + Number(amount).toFixed(digits)}</b>
                             {
                                 erc20TokenName.includes("EUR") ?
                                     <LogoOnLogo
