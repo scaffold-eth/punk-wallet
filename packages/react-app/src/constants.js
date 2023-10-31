@@ -317,6 +317,24 @@ export const NETWORKS = {
         imgSrc: "/WETH.png",
       },
       {
+        name: "ENS",
+        address: "0xc18360217d8f7ab5e7c516566761ea12ce7f9d72",
+        decimals: 18,
+        imgSrc: "/ENS.png",
+      },
+      {
+        name: "GTC",
+        address: "0xde30da39c46104798bb5aa3fe8b9e0e1f348163f",
+        decimals: 18,
+        imgSrc: "/GTC.png",
+      },
+      {
+        name: "BAL",
+        address: "0xba100000625a3754423978a60c9317c58a424e3d",
+        decimals: 18,
+        imgSrc: "/BAL.png",
+      },
+      {
         name: "EURe",
         address: "0x3231cb76718cdef2155fc47b5286d82e6eda273f",
         decimals: 18,
