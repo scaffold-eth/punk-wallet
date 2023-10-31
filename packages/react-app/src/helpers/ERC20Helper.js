@@ -1,3 +1,5 @@
+import { NETWORKS } from "../constants";
+
 const { ethers, utils } = require("ethers");
 
 // https://docs.ethers.org/v5/single-page/#/v5/api/contract/example/-%23-example-erc-20-contract--connecting-to-a-contract
@@ -68,6 +70,29 @@ export const getTransferTxParams = (token, to, amount) => {
 	return erc20Helper.transferPopulateTransaction(to, amount, token.decimals);
 }
 
+const isTokenAddressMainnetWETH = (tokenAddress) => {
+	const tokens = NETWORKS?.ethereum?.erc20Tokens;
+
+	if (!tokens) {
+		return false;
+	}
+
+	let tokenAddressWETH = undefined;
+
+	for (const token of tokens) {
+		if (token.name === "WETH") {
+            tokenAddressWETH = token.address;
+            break;
+        }
+	}
+
+	if (tokenAddress == tokenAddressWETH) {
+		return true;
+	}
+
+	return false;
+}
+
 export const getTokenBalance = async (token, rpcURL, address) => {
     const erc20Helper = new ERC20Helper(token.address, null, rpcURL);
 
@@ -75,10 +100,14 @@ export const getTokenBalance = async (token, rpcURL, address) => {
 
     const inverseDecimalCorrectedAmountNumber = await erc20Helper.getInverseDecimalCorrectedAmountNumber(balance, token.decimals);
 
-    const DIGITS = 2;
+    let digits = 2;
 
-    const roundedDown = Math.floor(inverseDecimalCorrectedAmountNumber * Math.pow(10, DIGITS)) / Math.pow(10, DIGITS);
+    if (isTokenAddressMainnetWETH(token.address)) {
+    	digits = 4;
+    }
 
-    return roundedDown.toFixed(DIGITS);
+    const roundedDown = Math.floor(inverseDecimalCorrectedAmountNumber * Math.pow(10, digits)) / Math.pow(10, digits);
+
+    return roundedDown.toFixed(digits);
 }
 
