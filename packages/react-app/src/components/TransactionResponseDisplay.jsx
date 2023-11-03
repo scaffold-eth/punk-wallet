@@ -67,7 +67,7 @@ export default function TransactionResponseDisplay({transactionResponse, transac
   const getTransactionPopoverContent = () => {
     return (
       <div style={{ margin: "1em"}}>
-        {isCancelTransaction(transactionResponse) && <p style={{ marginBottom: "2em"}}><b>The original transaciton was replaced by a cancel transaction - sending 0 to yourself</b></p>}
+        {isCancelTransaction(transactionResponse) && <p style={{ marginBottom: "2em"}}><b>The original transaction was replaced by a cancel transaction - sending 0 to yourself</b></p>}
         <p><b>From:</b> {transactionResponse.from}</p>
         <p><b>To:</b> {transactionResponse.to}</p>
         <p><b>Value:</b> {ethers.utils.formatEther(BigNumber.from(transactionResponse.value).toString())} Ξ</p>
