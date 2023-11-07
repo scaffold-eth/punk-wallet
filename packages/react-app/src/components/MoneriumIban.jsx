@@ -5,10 +5,9 @@ import QR from 'qrcode.react';
 import { Alert, Input, message } from "antd";
 import { CopyOutlined, QrcodeOutlined, WarningOutlined } from "@ant-design/icons";
 
-import { LogoOnLogo } from "./";
+import { LogoOnLogo, TokenDisplay } from "./";
 import { getShortAddress } from "../helpers/MoneriumHelper";
 import { useLocalStorage} from "../hooks";
-import { tokenDisplay } from "./ERC20Selector";
 
 //const generateQrCode = require('sepa-payment-qr-code')
 import { generateQrCode } from "../helpers/SepaPaymentQrCodeHelper";
@@ -189,7 +188,7 @@ export default function MoneriumIban( { clientData, currentPunkAddress } ) {
                         style={{ paddingBottom:"1em" }}
                         value={amount}
                         placeholder={"amount in " + "EURe"}
-                        addonAfter={tokenDisplay("EURe", "EURe.png")}
+                        addonAfter={<TokenDisplay token={{name:"EURe", imgSrc:"EURe.png"}}/>}
                         onChange={async e => {
                           setAmount(e.target.value);
                         }}

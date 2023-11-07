@@ -1,42 +1,65 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 
 import { Select } from "antd";
+import { SettingOutlined } from "@ant-design/icons";
 
-export const tokenDisplay = (name, imgSrc) => (
-    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-evenly"}}>
-        <img style={{ height: "1em", width: "1em" }} src={imgSrc} />
-        {name}
-    </div>
-);
+import { TokenDisplay } from "./";
 
-export default function ERC20Selector({token, setTokenName, targetNetwork}) {
-    const tokenOption = (name, value, imgSrc) => (
-        <Select.Option key={name} value={value} style={{lineHeight:2, fontSize:24}}>
-            {tokenDisplay(name, imgSrc)}
-        </Select.Option>
+// ToDo: Actually this is native token + ERC20 tokens selector
+export default function ERC20Selector({tokenSettingsHelper, setTokenSettingsModalOpen}) {
+    const selectedToken = tokenSettingsHelper.getSelectedItem();
+
+    const selectedTokenName = selectedToken ? selectedToken.name : tokenSettingsHelper.items[0].name;
+    const [currentValue, setCurrentValue] = useState(selectedTokenName);
+
+    useEffect(() => {
+        // This is only needed once, when migrateSelectedTokenStorageSetting is used
+        if (selectedToken && (selectedToken.name != currentValue)) {
+            setCurrentValue(selectedToken.name);
+        }
+    }, [selectedToken]);
+    
+    const options = tokenSettingsHelper.sortedItems.map(
+        (token) => tokenOption(token)
     );
 
-    const DEFAULT_VALUE = "";
-    
-    const options = [];
-
-    options.push(tokenOption(targetNetwork.nativeToken.name, DEFAULT_VALUE, targetNetwork.nativeToken.imgSrc));
-
-    for (const erc20Token of targetNetwork.erc20Tokens) {
-        options.push(tokenOption(erc20Token.name, erc20Token.name, erc20Token.imgSrc));
-    }
+    options.push(tokenSettingsOption());
 
     return (
         <div>
             <Select
                 size="large"
-                defaultValue={token ? token.name : DEFAULT_VALUE}
+                defaultValue={currentValue}
                 style={{ width: 170, fontSize: 24 }}
                 listHeight={1024}
-                onChange={value => {setTokenName(value);}}
+                onChange={(value) => {
+                    if (value == TOKEN_SETTINGS_NAME) {
+                        setTokenSettingsModalOpen(true);
+                    }
+                    else {
+                        setCurrentValue(value);
+                        tokenSettingsHelper.updateSelectedName(value);
+                    }
+                }}
+                value={currentValue}
             >
                 {options}
             </Select>
         </div>
     );
 }
+
+const tokenOption = (token) => (
+    <Select.Option key={token.name} value={token.name} style={{lineHeight:2, fontSize:24}}>
+        <TokenDisplay token={token}/>
+    </Select.Option>
+);
+
+const TOKEN_SETTINGS_NAME = "tokenSettingsName";
+const tokenSettingsOption = () => (
+    <Select.Option  key={"tokenSettingsKey"} value={TOKEN_SETTINGS_NAME} style={{lineHeight:2, fontSize:32}}>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "center"}}>
+            <SettingOutlined />
+        </div>
+    </Select.Option>
+);

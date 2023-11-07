@@ -8,8 +8,6 @@ import { TransactionDisplay, QRPunkBlockie } from "./";
 
 import axios from "axios";
 
-import {tokenDisplay} from "./ERC20Selector";
-
 const { BigNumber, ethers } = require("ethers");
 
 export default function TransactionResponseDisplay({transactionResponse, transactionManager, blockExplorer}) {
