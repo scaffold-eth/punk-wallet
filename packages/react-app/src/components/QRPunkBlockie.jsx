@@ -1,58 +1,62 @@
 import React from "react";
 import QR from 'qrcode.react';
-import { Blockie } from "."
+import { Blockie, Punk } from "."
 import { message } from 'antd';
 
-export default function QRPunkBlockie(props) {
-  const hardcodedSizeForNow = 380
+export default function QRPunkBlockie({ address, showAddress, withQr, scale }) {
+  const hardcodedSizeForNow = 380;
+  let blockieScale = 11.5;
 
-  const punkSize = 112
+  if (scale) {
+    blockieScale = blockieScale * scale;
+  }
 
-  let part1 = props.address && props.address.substr(2,20)
-  let part2= props.address && props.address.substr(22)
-  const x = parseInt(part1, 16)%100
-  const y = parseInt(part2, 16)%100
+  const punkSize = blockieScale * 8; // Make punk image the same size as the blockie, from https://github.com/ethereum/blockies: width/height of the icon in blocks, default: 8
 
   return (
-    <div style={{transform:"scale("+(props.scale?props.scale:"1")+")",transformOrigin:"50% 50%",margin:"auto", position:"relative",width:hardcodedSizeForNow}} onClick={()=>{
-       const el = document.createElement('textarea');
-       el.value = props.address;
-       document.body.appendChild(el);
-       el.select();
-       document.execCommand('copy');
-       document.body.removeChild(el);
-       const iconPunkSize = 40
-       message.success(
-         <span style={{position:"relative"}}>
-          Copied Address
-          <div style={{position:"absolute",left:-60,top:-14}}>
-            <div style={{position:"relative",width:iconPunkSize, height:iconPunkSize-1, overflow: "hidden"}}>
-              <img src="/punks.png" style={{position:"absolute",left:-iconPunkSize*x,top:(-iconPunkSize*y),width:iconPunkSize*100, height:iconPunkSize*100,imageRendering:"pixelated"}} />
-            </div>
+    <span
+      onClick={() => {
+          // Todo: this part is duplicated in MoneriumIban
+          const el = document.createElement('textarea');
+          el.value = address;
+          document.body.appendChild(el);
+          el.select();
+          document.execCommand('copy');
+          document.body.removeChild(el);
+          const iconPunkSize = 40
+          message.success(
+            <span style={{ position: "relative" }}>
+              Copied Address
+              <div style={{ position: "absolute", left: -60, top: -14, zIndex: 1 }}>
+                <Punk address={address} size={iconPunkSize}/>
+              </div>
+            </span>
+          );
+        }}
+    >
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: hardcodedSizeForNow, margin:"auto", position:"" }}>
+        {withQr &&
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }} >
+              <QR
+                level={"H"}
+                includeMargin={false}
+                value={address}
+                size={hardcodedSizeForNow}
+                imageSettings={{ width: 105, height: 105, excavate: true, src: "" }}
+              />
           </div>
-         </span>
-       );
-    }}>
+        }
 
-      <div style={{position:"absolute",opacity:0.5,left:hardcodedSizeForNow/2-46,top:hardcodedSizeForNow/2-46}}>
-        <Blockie address={props.address} scale={11.5}/>
-      </div>
+        <div style={{ position: 'absolute', opacity:"0.5", width:punkSize, height:punkSize }}>
+          <Blockie address={address} scale={blockieScale} />
+        </div>
 
-      <div style={{position:"absolute",left:hardcodedSizeForNow/2-53,top:hardcodedSizeForNow/2-65}}>
-        <div style={{position:"relative",width:punkSize, height:punkSize-1, overflow: "hidden"}}>
-          <img src="/punks.png" style={{position:"absolute",left:-punkSize*x,top:(-punkSize*y)-1,width:punkSize*100, height:punkSize*100,imageRendering:"pixelated"}} />
+        <div style={{ position: 'absolute' }}>
+          <Punk address={address} size={punkSize}/>
         </div>
       </div>
 
-      {props.withQr ? <QR
-        level={"H"}
-        includeMargin={false}
-        value={props.address?props.address:""}
-        size={hardcodedSizeForNow}
-        imageSettings={{width:105,height:105,excavate:true,src:""}}
-      /> : ""}
-
-      {props.showAddress ? <div style={{fontWeight:"bolder",letterSpacing:-0.8,color:"#666666",fontSize:14.8}}>{props.address}</div>: ""}
-    </div>
+      {showAddress && <div style={{marginTop:"0.39em", fontWeight:"bolder", letterSpacing:-0.8,color:"#666666", fontSize:14.8}}>{address}</div>}
+    </span>
   );
 }

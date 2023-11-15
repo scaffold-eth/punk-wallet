@@ -298,7 +298,7 @@ export default function AddressInput(props) {
 
   return (
     <div>
-      <div style={{ position: "absolute", left: -202, top: -88 }}>
+      <div style={{ position: "absolute", left: -202, top: 26 }}>
         {currentValue && currentValue.length > 41 ? <QRPunkBlockie scale={0.6} address={currentValue} /> : ""}
       </div>
 

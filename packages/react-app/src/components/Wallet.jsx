@@ -228,7 +228,7 @@ export default function Wallet(props) {
               message.success(<span style={{ position: "relative" }}>Copied Private Key Link</span>);
             }}
           >
-            <div style={{position:"relative",top:34,left:-11}}>
+            <div style={{position:"relative",top:224,left:-11}}>
               <QRPunkBlockie withQr={false} address={selectedAddress} />
             </div>
 

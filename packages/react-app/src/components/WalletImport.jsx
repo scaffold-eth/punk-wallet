@@ -74,19 +74,15 @@ export default function WalletImport({setShowImport}) {
 	      setImportPrivatekey(e.target.value)
 	    }}/>
 
-	    <hr/>
-
-	    {importAddress ? 
+	    {importAddress &&
 	    	<div style={{width:420,height:200}}>
 		      <div style={{float:"right",marginTop:64}}>
 		        <Address value={importAddress}/>
 		      </div>
-		      <div style={{ position:"relative", top:-100, left:-100}}>
+		      <div style={{ position:"relative", top:-19, left:-100}}>
 		      	<QRPunkBlockie withQr={false} address={importAddress} />
 					</div>
-					<hr/>
 				</div>
-				:""
 			}
 
 			<div style={{float:'right'}}>

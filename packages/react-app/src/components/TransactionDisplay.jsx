@@ -8,7 +8,7 @@ import moment from 'moment';
 import { useLocalStorage } from "../hooks";
 
 import {tokenDisplay} from "./ERC20Selector";
-import { LogoOnLogo, QRPunkBlockie } from "./";
+import { LogoOnLogo } from "./";
 
 import { getShortAddress } from "../helpers/MoneriumHelper";
 

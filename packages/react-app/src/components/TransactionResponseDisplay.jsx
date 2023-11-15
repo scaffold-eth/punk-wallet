@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 
 import { TransactionManager } from "../helpers/TransactionManager";
 
-import { TransactionDisplay, QRPunkBlockie } from "./";
+import { TransactionDisplay } from "./";
 
 import axios from "axios";
 
