@@ -1,27 +1,9 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import QR from 'qrcode.react';
-import { Blockie, Balance } from "."
-import { message, Typography } from 'antd';
-const { Text } = Typography;
-
+import { Blockie } from "."
+import { message } from 'antd';
 
 export default function QRPunkBlockie(props) {
-
-  const size = useWindowSize();
-  const minSize = 360
-  let qrWidth
-  if(size.width / 3 < minSize) {
-    qrWidth = minSize
-  } else {
-    qrWidth = size.width / 3
-  }
-
-  let scale = Math.min(size.height-130,size.width,1024)/(qrWidth*1)
-
-  let offset =  0.42
-
-  const url  = window.location.href+""
-
   const hardcodedSizeForNow = 380
 
   const punkSize = 112
@@ -31,8 +13,6 @@ export default function QRPunkBlockie(props) {
   const x = parseInt(part1, 16)%100
   const y = parseInt(part2, 16)%100
 
-  //console.log("window.location",window.location)
-
   return (
     <div style={{transform:"scale("+(props.scale?props.scale:"1")+")",transformOrigin:"50% 50%",margin:"auto", position:"relative",width:hardcodedSizeForNow}} onClick={()=>{
        const el = document.createElement('textarea');
@@ -41,7 +21,6 @@ export default function QRPunkBlockie(props) {
        el.select();
        document.execCommand('copy');
        document.body.removeChild(el);
-       const iconHardcodedSizeForNow = 380
        const iconPunkSize = 40
        message.success(
          <span style={{position:"relative"}}>
@@ -68,44 +47,12 @@ export default function QRPunkBlockie(props) {
       {props.withQr ? <QR
         level={"H"}
         includeMargin={false}
-        //ethereum:0x34aA3F359A9D614239015126635CE7732c18fDF3
-        value={props.address?props.address:""}//"https://punkwallet.io/"+
+        value={props.address?props.address:""}
         size={hardcodedSizeForNow}
         imageSettings={{width:105,height:105,excavate:true,src:""}}
       /> : ""}
 
-
       {props.showAddress ? <div style={{fontWeight:"bolder",letterSpacing:-0.8,color:"#666666",fontSize:14.8}}>{props.address}</div>: ""}
-
     </div>
   );
-}
-
-
-function useWindowSize() {
-  const isClient = typeof window === 'object';
-
-  function getSize() {
-    return {
-      width: isClient ? window.innerWidth : undefined,
-      height: isClient ? window.innerHeight : undefined
-    };
-  }
-
-  const [windowSize, setWindowSize] = useState(getSize);
-
-  useEffect(() => {
-    if (!isClient) {
-      return false;
-    }
-
-    function handleResize() {
-      setWindowSize(getSize());
-    }
-
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []); // Empty array ensures that effect is only run on mount and unmount
-
-  return windowSize;
 }
