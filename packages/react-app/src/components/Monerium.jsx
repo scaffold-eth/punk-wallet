@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 
 import { Button, Divider, Modal, Spin } from "antd";
-import { MoneriumBalances, MoneriumDescription, MoneriumHeader, MoneriumIban, MoneriumPunkNotConnected, LogoOnLogo, QRPunkBlockie } from "./";
+import { MoneriumBalances, MoneriumDescription, MoneriumHeader, MoneriumIban, MoneriumPunkNotConnected, LogoOnLogo } from "./";
 
 import { authorize, authorizeWithRefreshToken, getData } from "../helpers/MoneriumHelper";
 
