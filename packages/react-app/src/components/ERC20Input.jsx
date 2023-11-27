@@ -2,7 +2,7 @@ import React from "react";
 
 import { Input } from "antd";
 
-import { tokenDisplay } from "./ERC20Selector";
+import { TokenDisplay } from "./";
 
 export default function ERC20Input({token, amount, setAmount}) {
   return (
@@ -10,7 +10,7 @@ export default function ERC20Input({token, amount, setAmount}) {
       <Input
         value={amount}
         placeholder={"amount in " + token.name}
-        addonAfter={tokenDisplay(token.name, token.imgSrc)}
+        addonAfter={<TokenDisplay token={token}/>}
         onChange={async e => {
           setAmount(e.target.value);
         }}

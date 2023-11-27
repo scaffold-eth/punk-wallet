@@ -23,10 +23,12 @@ export { default as MoneriumPunkNotConnected } from "./MoneriumPunkNotConnected"
 export { default as Provider } from "./Provider";
 export { default as QRPunkBlockie } from "./QRPunkBlockie";
 export { default as Ramp } from "./Ramp";
+export { default as SettingsModal } from "./SettingsModal";
 export { default as Swap } from "./Swap";
 export { default as ThemeSwitch } from "./ThemeSwitch";
 export { default as Timeline } from "./Timeline";
 export { default as TokenBalance } from "./TokenBalance";
+export { default as TokenDisplay } from "./TokenDisplay";
 export { default as TransactionDisplay } from "./TransactionDisplay";
 export { default as TransactionHistory } from "./TransactionHistory";
 export { default as TransactionResponseDisplay } from "./TransactionResponseDisplay";

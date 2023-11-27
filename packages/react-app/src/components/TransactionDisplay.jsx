@@ -7,8 +7,7 @@ import moment from 'moment';
 
 import { useLocalStorage } from "../hooks";
 
-import {tokenDisplay} from "./ERC20Selector";
-import { LogoOnLogo, QRPunkBlockie } from "./";
+import { LogoOnLogo, TokenDisplay, QRPunkBlockie } from "./";
 
 import { getShortAddress } from "../helpers/MoneriumHelper";
 
@@ -107,15 +106,19 @@ export default function TransactionDisplay({
                             <b>{(kind ? (incomingOrder ? "+" : "-") : "" ) + Number(amount).toFixed(digits)}</b>
                             {
                                 erc20TokenName.includes("EUR") ?
-                                    <LogoOnLogo
-                                        src1={"EURe.png"}
-                                        src2={smallImageSrc}
-                                        showImage2={smallImageSrc !== undefined}
-                                        sizeMultiplier1={1.24}
-                                        sizeMultiplier2={0.5}
-                                    />
+                                    <div>
+                                        <LogoOnLogo
+                                            src1={"EURe.png"}
+                                            src2={smallImageSrc}
+                                            showImage2={smallImageSrc !== undefined}
+                                            sizeMultiplier1={1.24}
+                                            sizeMultiplier2={0.5}
+                                        />
+                                    </div>
                                     :
-                                    tokenDisplay("", erc20ImgSrc)
+                                    <div>
+                                        <TokenDisplay token={{name:"", imgSrc:erc20ImgSrc}}/>
+                                    </div>
                             }
                         </div>
                     </div>

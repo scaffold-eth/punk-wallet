@@ -22,6 +22,7 @@ import {
   Header,
   IFrame,
   Monerium,
+  SettingsModal,
   QRPunkBlockie,
   Ramp,
   TransactionResponses,
@@ -44,10 +45,13 @@ import {
   onSessionProposal
 } from "./helpers/WalletConnectV2Helper";
 
-import { TransactionManager } from "./helpers/TransactionManager";
 import { sendTransaction } from "./helpers/EIP1559Helper";
 
 import { getMemo, getNewMoneriumClient, getFilteredOrders, isValidIban, placeIbanOrder, isIbanAddressObjectValid } from "./helpers/MoneriumHelper";
+
+import { SettingsHelper } from "./helpers/SettingsHelper";
+
+import { getSelectedErc20Token, getStorageKey, getTokens, migrateSelectedTokenStorageSetting } from "./helpers/TokenSettingsHelper";
 
 const { confirm } = Modal;
 
@@ -124,7 +128,22 @@ const web3Modal = new Web3Modal({
   },
 });
 
+const networkName = targetNetwork.name;
+const erc20Tokens = targetNetwork?.erc20Tokens;
+const tokens = getTokens(targetNetwork?.nativeToken, erc20Tokens);
+const tokenSettingsStorageKey = networkName + getStorageKey();
+
 function App(props) {
+  const [tokenSettingsModalOpen, setTokenSettingsModalOpen] = useState(false);
+  const [tokenSettings, setTokenSettings] = useLocalStorage(tokenSettingsStorageKey, {});
+  const tokenSettingsHelper = tokens ?  new SettingsHelper(tokenSettingsStorageKey, tokens, tokenSettings, setTokenSettings) : undefined;
+
+  useEffect(() => {
+    migrateSelectedTokenStorageSetting(networkName, tokenSettingsHelper);
+  }, []);
+
+  const selectedErc20Token = tokenSettingsHelper ? getSelectedErc20Token(tokenSettingsHelper.getSelectedItem(), erc20Tokens): undefined;
+
   //const [isWalletModalVisible, setIsWalletModalVisible] = useState(false);
   //const [walletModalData, setWalletModalData] = useState();
 
@@ -235,9 +254,6 @@ function App(props) {
 
   const balance = yourLocalBalance && formatEther(yourLocalBalance);
 
-  const [tokenName, setTokenName] = useLocalStorage(targetNetwork.name + "TokenName");
-  const token = targetNetwork?.erc20Tokens ? targetNetwork.erc20Tokens.find(token => token.name === tokenName) : undefined;
-
   const [showHistory, setShowHistory] = useLocalStorage("showHistory", true);
 
   const [moneriumClient, setMoneriumClient] = useState(getNewMoneriumClient());
@@ -306,7 +322,7 @@ function App(props) {
 
   const [ibanAddressObject, setIbanAddressObject] = useState({});
 
-  const isIbanTransferReady = moneriumConnected && punkConnectedToMonerium && token && token?.name == "EURe";
+  const isIbanTransferReady = moneriumConnected && punkConnectedToMonerium && selectedErc20Token && selectedErc20Token.name == "EURe";
 
   // if you don't have any money, scan the other networks for money
   // lol this poller is a bad idea why does it keep
@@ -726,7 +742,7 @@ function App(props) {
                     const data = [
                       {
                         chainId: "0x" + targetNetwork.chainId.toString(16),
-                        chainName: targetNetwork.name,
+                        chainName: networkName,
                         nativeCurrency: targetNetwork.nativeCurrency,
                         rpcUrls: [targetNetwork.rpcUrl],
                         blockExplorerUrls: [targetNetwork.blockExplorer],
@@ -775,7 +791,7 @@ function App(props) {
   } else {
     networkDisplay = (
       <div style={{ zIndex: -1, position: "absolute", right: 154, top: 28, padding: 16, color: targetNetwork.color }}>
-        {targetNetwork.name}
+        {networkName}
       </div>
     );
   }
@@ -794,7 +810,7 @@ function App(props) {
   const networkSelect = (
     <Select
       size="large"
-      defaultValue={targetNetwork.name}
+      defaultValue={networkName}
       style={{ width: 170 }}
       listHeight={1024}
       onChange={value => {
@@ -831,7 +847,7 @@ function App(props) {
   }, [setRoute]);
 
   let faucetHint = "";
-  const faucetAvailable = localProvider && localProvider.connection && targetNetwork.name == "localhost";
+  const faucetAvailable = localProvider && localProvider.connection && networkName == "localhost";
 
   const [faucetClicked, setFaucetClicked] = useState(false);
   if (
@@ -927,7 +943,6 @@ function App(props) {
   };
 
 */
-
   const walletDisplay =
     web3Modal && web3Modal.cachedProvider ? (
       ""
@@ -937,6 +952,13 @@ function App(props) {
 
   return (
     <div className="App">
+      <SettingsModal
+        settingsHelper={tokenSettingsHelper}
+        modalOpen={tokenSettingsModalOpen}
+        setModalOpen={setTokenSettingsModalOpen}
+        title={"Token Settings"} // ToDo: Reuse TOKEN_SETTINGS_STORAGE_KEY and colored network name
+      />
+
       <div className="site-page-header-ghost-wrapper">
         <Header
           extra={[
@@ -994,9 +1016,9 @@ function App(props) {
         style={{ clear: "both", opacity: yourLocalBalance ? 1 : 0.2, width: 500, margin: "auto", position: "relative" }}
       >
         <div>
-          {token ?
+          {selectedErc20Token ?
             <ERC20Balance
-              token={token}
+              token={selectedErc20Token}
               rpcURL={targetNetwork.rpcUrl}
               size={12 + window.innerWidth / 16}
               address={address}
@@ -1008,14 +1030,17 @@ function App(props) {
               price={price} />
           }
         </div>
-        
+
         <span style={{ verticalAlign: "middle" }}>
-          <div style={{ display: "flex", justifyContent: targetNetwork.erc20Tokens ? "space-evenly" : "center", alignItems: "center" }}>
+          <div style={{ display: "flex", justifyContent: erc20Tokens ? "space-evenly" : "center", alignItems: "center" }}>
             <div>
               {networkSelect}
             </div>
-            <div>
-              {targetNetwork.erc20Tokens && <ERC20Selector token={token} setTokenName={setTokenName} targetNetwork={targetNetwork} />}
+            <div> {erc20Tokens &&
+              <ERC20Selector
+                tokenSettingsHelper={tokenSettingsHelper}
+                setTokenSettingsModalOpen={setTokenSettingsModalOpen}
+              />}
             </div>
           </div>
           {faucetHint}
@@ -1075,9 +1100,9 @@ function App(props) {
             <Input disabled={true} value={amount} />
           ) : 
             (
-            token ? 
+            selectedErc20Token ? 
               <ERC20Input
-                token={token}
+                token={selectedErc20Token}
                 amount={amount}
                 setAmount={setAmount}
               />
@@ -1119,7 +1144,7 @@ function App(props) {
               setLoading(true);
 
               if (isValidIban(toAddress)) {
-                const order = await placeIbanOrder(moneriumClient, address, ibanAddressObject, amount, targetNetwork.name);
+                const order = await placeIbanOrder(moneriumClient, address, ibanAddressObject, amount, networkName);
                 await initMoneriumOrders();
               }
               else {
@@ -1127,7 +1152,7 @@ function App(props) {
                   chainId: selectedChainId
                 };
 
-                if (!token) {
+                if (!selectedErc20Token) {
                   let value;
                   try {
                     console.log("PARSE ETHER", amount);
@@ -1146,27 +1171,27 @@ function App(props) {
                   txConfig.value = value;
                 }
                 else {
-                  if (token) {
+                  if (selectedErc20Token) {
                     txConfig.erc20 = {
-                      token: token,
+                      token: selectedErc20Token,
                       to: toAddress,
                       amount: amount
                     }
                   }
                 }
 
-                if (targetNetwork.name == "arbitrum") {
+                if (networkName == "arbitrum") {
                   //txConfig.gasLimit = 21000;
                   //ask rpc for gas price
-                } else if (targetNetwork.name == "optimism") {
+                } else if (networkName == "optimism") {
                   //ask rpc for gas price
-                } else if (targetNetwork.name == "gnosis") {
+                } else if (networkName == "gnosis") {
                   //ask rpc for gas price
-                } else if (targetNetwork.name == "polygon") {
+                } else if (networkName == "polygon") {
                   //ask rpc for gas price
-                } else if (targetNetwork.name == "goerli") {
+                } else if (networkName == "goerli") {
                   //ask rpc for gas price
-                } else if (targetNetwork.name == "sepolia") {
+                } else if (networkName == "sepolia") {
                   //ask rpc for gas price
                 } else {
                   txConfig.gasPrice = gasPrice;
@@ -1401,7 +1426,7 @@ function App(props) {
 
       </div>
 
-      {targetNetwork.name == "ethereum" ? (
+      {networkName == "ethereum" ? (
         <div style={{ zIndex: -1, padding: 64, opacity: 0.5, fontSize: 12 }}>
           {depositing ? (
             <div style={{ width: 200, margin: "auto" }}>
@@ -1507,10 +1532,10 @@ function App(props) {
             <Ramp price={price} address={address} networks={NETWORKS} />
           </Col>
 
-          {targetNetwork.name == "arbitrum" ||
-          targetNetwork.name == "gnosis" ||
-          targetNetwork.name == "optimism" ||
-          targetNetwork.name == "polygon" ? (
+          {networkName == "arbitrum" ||
+          networkName == "gnosis" ||
+          networkName == "optimism" ||
+          networkName == "polygon" ? (
             ""
           ) : (
             <Col span={12} style={{ textAlign: "center", opacity: 0.8 }}>
