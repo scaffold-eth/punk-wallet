@@ -3,26 +3,27 @@ import React, { useEffect, useState } from "react";
 import { Select } from "antd";
 import { SettingOutlined } from "@ant-design/icons";
 
-import { TokenDisplay } from "./";
+export default function SelectorWithSettings({settingsHelper, settingsModalOpen, itemDisplay}) {
+    const selectedItem = settingsHelper.getSelectedItem();
+    const selectedItemName = selectedItem ? selectedItem.name : settingsHelper.items[0].name;
 
-export default function SelectorWithSettings({tokenSettingsHelper, setTokenSettingsModalOpen}) {
-    const selectedToken = tokenSettingsHelper.getSelectedItem();
-
-    const selectedTokenName = selectedToken ? selectedToken.name : tokenSettingsHelper.items[0].name;
-    const [currentValue, setCurrentValue] = useState(selectedTokenName);
+    const [currentValue, setCurrentValue] = useState(selectedItemName);
 
     useEffect(() => {
-        // This is only needed once, when migrateSelectedTokenStorageSetting is used
-        if (selectedToken && (selectedToken.name != currentValue)) {
-            setCurrentValue(selectedToken.name);
+        // This is only needed once, after migrating an old storage key
+        if (selectedItem && (selectedItem.name != currentValue)) {
+            setCurrentValue(selectedItem.name);
         }
-    }, [selectedToken]);
+    }, [selectedItem]);
     
-    const options = tokenSettingsHelper.sortedItems.map(
-        (token) => tokenOption(token)
+    const options = settingsHelper.sortedItems.map(
+        (item) => option(item, itemDisplay)
     );
 
-    options.push(tokenSettingsOption());
+    //options.push(settingsOption());
+    options.push(
+        option({name:SETTINGS_NAME}, settingsOption, {fontSize:32})
+    );
 
     return (
         <div>
@@ -32,12 +33,12 @@ export default function SelectorWithSettings({tokenSettingsHelper, setTokenSetti
                 style={{ width: 170, fontSize: 24 }}
                 listHeight={1024}
                 onChange={(value) => {
-                    if (value == TOKEN_SETTINGS_NAME) {
-                        setTokenSettingsModalOpen(true);
+                    if (value == SETTINGS_NAME) {
+                        settingsModalOpen(true);
                     }
                     else {
                         setCurrentValue(value);
-                        tokenSettingsHelper.updateSelectedName(value);
+                        settingsHelper.updateSelectedName(value);
                     }
                 }}
                 value={currentValue}
@@ -48,17 +49,15 @@ export default function SelectorWithSettings({tokenSettingsHelper, setTokenSetti
     );
 }
 
-const tokenOption = (token) => (
-    <Select.Option key={token.name} value={token.name} style={{lineHeight:2, fontSize:24}}>
-        <TokenDisplay token={token}/>
+const option = (item, itemDisplay, style) => (
+    <Select.Option key={item.name} value={item.name} style={{lineHeight:2, fontSize:24, ...style}}>
+        {itemDisplay(item)}
     </Select.Option>
 );
 
-const TOKEN_SETTINGS_NAME = "tokenSettingsName";
-const tokenSettingsOption = () => (
-    <Select.Option  key={"tokenSettingsKey"} value={TOKEN_SETTINGS_NAME} style={{lineHeight:2, fontSize:32}}>
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "center"}}>
-            <SettingOutlined />
-        </div>
-    </Select.Option>
+const SETTINGS_NAME = "SettingsName";
+const settingsOption = () => (
+    <div style={{ display: "flex", alignItems: "center", justifyContent: "center"}}>
+        <SettingOutlined />
+    </div>
 );

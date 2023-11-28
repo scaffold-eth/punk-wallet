@@ -25,6 +25,7 @@ import {
   SettingsModal,
   QRPunkBlockie,
   Ramp,
+  TokenDisplay,
   TransactionResponses,
   Wallet,
   WalletConnectTransactionPopUp,
@@ -1036,10 +1037,11 @@ function App(props) {
             <div>
               {networkSelect}
             </div>
-            <div> {erc20Tokens &&
+            <div> {tokenSettingsHelper &&
               <SelectorWithSettings
-                tokenSettingsHelper={tokenSettingsHelper}
-                setTokenSettingsModalOpen={setTokenSettingsModalOpen}
+                settingsHelper={tokenSettingsHelper}
+                settingsModalOpen={setTokenSettingsModalOpen}
+                itemDisplay={(item) => <TokenDisplay token={item}/>}
               />}
             </div>
           </div>
