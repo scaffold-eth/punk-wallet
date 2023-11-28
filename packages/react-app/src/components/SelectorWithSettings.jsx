@@ -5,8 +5,7 @@ import { SettingOutlined } from "@ant-design/icons";
 
 import { TokenDisplay } from "./";
 
-// ToDo: Actually this is native token + ERC20 tokens selector
-export default function ERC20Selector({tokenSettingsHelper, setTokenSettingsModalOpen}) {
+export default function SelectorWithSettings({tokenSettingsHelper, setTokenSettingsModalOpen}) {
     const selectedToken = tokenSettingsHelper.getSelectedItem();
 
     const selectedTokenName = selectedToken ? selectedToken.name : tokenSettingsHelper.items[0].name;

@@ -6,7 +6,6 @@ export { default as Blockie } from "./Blockie";
 export { default as BytesStringInput } from "./BytesStringInput";
 export { default as ERC20Balance } from "./ERC20Balance";
 export { default as ERC20Input } from "./ERC20Input";
-export { default as ERC20Selector } from "./ERC20Selector";
 export { default as Contract } from "./Contract";
 export { default as EtherInput } from "./EtherInput";
 export { default as Faucet } from "./Faucet";
@@ -23,6 +22,7 @@ export { default as MoneriumPunkNotConnected } from "./MoneriumPunkNotConnected"
 export { default as Provider } from "./Provider";
 export { default as QRPunkBlockie } from "./QRPunkBlockie";
 export { default as Ramp } from "./Ramp";
+export { default as SelectorWithSettings } from "./SelectorWithSettings";
 export { default as SettingsModal } from "./SettingsModal";
 export { default as Swap } from "./Swap";
 export { default as ThemeSwitch } from "./ThemeSwitch";

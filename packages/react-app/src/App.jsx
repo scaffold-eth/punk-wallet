@@ -15,7 +15,7 @@ import {
   Balance,
   ERC20Balance,
   ERC20Input,
-  ERC20Selector,
+  SelectorWithSettings,
   EtherInput,
   Faucet,
   GasGauge,
@@ -1037,7 +1037,7 @@ function App(props) {
               {networkSelect}
             </div>
             <div> {erc20Tokens &&
-              <ERC20Selector
+              <SelectorWithSettings
                 tokenSettingsHelper={tokenSettingsHelper}
                 setTokenSettingsModalOpen={setTokenSettingsModalOpen}
               />}
