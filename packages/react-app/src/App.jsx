@@ -15,16 +15,18 @@ import {
   Balance,
   ERC20Balance,
   ERC20Input,
-  ERC20Selector,
+  SelectorWithSettings,
   EtherInput,
   Faucet,
   GasGauge,
   Header,
   IFrame,
   Monerium,
+  NetworkDisplay,
   SettingsModal,
   QRPunkBlockie,
   Ramp,
+  TokenDisplay,
   TransactionResponses,
   Wallet,
   WalletConnectTransactionPopUp,
@@ -51,6 +53,7 @@ import { getMemo, getNewMoneriumClient, getFilteredOrders, isValidIban, placeIba
 
 import { SettingsHelper } from "./helpers/SettingsHelper";
 
+import { migrateSelectedNetworkStorageSetting } from "./helpers/NetworkSettingsHelper";
 import { getSelectedErc20Token, getStorageKey, getTokens, migrateSelectedTokenStorageSetting } from "./helpers/TokenSettingsHelper";
 
 const { confirm } = Modal;
@@ -79,7 +82,11 @@ const { OrderState } = require("@monerium/sdk");
 */
 
 /// 📡 What chain are your contracts deployed to?
-const cachedNetwork = window.localStorage.getItem("network");
+
+const networkSettingsStorageKey = "networkSettings";
+
+// ToDo: Check if network settings can be stored in state, currently page refresh is used on network changes
+const cachedNetwork = JSON.parse(window.localStorage.getItem(networkSettingsStorageKey))?.selectedName;
 let targetNetwork = NETWORKS[cachedNetwork || "ethereum"]; // <------- select your target frontend network (localhost, rinkeby, xdai, mainnet)
 if (!targetNetwork) {
   targetNetwork = NETWORKS["ethereum"];
@@ -133,13 +140,20 @@ const erc20Tokens = targetNetwork?.erc20Tokens;
 const tokens = getTokens(targetNetwork?.nativeToken, erc20Tokens);
 const tokenSettingsStorageKey = networkName + getStorageKey();
 
+const networks = Object.values(NETWORKS);
+
 function App(props) {
+  const [networkSettingsModalOpen, setNetworkSettingsModalOpen] = useState(false);
+  const [networkSettings, setNetworkSettings] = useLocalStorage(networkSettingsStorageKey, {});
+  const networkSettingsHelper = networks ? new SettingsHelper(networkSettingsStorageKey, networks, networkSettings, setNetworkSettings) : undefined;
+
   const [tokenSettingsModalOpen, setTokenSettingsModalOpen] = useState(false);
   const [tokenSettings, setTokenSettings] = useLocalStorage(tokenSettingsStorageKey, {});
-  const tokenSettingsHelper = tokens ?  new SettingsHelper(tokenSettingsStorageKey, tokens, tokenSettings, setTokenSettings) : undefined;
+  const tokenSettingsHelper = tokens ? new SettingsHelper(tokenSettingsStorageKey, tokens, tokenSettings, setTokenSettings) : undefined;
 
   useEffect(() => {
     migrateSelectedTokenStorageSetting(networkName, tokenSettingsHelper);
+    migrateSelectedNetworkStorageSetting(networkSettingsHelper);
   }, []);
 
   const selectedErc20Token = tokenSettingsHelper ? getSelectedErc20Token(tokenSettingsHelper.getSelectedItem(), erc20Tokens): undefined;
@@ -796,36 +810,6 @@ function App(props) {
     );
   }
 
-  const options = [];
-  for (const id in NETWORKS) {
-    options.push(
-      <Select.Option key={id} value={NETWORKS[id].name} style={{lineHeight:1.1}}>
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "center", color: NETWORKS[id].color, fontSize: 24 }}>
-          {NETWORKS[id].name}
-        </div>
-      </Select.Option>,
-    );
-  }
-
-  const networkSelect = (
-    <Select
-      size="large"
-      defaultValue={networkName}
-      style={{ width: 170 }}
-      listHeight={1024}
-      onChange={value => {
-        if (targetNetwork.chainId != NETWORKS[value].chainId) {
-          window.localStorage.setItem("network", value);
-          setTimeout(() => {
-            window.location.reload();
-          }, 1);
-        }
-      }}
-    >
-      {options}
-    </Select>
-  );
-
   const loadWeb3Modal = useCallback(async () => {
     const provider = await web3Modal.connect();
     provider.on("disconnect", () => {
@@ -953,7 +937,16 @@ function App(props) {
   return (
     <div className="App">
       <SettingsModal
+        settingsHelper={networkSettingsHelper}
+        itemCoreDisplay={(network) => <NetworkDisplay network={network}/>}
+        modalOpen={networkSettingsModalOpen}
+        setModalOpen={setNetworkSettingsModalOpen}
+        title={"Network Settings"} 
+      />
+
+      <SettingsModal
         settingsHelper={tokenSettingsHelper}
+        itemCoreDisplay={(token) => <TokenDisplay token={token} divStyle={{display: "flex", alignItems: "center", justifyContent: "center"}} spanStyle={{paddingLeft:"0.2em"}}/>}
         modalOpen={tokenSettingsModalOpen}
         setModalOpen={setTokenSettingsModalOpen}
         title={"Token Settings"} // ToDo: Reuse TOKEN_SETTINGS_STORAGE_KEY and colored network name
@@ -1034,12 +1027,25 @@ function App(props) {
         <span style={{ verticalAlign: "middle" }}>
           <div style={{ display: "flex", justifyContent: erc20Tokens ? "space-evenly" : "center", alignItems: "center" }}>
             <div>
-              {networkSelect}
+              <SelectorWithSettings
+                settingsHelper={networkSettingsHelper}
+                settingsModalOpen={setNetworkSettingsModalOpen}
+                itemCoreDisplay={(network) => <NetworkDisplay network={network}/>}
+                onChange={() => setTimeout(
+                    () => {
+                      window.location.reload();
+                    },
+                    1
+                  )
+                }       
+                optionStyle={{lineHeight:1.1}}
+              />
             </div>
-            <div> {erc20Tokens &&
-              <ERC20Selector
-                tokenSettingsHelper={tokenSettingsHelper}
-                setTokenSettingsModalOpen={setTokenSettingsModalOpen}
+            <div> {tokenSettingsHelper &&
+              <SelectorWithSettings
+                settingsHelper={tokenSettingsHelper}
+                settingsModalOpen={setTokenSettingsModalOpen}
+                itemCoreDisplay={(token) => <TokenDisplay token={token}/>}
               />}
             </div>
           </div>
