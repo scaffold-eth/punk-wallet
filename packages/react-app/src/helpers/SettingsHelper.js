@@ -196,6 +196,33 @@ const updateSettings = (settings, setSettings) => {
 
 // Settings example 
 /*
+
+{
+   "storageKey":"networkSettings",
+   "indexMap":{
+      "ethereum":0,
+      "optimism":1,
+      "base":2,
+      "arbitrum":3,
+      "polygon":4,
+      "gnosis":5
+   },
+   "removedNames":[
+      "canto",
+      "zkSyncEra",
+      "buidlguidl",
+      "goerli",
+      "sepolia",
+      "localhost",
+      "zkSyncTest",
+      "mumbai",
+      "scroll",
+      "testnetHarmony",
+      "harmony"
+   ],
+   "selectedName":"optimism"
+}
+
 {
    "storageKey":"polygonTokenSettings",
    "indexMap":{
