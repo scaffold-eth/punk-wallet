@@ -53,6 +53,7 @@ import { getMemo, getNewMoneriumClient, getFilteredOrders, isValidIban, placeIba
 
 import { SettingsHelper } from "./helpers/SettingsHelper";
 
+import { migrateSelectedNetworkStorageSetting } from "./helpers/NetworkSettingsHelper";
 import { getSelectedErc20Token, getStorageKey, getTokens, migrateSelectedTokenStorageSetting } from "./helpers/TokenSettingsHelper";
 
 const { confirm } = Modal;
@@ -81,7 +82,11 @@ const { OrderState } = require("@monerium/sdk");
 */
 
 /// 📡 What chain are your contracts deployed to?
-const cachedNetwork = window.localStorage.getItem("network");
+
+const networkSettingsStorageKey = "networkSettings";
+
+// ToDo: Check if network settings can be stored in state, currently page refresh is used on network changes
+const cachedNetwork = JSON.parse(window.localStorage.getItem(networkSettingsStorageKey))?.selectedName;
 let targetNetwork = NETWORKS[cachedNetwork || "ethereum"]; // <------- select your target frontend network (localhost, rinkeby, xdai, mainnet)
 if (!targetNetwork) {
   targetNetwork = NETWORKS["ethereum"];
@@ -135,7 +140,6 @@ const erc20Tokens = targetNetwork?.erc20Tokens;
 const tokens = getTokens(targetNetwork?.nativeToken, erc20Tokens);
 const tokenSettingsStorageKey = networkName + getStorageKey();
 
-const networkSettingsStorageKey = "networkSettings";
 const networks = Object.values(NETWORKS);
 
 function App(props) {
@@ -149,7 +153,7 @@ function App(props) {
 
   useEffect(() => {
     migrateSelectedTokenStorageSetting(networkName, tokenSettingsHelper);
-    // ToDo: Migrate selected network key
+    migrateSelectedNetworkStorageSetting(networkSettingsHelper);
   }, []);
 
   const selectedErc20Token = tokenSettingsHelper ? getSelectedErc20Token(tokenSettingsHelper.getSelectedItem(), erc20Tokens): undefined;
