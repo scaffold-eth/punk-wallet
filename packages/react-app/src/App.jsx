@@ -810,36 +810,6 @@ function App(props) {
     );
   }
 
-  const options = [];
-  for (const id in NETWORKS) {
-    options.push(
-      <Select.Option key={id} value={NETWORKS[id].name} style={{lineHeight:1.1}}>
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "center", color: NETWORKS[id].color, fontSize: 24 }}>
-          {NETWORKS[id].name}
-        </div>
-      </Select.Option>,
-    );
-  }
-
-  const networkSelect = (
-    <Select
-      size="large"
-      defaultValue={networkName}
-      style={{ width: 170 }}
-      listHeight={1024}
-      onChange={value => {
-        if (targetNetwork.chainId != NETWORKS[value].chainId) {
-          window.localStorage.setItem("network", value);
-          setTimeout(() => {
-            window.location.reload();
-          }, 1);
-        }
-      }}
-    >
-      {options}
-    </Select>
-  );
-
   const loadWeb3Modal = useCallback(async () => {
     const provider = await web3Modal.connect();
     provider.on("disconnect", () => {
