@@ -955,6 +955,7 @@ function App(props) {
     <div className="App">
       <SettingsModal
         settingsHelper={tokenSettingsHelper}
+        itemCoreDisplay={(token) => <TokenDisplay token={token} divStyle={{display: "flex", alignItems: "center", justifyContent: "center"}} spanStyle={{paddingLeft:"0.2em"}}/>}
         modalOpen={tokenSettingsModalOpen}
         setModalOpen={setTokenSettingsModalOpen}
         title={"Token Settings"} // ToDo: Reuse TOKEN_SETTINGS_STORAGE_KEY and colored network name

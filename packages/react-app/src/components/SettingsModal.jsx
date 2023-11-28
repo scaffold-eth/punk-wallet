@@ -3,9 +3,7 @@ import React, { useState } from "react";
 import { Button, Modal } from "antd";
 import { DeleteOutlined, DownCircleOutlined, RedoOutlined, UpCircleOutlined } from "@ant-design/icons";
 
-import { TokenDisplay } from "./";
-
-export default function SettingsModal({settingsHelper, modalOpen, setModalOpen, title }) {
+export default function SettingsModal({settingsHelper, itemCoreDisplay, modalOpen, setModalOpen, title }) {
     return (
         <Modal
             visible={modalOpen}
@@ -30,9 +28,9 @@ export default function SettingsModal({settingsHelper, modalOpen, setModalOpen, 
             ]}
         >
             <div style={{ fontSize:"2em"}} >
-                <ItemsDisplay settingsHelper={settingsHelper}/>
+                <ItemsDisplay settingsHelper={settingsHelper} itemCoreDisplay={itemCoreDisplay}/>
 
-                <RemovedItemDisplay settingsHelper={settingsHelper}/>
+                <RemovedItemDisplay settingsHelper={settingsHelper} itemCoreDisplay={itemCoreDisplay}/>
 
                 <ResetButton settingsHelper={settingsHelper}/>
             </div>
@@ -40,7 +38,7 @@ export default function SettingsModal({settingsHelper, modalOpen, setModalOpen, 
     );
 }
 
-const ItemDisplay = ({ item, onClick, isCurrentlySelected, width = "" }) => {
+const ItemDisplay = ({ item, itemCoreDisplay,  onClick, isCurrentlySelected, width = "" }) => {
     return (
         <div style={{ width: width  }}>
             <div
@@ -52,24 +50,21 @@ const ItemDisplay = ({ item, onClick, isCurrentlySelected, width = "" }) => {
                 onClick={onClick ? onClick : () => {}}
             >
                 <span style={{...(isCurrentlySelected && {border: "1px solid black", borderRadius: "40%", padding: "0.2em", backgroundColor: "ghostwhite"})}}>
-                    <TokenDisplay
-                        token={item}
-                        divStyle={{display: "flex", alignItems: "center", justifyContent: "center"}}
-                        spanStyle={{paddingLeft:"0.2em"}}
-                    />
+                    {itemCoreDisplay(item)}
                 </span>
             </div>
         </div>
     );
 };
 
-const ItemsDisplay = ({settingsHelper}) => {
+const ItemsDisplay = ({settingsHelper, itemCoreDisplay}) => {
     return (
         <>
             {settingsHelper.sortedItems.map((item, index) => (
                         <div key={index}>
                             <ItemWithButtons
                                 item={item}
+                                itemCoreDisplay={itemCoreDisplay}
                                 settingsHelper={settingsHelper}
                             />
                         </div>
@@ -78,7 +73,7 @@ const ItemsDisplay = ({settingsHelper}) => {
     );
 };
 
-const ItemWithButtons = ({item, settingsHelper}) => {
+const ItemWithButtons = ({item, itemCoreDisplay, settingsHelper}) => {
     const sortedItems = settingsHelper.sortedItems;
     const selectedItem = settingsHelper.getSelectedItem();
 
@@ -101,6 +96,7 @@ const ItemWithButtons = ({item, settingsHelper}) => {
 
                 <ItemDisplay
                     item={item}
+                    itemCoreDisplay={itemCoreDisplay}
                     isCurrentlySelected={isCurrentlySelected}
                     width={"7em"} // ToDo: There should be a better way to align the buttons
                 />
@@ -132,12 +128,13 @@ const SettingButton = ({icon, disabled, onClick}) => (
     </div>
 );
 
-const RemovedItemDisplay = ({settingsHelper}) => (
+const RemovedItemDisplay = ({settingsHelper, itemCoreDisplay}) => (
     <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-around", paddingTop:"2em", paddingBottom:"2em"}}>
         {settingsHelper.removedItems.map((item, index) => (
             <div key={index} style={{flexBasis: "30%", padding:"0.25em"}}>
                 <ItemDisplay
                     item={item}
+                    itemCoreDisplay={itemCoreDisplay}
                     onClick={() => settingsHelper.addItem(item)}
                 />
             </div>
