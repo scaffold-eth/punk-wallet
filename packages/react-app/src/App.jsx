@@ -1056,7 +1056,7 @@ function App(props) {
               <SelectorWithSettings
                 settingsHelper={networkSettingsHelper}
                 settingsModalOpen={setNetworkSettingsModalOpen}
-                itemDisplay={(network) => <NetworkDisplay network={network}/>}
+                itemCoreDisplay={(network) => <NetworkDisplay network={network}/>}
                 onChange={() => setTimeout(
                     () => {
                       window.location.reload();
@@ -1071,7 +1071,7 @@ function App(props) {
               <SelectorWithSettings
                 settingsHelper={tokenSettingsHelper}
                 settingsModalOpen={setTokenSettingsModalOpen}
-                itemDisplay={(token) => <TokenDisplay token={token}/>}
+                itemCoreDisplay={(token) => <TokenDisplay token={token}/>}
               />}
             </div>
           </div>
