@@ -19,6 +19,7 @@ export { default as MoneriumDescription } from "./MoneriumDescription";
 export { default as MoneriumHeader } from "./MoneriumHeader";
 export { default as MoneriumIban } from "./MoneriumIban";
 export { default as MoneriumPunkNotConnected } from "./MoneriumPunkNotConnected";
+export { default as NetworkDisplay } from "./NetworkDisplay";
 export { default as Provider } from "./Provider";
 export { default as QRPunkBlockie } from "./QRPunkBlockie";
 export { default as Ramp } from "./Ramp";

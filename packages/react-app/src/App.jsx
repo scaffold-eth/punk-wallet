@@ -22,6 +22,7 @@ import {
   Header,
   IFrame,
   Monerium,
+  NetworkDisplay,
   SettingsModal,
   QRPunkBlockie,
   Ramp,
@@ -134,13 +135,21 @@ const erc20Tokens = targetNetwork?.erc20Tokens;
 const tokens = getTokens(targetNetwork?.nativeToken, erc20Tokens);
 const tokenSettingsStorageKey = networkName + getStorageKey();
 
+const networkSettingsStorageKey = "networkSettings";
+const networks = Object.values(NETWORKS);
+
 function App(props) {
+  const [networkSettingsModalOpen, setNetworkSettingsModalOpen] = useState(false);
+  const [networkSettings, setNetworkSettings] = useLocalStorage(networkSettingsStorageKey, {});
+  const networkSettingsHelper = networks ? new SettingsHelper(networkSettingsStorageKey, networks, networkSettings, setNetworkSettings) : undefined;
+
   const [tokenSettingsModalOpen, setTokenSettingsModalOpen] = useState(false);
   const [tokenSettings, setTokenSettings] = useLocalStorage(tokenSettingsStorageKey, {});
-  const tokenSettingsHelper = tokens ?  new SettingsHelper(tokenSettingsStorageKey, tokens, tokenSettings, setTokenSettings) : undefined;
+  const tokenSettingsHelper = tokens ? new SettingsHelper(tokenSettingsStorageKey, tokens, tokenSettings, setTokenSettings) : undefined;
 
   useEffect(() => {
     migrateSelectedTokenStorageSetting(networkName, tokenSettingsHelper);
+    // ToDo: Migrate selected network key
   }, []);
 
   const selectedErc20Token = tokenSettingsHelper ? getSelectedErc20Token(tokenSettingsHelper.getSelectedItem(), erc20Tokens): undefined;
@@ -954,6 +963,14 @@ function App(props) {
   return (
     <div className="App">
       <SettingsModal
+        settingsHelper={networkSettingsHelper}
+        itemCoreDisplay={(network) => <NetworkDisplay network={network}/>}
+        modalOpen={networkSettingsModalOpen}
+        setModalOpen={setNetworkSettingsModalOpen}
+        title={"Network Settings"} 
+      />
+
+      <SettingsModal
         settingsHelper={tokenSettingsHelper}
         itemCoreDisplay={(token) => <TokenDisplay token={token} divStyle={{display: "flex", alignItems: "center", justifyContent: "center"}} spanStyle={{paddingLeft:"0.2em"}}/>}
         modalOpen={tokenSettingsModalOpen}
@@ -1036,13 +1053,25 @@ function App(props) {
         <span style={{ verticalAlign: "middle" }}>
           <div style={{ display: "flex", justifyContent: erc20Tokens ? "space-evenly" : "center", alignItems: "center" }}>
             <div>
-              {networkSelect}
+              <SelectorWithSettings
+                settingsHelper={networkSettingsHelper}
+                settingsModalOpen={setNetworkSettingsModalOpen}
+                itemDisplay={(network) => <NetworkDisplay network={network}/>}
+                onChange={() => setTimeout(
+                    () => {
+                      window.location.reload();
+                    },
+                    1
+                  )
+                }       
+                optionStyle={{lineHeight:1.1}}
+              />
             </div>
             <div> {tokenSettingsHelper &&
               <SelectorWithSettings
                 settingsHelper={tokenSettingsHelper}
                 settingsModalOpen={setTokenSettingsModalOpen}
-                itemDisplay={(item) => <TokenDisplay token={item}/>}
+                itemDisplay={(token) => <TokenDisplay token={token}/>}
               />}
             </div>
           </div>

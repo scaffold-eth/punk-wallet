@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import { Select } from "antd";
 import { SettingOutlined } from "@ant-design/icons";
 
-export default function SelectorWithSettings({settingsHelper, settingsModalOpen, itemDisplay}) {
+export default function SelectorWithSettings({settingsHelper, settingsModalOpen, itemDisplay, onChange, optionStyle}) {
     const selectedItem = settingsHelper.getSelectedItem();
     const selectedItemName = selectedItem ? selectedItem.name : settingsHelper.items[0].name;
 
@@ -17,10 +17,9 @@ export default function SelectorWithSettings({settingsHelper, settingsModalOpen,
     }, [selectedItem]);
     
     const options = settingsHelper.sortedItems.map(
-        (item) => option(item, itemDisplay)
+        (item) => option(item, itemDisplay, optionStyle)
     );
 
-    //options.push(settingsOption());
     options.push(
         option({name:SETTINGS_NAME}, settingsOption, {fontSize:32})
     );
@@ -39,6 +38,7 @@ export default function SelectorWithSettings({settingsHelper, settingsModalOpen,
                     else {
                         setCurrentValue(value);
                         settingsHelper.updateSelectedName(value);
+                        onChange && onChange(value);
                     }
                 }}
                 value={currentValue}
