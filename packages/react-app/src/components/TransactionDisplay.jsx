@@ -7,7 +7,7 @@ import moment from 'moment';
 
 import { useLocalStorage } from "../hooks";
 
-import { LogoOnLogo, TokenDisplay, QRPunkBlockie } from "./";
+import { LogoOnLogo, TokenDisplay } from "./";
 
 import { getShortAddress } from "../helpers/MoneriumHelper";
 
