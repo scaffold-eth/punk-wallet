@@ -3,7 +3,9 @@ import QR from 'qrcode.react';
 import { Blockie, Punk } from "."
 import { message } from 'antd';
 
-export default function QRPunkBlockie({ address, showAddress, withQr, scale }) {
+export default function QRPunkBlockie({ address, showAddress, withQr, scale, enlargePunk = false }) {
+  const qrImageSize = 105;
+
   const hardcodedSizeForNow = 380;
   let blockieScale = 11.5;
 
@@ -11,7 +13,24 @@ export default function QRPunkBlockie({ address, showAddress, withQr, scale }) {
     blockieScale = blockieScale * scale;
   }
 
-  const punkSize = blockieScale * 8; // Make punk image the same size as the blockie, from https://github.com/ethereum/blockies: width/height of the icon in blocks, default: 8
+  // Make punk image the same size as the blockie,
+  // from https://github.com/ethereum/blockies: width/height of the icon in blocks, default: 8
+  const blockieSize = blockieScale * 8
+  let punkSize = blockieSize; 
+
+  let paddingBottom;
+
+  if (enlargePunk) {
+    const maxEnlargementPercentage = qrImageSize / punkSize;
+
+    const halfOfMaxEnlargementPercentage = ((maxEnlargementPercentage * 100 - 100) / 2 + 100) / 100;
+
+    const originalPunkSize = punkSize;
+
+    punkSize = punkSize * halfOfMaxEnlargementPercentage;
+
+    paddingBottom = punkSize - originalPunkSize;
+  }
 
   return (
     <span
@@ -42,16 +61,16 @@ export default function QRPunkBlockie({ address, showAddress, withQr, scale }) {
                 includeMargin={false}
                 value={address}
                 size={hardcodedSizeForNow}
-                imageSettings={{ width: 105, height: 105, excavate: true, src: "" }}
+                imageSettings={{ width: qrImageSize, height: qrImageSize, excavate: true, src: "" }}
               />
           </div>
         }
 
-        <div style={{ position: 'absolute', opacity:"0.5", width:punkSize, height:punkSize }}>
+        <div style={{ position: 'absolute', opacity:"0.5", width:blockieSize, height:blockieSize }}>
           <Blockie address={address} scale={blockieScale} />
         </div>
 
-        <div style={{ position: 'absolute' }}>
+        <div style={{ position: 'absolute', paddingBottom:paddingBottom }}>
           <Punk address={address} size={punkSize}/>
         </div>
       </div>
