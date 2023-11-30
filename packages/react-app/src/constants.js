@@ -518,7 +518,7 @@ export const NETWORKS = {
     },
     rpcUrl: "https://rpc.gnosischain.com/",
     faucet: "https://xdai-faucet.top/",
-    blockExplorer: "https://blockscout.com/poa/xdai/",
+    blockExplorer: "https://gnosisscan.io/",
     erc20Tokens: [
       {
         name: "sDAI",

@@ -8,6 +8,7 @@ const { ethers, utils } = require("ethers");
 const abi = [
     "function balanceOf(address owner) view returns (uint256)",
     "function decimals() view returns (uint8)",
+    "function symbol() view returns (string)",
     "function transfer(address to, uint amount) returns (bool)",
 ];
 
@@ -29,6 +30,10 @@ export class ERC20Helper {
 
 	balanceOf = (address) => { 
 		return this.contract.balanceOf(address);
+	}
+
+	symbol = () => { 
+		return this.contract.symbol();
 	}
 
 	decimals = () => { 

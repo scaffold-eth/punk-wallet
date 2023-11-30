@@ -1,13 +1,16 @@
 import React, { useState } from "react";
 
 import { Button, Modal } from "antd";
-import { DeleteOutlined, DownCircleOutlined, RedoOutlined, UpCircleOutlined } from "@ant-design/icons";
+import { DeleteOutlined, DownCircleOutlined, ImportOutlined, RedoOutlined, UpCircleOutlined } from "@ant-design/icons";
 
-export default function SettingsModal({settingsHelper, itemCoreDisplay, modalOpen, setModalOpen, title }) {
+export default function SettingsModal({settingsHelper, itemCoreDisplay, itemDetailedDisplay, itemImportDisplay, modalOpen, setModalOpen, title, network }) {
+    const [itemDetailed, setItemDetailed] = useState(undefined);
+    const [importView, setImportView] = useState(false);
+
     return (
         <Modal
             visible={modalOpen}
-            title={title}
+            title={<Title title={title} network={network}/>}
             onOk={() => {
                 setModalOpen(false);
             }}
@@ -27,18 +30,43 @@ export default function SettingsModal({settingsHelper, itemCoreDisplay, modalOpe
                 </Button>,
             ]}
         >
-            <div style={{ fontSize:"2em"}} >
-                <ItemsDisplay settingsHelper={settingsHelper} itemCoreDisplay={itemCoreDisplay}/>
+            <div style={{ fontSize:"2em"}}>
+                {importView && itemImportDisplay && itemImportDisplay(settingsHelper, itemCoreDisplay, itemDetailedDisplay, network, setImportView)}
 
-                <RemovedItemDisplay settingsHelper={settingsHelper} itemCoreDisplay={itemCoreDisplay}/>
+                {!importView && 
+                    (
+                        itemDetailed ?
+                            itemDetailedDisplay(settingsHelper, itemDetailed, itemCoreDisplay, network, setItemDetailed)
+                        :
+                            <div>
+                                <ItemsDisplay settingsHelper={settingsHelper} itemCoreDisplay={itemCoreDisplay} itemDetailedDisplay={itemDetailedDisplay} setItemDetailed={setItemDetailed}/>
 
-                <ResetButton settingsHelper={settingsHelper}/>
+                                <RemovedItemDisplay settingsHelper={settingsHelper} itemCoreDisplay={itemCoreDisplay}/>
+
+                                <Buttons settingsHelper={settingsHelper} itemImportDisplay={itemImportDisplay} setImportView={setImportView}/>
+                            </div>
+                    )
+                }
+
+                {(importView || itemDetailed) &&
+                    <div style={{ display: "flex", alignItems:"center", justifyContent: "center", marginTop: "2em"}}>
+                        <Button
+                            key="cancel"
+                            onClick={() => {
+                                setImportView(false);
+                                setItemDetailed(undefined);
+                            }}
+                        >
+                        <span style={{ marginRight: 8 }}>⏪</span>Cancel
+                      </Button>
+                    </div>
+                }
             </div>
         </Modal>
     );
 }
 
-const ItemDisplay = ({ item, itemCoreDisplay,  onClick, isCurrentlySelected, width = "" }) => {
+const ItemDisplay = ({ item, itemCoreDisplay, onClick, isCurrentlySelected, width = "" }) => {
     return (
         <div style={{ width: width  }}>
             <div
@@ -57,7 +85,7 @@ const ItemDisplay = ({ item, itemCoreDisplay,  onClick, isCurrentlySelected, wid
     );
 };
 
-const ItemsDisplay = ({settingsHelper, itemCoreDisplay}) => {
+const ItemsDisplay = ({settingsHelper, itemCoreDisplay, itemDetailedDisplay, setItemDetailed}) => {
     return (
         <>
             {settingsHelper.sortedItems.map((item, index) => (
@@ -65,6 +93,8 @@ const ItemsDisplay = ({settingsHelper, itemCoreDisplay}) => {
                             <ItemWithButtons
                                 item={item}
                                 itemCoreDisplay={itemCoreDisplay}
+                                itemDetailedDisplay={itemDetailedDisplay}
+                                setItemDetailed={setItemDetailed}
                                 settingsHelper={settingsHelper}
                             />
                         </div>
@@ -73,7 +103,7 @@ const ItemsDisplay = ({settingsHelper, itemCoreDisplay}) => {
     );
 };
 
-const ItemWithButtons = ({item, itemCoreDisplay, settingsHelper}) => {
+const ItemWithButtons = ({item, itemCoreDisplay, itemDetailedDisplay, setItemDetailed, settingsHelper}) => {
     const sortedItems = settingsHelper.sortedItems;
     const selectedItem = settingsHelper.getSelectedItem();
 
@@ -97,6 +127,7 @@ const ItemWithButtons = ({item, itemCoreDisplay, settingsHelper}) => {
                 <ItemDisplay
                     item={item}
                     itemCoreDisplay={itemCoreDisplay}
+                    onClick={itemDetailedDisplay ? () => setItemDetailed(item) : undefined}
                     isCurrentlySelected={isCurrentlySelected}
                     width={"7em"} // ToDo: There should be a better way to align the buttons
                 />
@@ -142,17 +173,48 @@ const RemovedItemDisplay = ({settingsHelper, itemCoreDisplay}) => (
     </div>
 );
 
-const ResetButton =({settingsHelper}) => (
-    <div style={{ display: "flex", alignItems: "center", justifyContent:"center"}}>
-        <Button
-            key="reset"
-            icon={<RedoOutlined />}
-            disabled={!settingsHelper.isModalSettingsModified()}
-            onClick={() => {
-                settingsHelper.resetModalSettings();
-            }}
-        >
-            Reset Settings
-        </Button>
+const Buttons = ({ settingsHelper, itemImportDisplay, setImportView }) => (
+    <div style={{ display: "flex", alignItems: "center", justifyContent: itemImportDisplay ? "space-around" : "center"}}>
+        {itemImportDisplay && <ImportButton itemImportDisplay={itemImportDisplay} setImportView={setImportView}/>}
+
+        <ResetButton settingsHelper={settingsHelper}/>
+    </div>
+);
+
+const ImportButton =({ itemImportDisplay, setImportView }) => (
+    <Button
+        key="import"
+        icon={<ImportOutlined />}
+        onClick={() => {setImportView(true)}}
+    >
+        Import
+    </Button>
+);
+
+const ResetButton =({ settingsHelper }) => (
+    <Button
+        key="reset"
+        icon={<RedoOutlined />}
+        disabled={!settingsHelper.isModalSettingsModified()}
+        onClick={() => {
+            settingsHelper.resetModalSettings();
+        }}
+    >
+        Reset Settings
+    </Button>
+);
+
+const Title =({ title, network }) => (
+    <div style={{ display: "flex", alignItems: "center", justifyContent:"flex-start"}}>
+        <div>
+            {title}
+        </div>
+        &nbsp;
+        {
+            network && 
+                <div style={{ color: network.color}}>
+                    {network.name}
+                </div>
+        }
     </div>
 );
