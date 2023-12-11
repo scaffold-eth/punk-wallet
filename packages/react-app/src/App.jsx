@@ -23,6 +23,7 @@ import {
   IFrame,
   Monerium,
   NetworkDisplay,
+  NetworkDetailedDisplay,
   SettingsModal,
   QRPunkBlockie,
   Ramp,
@@ -55,8 +56,10 @@ import { getMemo, getNewMoneriumClient, getFilteredOrders, isValidIban, placeIba
 
 import { SettingsHelper } from "./helpers/SettingsHelper";
 
-import { migrateSelectedNetworkStorageSetting } from "./helpers/NetworkSettingsHelper";
+import { SELECTED_BLOCK_EXPORER_NAME_KEY, getBLockExplorer, migrateSelectedNetworkStorageSetting } from "./helpers/NetworkSettingsHelper";
 import { getSelectedErc20Token, getStorageKey, getTokens, migrateSelectedTokenStorageSetting } from "./helpers/TokenSettingsHelper";
+
+import { getChain} from "./helpers/ChainHelper";
 
 const { confirm } = Modal;
 
@@ -107,7 +110,7 @@ if (DEBUG) console.log("🏠 Connecting to provider:", localProviderUrlFromEnv);
 let localProvider = new StaticJsonRpcProvider(localProviderUrlFromEnv);
 
 // 🔭 block explorer URL
-const blockExplorer = targetNetwork.blockExplorer;
+let blockExplorer = targetNetwork.blockExplorer;
 
 let scanner;
 
@@ -148,6 +151,19 @@ function App(props) {
   const [networkSettingsModalOpen, setNetworkSettingsModalOpen] = useState(false);
   const [networkSettings, setNetworkSettings] = useLocalStorage(networkSettingsStorageKey, {});
   const networkSettingsHelper = networks ? new SettingsHelper(networkSettingsStorageKey, networks, networkSettings, setNetworkSettings) : undefined;
+
+  if (networkSettingsHelper) {
+    const selectedBlockExplorerName = networkSettingsHelper.getItemSettings(targetNetwork)[SELECTED_BLOCK_EXPORER_NAME_KEY];
+
+    if (selectedBlockExplorerName) {
+      const selectedBlockExplorer = getBLockExplorer(getChain(targetNetwork.chainId), selectedBlockExplorerName);
+
+      if (selectedBlockExplorer) {
+        blockExplorer = selectedBlockExplorer.url + "/";
+        targetNetwork.blockExplorer = selectedBlockExplorer.url + "/";
+      }
+    }
+  }
 
   const [tokenSettingsModalOpen, setTokenSettingsModalOpen] = useState(false);
   const [tokenSettings, setTokenSettings] = useLocalStorage(tokenSettingsStorageKey, {});
@@ -942,6 +958,7 @@ function App(props) {
         <SettingsModal
           settingsHelper={networkSettingsHelper}
           itemCoreDisplay={(network) => <NetworkDisplay network={network}/>}
+          itemDetailedDisplay={(networkSettingsHelper, network, networkCoreDisplay, setItemDetailed) => <NetworkDetailedDisplay networkSettingsHelper={networkSettingsHelper} network={network} networkCoreDisplay={networkCoreDisplay} setItemDetailed={setItemDetailed} />}
           modalOpen={networkSettingsModalOpen}
           setModalOpen={setNetworkSettingsModalOpen}
           title={"Network Settings"} 

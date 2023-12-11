@@ -64,7 +64,3 @@ export default function TokenDetailedDisplay({ tokenSettingsHelper, token, token
         </>
     );
 }
-
-const isNativeToken = (token) => {
-    return 
-}
