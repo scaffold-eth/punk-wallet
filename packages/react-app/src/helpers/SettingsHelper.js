@@ -3,6 +3,7 @@ const STORAGE_KEY_KEY = "storageKey";
 const INDEX_MAP_KEY = "indexMap";
 const REMOVED_NAMES_KEY = "removedNames";
 const SELECTED_NAME_KEY = "selectedName";
+const CUSTOM_ITEMS_KEY = "customItems";
 
 const modalSettingsKeys = [INDEX_MAP_KEY, REMOVED_NAMES_KEY];
 
@@ -14,11 +15,17 @@ export class SettingsHelper {
         this.settings = {...getInitialSettings(this.storageKey, this.items), ...this.storedSettings};
         this.setSettings = setSettings;
 
-        const {sortedItems, removedItems, selectedItem} = getItems(this.items, this.settings);
+        const {sortedItems, removedItems, selectedItem} = splitItems(getAllItems(this.items, this.settings), this.settings);
 
         this.sortedItems = sortedItems;
         this.removedItems = removedItems;
         this.selectedItem = selectedItem;
+    }
+
+    addCustomItem = (item) => {
+        setCustomItems(getCustomItems(this.settings).concat(item), this.settings);
+
+        return updateSettings(this.settings, this.setSettings);
     }
 
     addItem = (item) => {
@@ -32,14 +39,52 @@ export class SettingsHelper {
         return updateSettings(this.settings, this.setSettings);
     }
 
+    getCustomItems = () => {
+        return getCustomItems(this.settings);
+    }
+
+    getExistingItem = (item, keyProperty) => {
+        let existingItem;
+
+        getAllItems(this.items, this.settings).some(
+            (otherItem) => {
+                if (this.isItemsTheSame(otherItem, item, keyProperty)) {
+                    existingItem = otherItem;
+
+                    return true;
+                }
+            }
+        )
+
+        return existingItem;
+    }
+
     getSelectedItem = () => {
         const selectedName = getSelectedName(this.settings);
 
-        return this.items.find(item => item.name === selectedName);
+        return getAllItems(this.items, this.settings).find(item => item.name === selectedName);
+    }
+
+    isCustomItem = (item, keyProperty) => {
+        return this.getCustomItems().some(customItem => this.isItemsTheSame(customItem, item, keyProperty));
+    }
+
+    isItemsTheSame = (item1, item2, keyProperty) => {
+        if (!keyProperty) {
+            keyProperty = "name";
+        }
+
+        return item1[keyProperty] && item2[keyProperty] && (item1[keyProperty].toLowerCase() == item2[keyProperty].toLowerCase());
     }
 
     isModalSettingsModified = () => {
         return modalSettingsKeys.some(key => this.storedSettings.hasOwnProperty(key));
+    }
+
+    removeCustomItem = (item) => {
+        setCustomItems(this.getCustomItems().filter(customItem => customItem.name != item.name), this.settings);
+
+        return updateSettings(this.settings, this.setSettings);
     }
 
     removeItem = (item) => {
@@ -90,6 +135,14 @@ const createIndexMap = (sortedItems) => {
     return orderSetting;
 }
 
+const getAllItems = (items, settings) => {
+    return items.concat(getCustomItems(settings));
+}
+
+const getCustomItems = (settings) => {
+    return settings[CUSTOM_ITEMS_KEY];
+}
+
 const getIndexMap = (settings) => {
     return settings[INDEX_MAP_KEY];
 }
@@ -103,12 +156,25 @@ const getInitialSettings = (storageKey, items) => {
         [STORAGE_KEY_KEY]: storageKey,
         [INDEX_MAP_KEY]: createIndexMap(items),
         [REMOVED_NAMES_KEY]: [],
-        [SELECTED_NAME_KEY]: items[0].name
+        [SELECTED_NAME_KEY]: items[0].name,
+        [CUSTOM_ITEMS_KEY]: [],
     }
 }
 
+const getRemovedNames = (settings) => {
+    return settings[REMOVED_NAMES_KEY];
+}
+
+const getSelectedName = (settings) => {
+    return settings[SELECTED_NAME_KEY];
+}
+
+const getStorageKey = (settings) => {
+    return settings[STORAGE_KEY_KEY];
+}
+
 // Split items into displayed items (sorted), removed items and currently selected item according to the settings
-const getItems = (items, settings) => {
+const splitItems = (items, settings) => {
     const removedNames = getRemovedNames(settings);
     const filterMethod = removedNames.length ? (item) => removedNames.includes(item.name) : undefined;
 
@@ -142,18 +208,6 @@ const getItems = (items, settings) => {
     }
 }
 
-const getRemovedNames = (settings) => {
-    return settings[REMOVED_NAMES_KEY];
-}
-
-const getSelectedName = (settings) => {
-    return settings[SELECTED_NAME_KEY];
-}
-
-const getStorageKey = (settings) => {
-    return settings[STORAGE_KEY_KEY];
-}
-
 const sortItems = (items, settings) => {
     const order = getIndexMap(settings);
 
@@ -165,6 +219,10 @@ const sortItems = (items, settings) => {
     return items.slice().sort(
         (a, b) => order[a.name] - order[b.name]
     );
+}
+
+const setCustomItems = (customItems, settings) => {
+    return setSetting(CUSTOM_ITEMS_KEY, customItems, settings);
 }
 
 const setIndexMap = (indexMap, settings) => {
@@ -234,6 +292,23 @@ const updateSettings = (settings, setSettings) => {
       "DAI",
       "USDT"
    ],
-   "selectedName":"EURe"
+   "selectedName":"EURe",
+   "customItems":[
+      {
+         "address":"0x9C9e5fD8bbc25984B178FdCE6117Defa39d2db39",
+         "name":"BUSD",
+         "decimals":18
+      },
+      {
+         "address":"0x3BA4c387f786bFEE076A58914F5Bd38d668B42c3",
+         "name":"BNB",
+         "decimals":18
+      },
+      {
+         "address":"0x2C89bbc92BD86F8075d1DEcc58C7F4E0107f286b",
+         "name":"AVAX",
+         "decimals":18
+      }
+   ]
 }
 */

@@ -35,6 +35,7 @@ export default function TransactionDisplay({
 
     const [dateDisplayMode, setDateDisplayMode] = useLocalStorage("dateDisplayMode", false);
 
+    // ToDo: Reuse Punk component
     let part1 = toAddress && toAddress.substr(2,20)
     let part2= toAddress && toAddress.substr(22)
     const x = parseInt(part1, 16)%100
@@ -94,7 +95,7 @@ export default function TransactionDisplay({
                 </div>
             }
 
-            {erc20TokenName && erc20ImgSrc ?
+            {erc20TokenName ?
                 <div style={{ display: 'flex', fontSize: "1.42em" }}>
                     <div style={{ flex: '25%', backgroundColor:"" }}>
                         {kind && <div style={{  color: incomingOrder ? "#71d593" : "#2c6ca7" }}>
@@ -117,7 +118,7 @@ export default function TransactionDisplay({
                                     </div>
                                     :
                                     <div>
-                                        <TokenDisplay token={{name:"", imgSrc:erc20ImgSrc}}/>
+                                        <TokenDisplay token={{name:erc20ImgSrc ? undefined : erc20TokenName, imgSrc:erc20ImgSrc}} divStyle={{justifyContent:"center"}}/>
                                     </div>
                             }
                         </div>

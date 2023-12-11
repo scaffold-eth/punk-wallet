@@ -26,7 +26,9 @@ import {
   SettingsModal,
   QRPunkBlockie,
   Ramp,
+  TokenDetailedDisplay,
   TokenDisplay,
+  TokenImportDisplay,
   TransactionResponses,
   Wallet,
   WalletConnectTransactionPopUp,
@@ -156,7 +158,7 @@ function App(props) {
     migrateSelectedNetworkStorageSetting(networkSettingsHelper);
   }, []);
 
-  const selectedErc20Token = tokenSettingsHelper ? getSelectedErc20Token(tokenSettingsHelper.getSelectedItem(), erc20Tokens): undefined;
+  const selectedErc20Token = tokenSettingsHelper ? getSelectedErc20Token(tokenSettingsHelper.getSelectedItem(), erc20Tokens.concat(tokenSettingsHelper.getCustomItems())): undefined;
 
   //const [isWalletModalVisible, setIsWalletModalVisible] = useState(false);
   //const [walletModalData, setWalletModalData] = useState();
@@ -936,21 +938,28 @@ function App(props) {
 
   return (
     <div className="App">
-      <SettingsModal
-        settingsHelper={networkSettingsHelper}
-        itemCoreDisplay={(network) => <NetworkDisplay network={network}/>}
-        modalOpen={networkSettingsModalOpen}
-        setModalOpen={setNetworkSettingsModalOpen}
-        title={"Network Settings"} 
-      />
+      {networkSettingsHelper && 
+        <SettingsModal
+          settingsHelper={networkSettingsHelper}
+          itemCoreDisplay={(network) => <NetworkDisplay network={network}/>}
+          modalOpen={networkSettingsModalOpen}
+          setModalOpen={setNetworkSettingsModalOpen}
+          title={"Network Settings"} 
+        />
+      }
 
-      <SettingsModal
-        settingsHelper={tokenSettingsHelper}
-        itemCoreDisplay={(token) => <TokenDisplay token={token} divStyle={{display: "flex", alignItems: "center", justifyContent: "center"}} spanStyle={{paddingLeft:"0.2em"}}/>}
-        modalOpen={tokenSettingsModalOpen}
-        setModalOpen={setTokenSettingsModalOpen}
-        title={"Token Settings"} // ToDo: Reuse TOKEN_SETTINGS_STORAGE_KEY and colored network name
-      />
+      {tokenSettingsHelper && 
+        <SettingsModal
+          settingsHelper={tokenSettingsHelper}
+          itemCoreDisplay={(token) => <TokenDisplay token={token} divStyle={{display: "flex", alignItems: "center", justifyContent: "center"}} spanStyle={{paddingLeft:"0.2em"}}/>}
+          itemDetailedDisplay={(tokenSettingsHelper, token, tokenCoreDisplay, network, setItemDetailed) => <TokenDetailedDisplay tokenSettingsHelper={tokenSettingsHelper} token={token} tokenCoreDisplay={tokenCoreDisplay} network={network} setItemDetailed={setItemDetailed} />}
+          itemImportDisplay={(tokenSettingsHelper, tokenCoreDisplay, tokenDetailedDisplay, network, setImportView) => <TokenImportDisplay tokenSettingsHelper={tokenSettingsHelper} tokenCoreDisplay={tokenCoreDisplay} tokenDetailedDisplay={tokenDetailedDisplay} network={network} setImportView={setImportView}/>}
+          modalOpen={tokenSettingsModalOpen}
+          setModalOpen={setTokenSettingsModalOpen}
+          title={"Token Settings"} // ToDo: Reuse TOKEN_SETTINGS_STORAGE_KEY and colored network name
+          network={targetNetwork}
+        />
+      }
 
       <div className="site-page-header-ghost-wrapper">
         <Header
