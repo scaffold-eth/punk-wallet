@@ -3,9 +3,16 @@ const STORAGE_KEY_KEY = "storageKey";
 const INDEX_MAP_KEY = "indexMap";
 const REMOVED_NAMES_KEY = "removedNames";
 const SELECTED_NAME_KEY = "selectedName";
-const CUSTOM_ITEMS_KEY = "customItems";
 
-const modalSettingsKeys = [INDEX_MAP_KEY, REMOVED_NAMES_KEY];
+// These settings were added later, so it is possible 
+// that they don't exist yet for someone
+const CUSTOM_ITEMS_KEY = "customItems";
+const CUSTOM_ITEMS_DEFAULT_VALUE = [];
+
+const ITEMS_SETTINGS_KEY = "itemSettings";
+const ITEMS_SETTINGS_DEFAULT_VALUE = {};
+
+const modalSettingsKeys = [INDEX_MAP_KEY, ITEMS_SETTINGS_KEY, REMOVED_NAMES_KEY];
 
 export class SettingsHelper {
     constructor(storageKey, items, settings, setSettings) {
@@ -99,10 +106,6 @@ export class SettingsHelper {
         return updateSettings(this.settings, this.setSettings);
     }
 
-    updateSelectedName = (name) => {
-        return updateSettings(setSelectedName(name, this.settings), this.setSettings);
-    }
-
     resetModalSettings = () => {
         modalSettingsKeys.forEach(
             (key) => delete this.settings[key]
@@ -110,6 +113,8 @@ export class SettingsHelper {
 
         return updateSettings(this.settings, this.setSettings);
     }
+
+    getItemSettings = (item) => getItemsSettings(this.settings)[item.name] ?? {};
 
     updateIndexMap = (item, direction) => {
         const itemIndex = this.sortedItems.indexOf(item);
@@ -121,6 +126,18 @@ export class SettingsHelper {
 
         return updateSettings(setIndexMap(createIndexMap(this.sortedItems), this.settings), this.setSettings);
     }
+
+    updateItemSettings = (item, setting) => {
+        const itemsSettings = getItemsSettings(this.settings);
+
+        const currentItemSettings = this.getItemSettings(item);
+
+        itemsSettings[item.name] = {...currentItemSettings, ...setting};
+
+        return updateSettings(setItemsSettings(itemsSettings, this.settings), this.setSettings)
+    }
+
+    updateSelectedName = (name) => updateSettings(setSelectedName(name, this.settings), this.setSettings);
 }
 
 const createIndexMap = (sortedItems) => {
@@ -135,17 +152,13 @@ const createIndexMap = (sortedItems) => {
     return orderSetting;
 }
 
-const getAllItems = (items, settings) => {
-    return items.concat(getCustomItems(settings));
-}
+const getAllItems = (items, settings) => items.concat(getCustomItems(settings));
 
-const getCustomItems = (settings) => {
-    return settings[CUSTOM_ITEMS_KEY];
-}
+const getCustomItems = (settings) => settings[CUSTOM_ITEMS_KEY] ?? CUSTOM_ITEMS_DEFAULT_VALUE;
 
-const getIndexMap = (settings) => {
-    return settings[INDEX_MAP_KEY];
-}
+const getItemsSettings = (settings) => settings[ITEMS_SETTINGS_KEY] ?? ITEMS_SETTINGS_DEFAULT_VALUE;
+
+const getIndexMap = (settings) => settings[INDEX_MAP_KEY];
 
 const getInitialSettings = (storageKey, items) => {
     if (!items) {
@@ -157,21 +170,16 @@ const getInitialSettings = (storageKey, items) => {
         [INDEX_MAP_KEY]: createIndexMap(items),
         [REMOVED_NAMES_KEY]: [],
         [SELECTED_NAME_KEY]: items[0].name,
-        [CUSTOM_ITEMS_KEY]: [],
+        [CUSTOM_ITEMS_KEY]: CUSTOM_ITEMS_DEFAULT_VALUE,
+        [ITEMS_SETTINGS_KEY]: {},
     }
 }
 
-const getRemovedNames = (settings) => {
-    return settings[REMOVED_NAMES_KEY];
-}
+const getRemovedNames = (settings) => settings[REMOVED_NAMES_KEY];
 
-const getSelectedName = (settings) => {
-    return settings[SELECTED_NAME_KEY];
-}
+const getSelectedName = (settings) => settings[SELECTED_NAME_KEY];
 
-const getStorageKey = (settings) => {
-    return settings[STORAGE_KEY_KEY];
-}
+const getStorageKey = (settings) => settings[STORAGE_KEY_KEY];
 
 // Split items into displayed items (sorted), removed items and currently selected item according to the settings
 const splitItems = (items, settings) => {
@@ -208,6 +216,19 @@ const splitItems = (items, settings) => {
     }
 }
 
+const setCustomItems = (customItems, settings) => setSetting(CUSTOM_ITEMS_KEY, customItems, settings);
+const setItemsSettings = (itemsSettings, settings) => setSetting(ITEMS_SETTINGS_KEY, itemsSettings, settings);
+const setIndexMap = (indexMap, settings) => setSetting(INDEX_MAP_KEY, indexMap, settings);
+const setRemovedNames = (removedNames, settings) => setSetting(REMOVED_NAMES_KEY, removedNames, settings);
+const setSelectedName = (selectedName, settings) => setSetting(SELECTED_NAME_KEY, selectedName, settings);
+
+// Updates the settings without changing the state and storage
+const setSetting = (key, value, settings) => {
+    settings[key] = value;
+
+    return settings;
+}
+
 const sortItems = (items, settings) => {
     const order = getIndexMap(settings);
 
@@ -219,29 +240,6 @@ const sortItems = (items, settings) => {
     return items.slice().sort(
         (a, b) => order[a.name] - order[b.name]
     );
-}
-
-const setCustomItems = (customItems, settings) => {
-    return setSetting(CUSTOM_ITEMS_KEY, customItems, settings);
-}
-
-const setIndexMap = (indexMap, settings) => {
-    return setSetting(INDEX_MAP_KEY, indexMap, settings);
-}
-
-const setRemovedNames = (removedNames, settings) => {
-    return setSetting(REMOVED_NAMES_KEY, removedNames, settings);
-}
-
-const setSelectedName = (selectedName, settings) => {
-    return setSetting(SELECTED_NAME_KEY, selectedName, settings);
-}
-
-// Updates the settings without changing the state and storage
-const setSetting = (key, value, settings) => {
-    settings[key] = value;
-
-    return settings;
 }
 
 const updateSettings = (settings, setSettings) => {
@@ -278,7 +276,15 @@ const updateSettings = (settings, setSettings) => {
       "testnetHarmony",
       "harmony"
    ],
-   "selectedName":"optimism"
+   "selectedName":"optimism",
+   "itemsSettings": {
+      "ethereum": {
+         "selectedBlockExplorerName": "blockscout"
+      },
+      "polygon": {
+         "selectedBlockExplorerName": "dexguru"
+      }
+   }
 }
 
 {
