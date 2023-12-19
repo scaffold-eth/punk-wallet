@@ -1,4 +1,4 @@
-const TOKEN_SETTINGS_STORAGE_KEY = "TokenSettings";
+export const TOKEN_SETTINGS_STORAGE_KEY = "TokenSettings";
 
 export const getSelectedErc20Token = (selectedToken, erc20Tokens) => {
     if (!selectedToken || !erc20Tokens) {
@@ -6,10 +6,6 @@ export const getSelectedErc20Token = (selectedToken, erc20Tokens) => {
     }
 
     return erc20Tokens.find(token => token.name === selectedToken.name);
-}
-
-export const getStorageKey = () => {
-    return TOKEN_SETTINGS_STORAGE_KEY;
 }
 
 export const getTokens = (nativeToken, erc20Tokens) => {

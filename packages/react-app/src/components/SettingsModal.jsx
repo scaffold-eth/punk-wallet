@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import { Button, Modal } from "antd";
 import { DeleteOutlined, DownCircleOutlined, ImportOutlined, RedoOutlined, UpCircleOutlined } from "@ant-design/icons";
 
-export default function SettingsModal({settingsHelper, itemCoreDisplay, itemDetailedDisplay, itemImportDisplay, modalOpen, setModalOpen, title, network }) {
+export default function SettingsModal({settingsHelper, itemCoreDisplay, itemDetailedDisplay, itemImportDisplay, modalOpen, setModalOpen, title, network, setTargetNetwork }) {
     const [itemDetailed, setItemDetailed] = useState(undefined);
     const [importView, setImportView] = useState(false);
 
@@ -36,7 +36,7 @@ export default function SettingsModal({settingsHelper, itemCoreDisplay, itemDeta
                 {!importView && 
                     (
                         itemDetailed ?
-                            itemDetailedDisplay(settingsHelper, itemDetailed, itemCoreDisplay, network, setItemDetailed)
+                            itemDetailedDisplay(settingsHelper, itemDetailed, itemCoreDisplay, network, setItemDetailed, setTargetNetwork)
                         :
                             <div>
                                 <ItemsDisplay settingsHelper={settingsHelper} itemCoreDisplay={itemCoreDisplay} itemDetailedDisplay={itemDetailedDisplay} setItemDetailed={setItemDetailed}/>

@@ -8,19 +8,21 @@ const SELECTED_NAME_KEY = "selectedName";
 // that they don't exist yet for someone
 const CUSTOM_ITEMS_KEY = "customItems";
 const CUSTOM_ITEMS_DEFAULT_VALUE = [];
-
 const ITEMS_SETTINGS_KEY = "itemSettings";
 const ITEMS_SETTINGS_DEFAULT_VALUE = {};
+
+const ITEM_SETTINGS_DEFAULT_VALUE = {};
 
 const modalSettingsKeys = [INDEX_MAP_KEY, ITEMS_SETTINGS_KEY, REMOVED_NAMES_KEY];
 
 export class SettingsHelper {
-    constructor(storageKey, items, settings, setSettings) {
+    constructor(storageKey, items, settings, setSettings, getItemWithSettings) {
         this.storageKey = storageKey;
         this.items = items;
         this.storedSettings = settings;
         this.settings = {...getInitialSettings(this.storageKey, this.items), ...this.storedSettings};
         this.setSettings = setSettings;
+        this.getItemWithSettings = getItemWithSettings;
 
         const {sortedItems, removedItems, selectedItem} = splitItems(getAllItems(this.items, this.settings), this.settings);
 
@@ -66,10 +68,16 @@ export class SettingsHelper {
         return existingItem;
     }
 
-    getSelectedItem = () => {
+    getSelectedItem = (getItemSettings) => {
         const selectedName = getSelectedName(this.settings);
 
-        return getAllItems(this.items, this.settings).find(item => item.name === selectedName);
+        const selectedItem = getAllItems(this.items, this.settings).find(item => item.name === selectedName);
+
+        if (getItemSettings && this.getItemWithSettings) {
+            return this.getItemWithSettings(selectedItem, this.getItemSettings(selectedItem));
+        }
+
+        return selectedItem;
     }
 
     isCustomItem = (item, keyProperty) => {
@@ -114,7 +122,7 @@ export class SettingsHelper {
         return updateSettings(this.settings, this.setSettings);
     }
 
-    getItemSettings = (item) => getItemsSettings(this.settings)[item.name] ?? {};
+    getItemSettings = (item) => getItemsSettings(this.settings)[item.name] ?? ITEM_SETTINGS_DEFAULT_VALUE;
 
     updateIndexMap = (item, direction) => {
         const itemIndex = this.sortedItems.indexOf(item);
@@ -171,7 +179,7 @@ const getInitialSettings = (storageKey, items) => {
         [REMOVED_NAMES_KEY]: [],
         [SELECTED_NAME_KEY]: items[0].name,
         [CUSTOM_ITEMS_KEY]: CUSTOM_ITEMS_DEFAULT_VALUE,
-        [ITEMS_SETTINGS_KEY]: {},
+        [ITEMS_SETTINGS_KEY]: ITEMS_SETTINGS_DEFAULT_VALUE,
     }
 }
 
