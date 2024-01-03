@@ -19096,7 +19096,8 @@ const chains = [
          {
             "name":"basescan",
             "url":"https://basescan.org",
-            "standard":"none"
+            "standard":"EIP3091"
+            // ToDo: Check why basescan doesn't follow EIP3091
          },
          {
             "name":"basescout",
