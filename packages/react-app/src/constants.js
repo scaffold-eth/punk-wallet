@@ -411,6 +411,18 @@ export const NETWORKS = {
     chainId: 8453,
     rpcUrl: "https://mainnet.base.org",
     blockExplorer: "https://basescan.org/",
+    erc20Tokens: [
+      {
+        name: "USDC",
+        address: "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+        decimals: 6,
+        imgSrc: "/USDC.png",
+      }
+    ],
+    nativeToken: {
+      name: "ETH",
+      imgSrc: "/ETH.png",
+    },
   },
   arbitrum: {
     name: "arbitrum",
