@@ -1,6 +1,10 @@
+export const getBLockExplorer = (chain, name) => getBLockExplorers(chain).find(blockExplorer => blockExplorer.name == name);
+
+export const getBLockExplorers = (chain) => chain.explorers.filter(explorer => isEIP3091Explorer(explorer));
+
 export const getChain = (chainId) => chains.find(chain => chain.chainId == chainId)
 
-export const isEIP3091Explorer = (explorer) => explorer.standard == "EIP3091";
+const isEIP3091Explorer = (explorer) => explorer.standard == "EIP3091";
 
 // This chain list is from
 // https://github.com/ethereum-lists/
@@ -117,6 +121,7 @@ const chains = [
       "shortName":"rop",
       "chainId":3,
       "networkId":3,
+      "slip44":1,
       "ens":{
          "registry":"0x112234455c3a32fd11230c42e7bccd4a84e02010"
       },
@@ -149,6 +154,7 @@ const chains = [
       "shortName":"rin",
       "chainId":4,
       "networkId":4,
+      "slip44":1,
       "ens":{
          "registry":"0xe7410170f87102df0055eb195163a03b7f2bff4a"
       },
@@ -187,6 +193,7 @@ const chains = [
       "shortName":"gor",
       "chainId":5,
       "networkId":5,
+      "slip44":1,
       "ens":{
          "registry":"0x112234455c3a32fd11230c42e7bccd4a84e02010"
       },
@@ -205,11 +212,13 @@ const chains = [
       ]
    },
    {
-      "name":"Ethereum Classic Testnet Kotti",
+      "name":"Kotti Testnet",
+      "title":"Ethereum Classic Kotti Testnet",
       "status":"deprecated",
       "chain":"ETC",
+      "icon":"ethereumclassictestnet",
       "rpc":[
-         "https://www.ethercluster.com/kotti"
+         
       ],
       "faucets":[
          
@@ -219,10 +228,11 @@ const chains = [
          "symbol":"KOT",
          "decimals":18
       },
-      "infoURL":"https://explorer.jade.builders/?network=kotti",
+      "infoURL":"https://ethereumclassic.org/development/testnets",
       "shortName":"kot",
       "chainId":6,
-      "networkId":6
+      "networkId":6,
+      "slip44":1
    },
    {
       "name":"ThaiChain",
@@ -304,7 +314,8 @@ const chains = [
       "infoURL":"https://ethersocial.org",
       "shortName":"tubq",
       "chainId":9,
-      "networkId":2
+      "networkId":2,
+      "slip44":1
    },
    {
       "name":"OP Mainnet",
@@ -385,7 +396,8 @@ const chains = [
       "infoURL":"https://metadium.com",
       "shortName":"kal",
       "chainId":12,
-      "networkId":12
+      "networkId":12,
+      "slip44":1
    },
    {
       "name":"Diode Testnet Staging",
@@ -405,7 +417,8 @@ const chains = [
       "infoURL":"https://diode.io/staging",
       "shortName":"dstg",
       "chainId":13,
-      "networkId":13
+      "networkId":13,
+      "slip44":1
    },
    {
       "name":"Flare Mainnet",
@@ -526,6 +539,7 @@ const chains = [
       "shortName":"TST",
       "chainId":18,
       "networkId":18,
+      "slip44":1,
       "explorers":[
          {
             "name":"thundercore-blockscout-testnet",
@@ -653,7 +667,8 @@ const chains = [
       "infoURL":"https://elaeth.io/",
       "shortName":"eladidt",
       "chainId":23,
-      "networkId":23
+      "networkId":23,
+      "slip44":1
    },
    {
       "name":"KardiaChain Mainnet",
@@ -729,6 +744,7 @@ const chains = [
       "shortName":"L1test",
       "chainId":26,
       "networkId":26,
+      "slip44":1,
       "explorers":[
          {
             "name":"Genesis L1 testnet explorer",
@@ -781,6 +797,7 @@ const chains = [
       "shortName":"BobaRinkeby",
       "chainId":28,
       "networkId":28,
+      "slip44":1,
       "explorers":[
          {
             "name":"Blockscout",
@@ -879,6 +896,7 @@ const chains = [
       "shortName":"trsk",
       "chainId":31,
       "networkId":31,
+      "slip44":1,
       "explorers":[
          {
             "name":"RSK Testnet Explorer",
@@ -904,7 +922,8 @@ const chains = [
       "infoURL":"https://www.goodata.org",
       "shortName":"GooDT",
       "chainId":32,
-      "networkId":32
+      "networkId":32,
+      "slip44":1
    },
    {
       "name":"GoodData Mainnet",
@@ -1123,6 +1142,7 @@ const chains = [
       "shortName":"TelosEVMTestnet",
       "chainId":41,
       "networkId":41,
+      "slip44":1,
       "explorers":[
          {
             "name":"teloscan",
@@ -1188,6 +1208,7 @@ const chains = [
       "shortName":"pangolin",
       "chainId":43,
       "networkId":43,
+      "slip44":1,
       "explorers":[
          {
             "name":"subscan",
@@ -1242,6 +1263,7 @@ const chains = [
       "shortName":"pangoro",
       "chainId":45,
       "networkId":45,
+      "slip44":1,
       "explorers":[
          {
             "name":"subscan",
@@ -1358,6 +1380,7 @@ const chains = [
       "shortName":"etmpTest",
       "chainId":49,
       "networkId":49,
+      "slip44":1,
       "icon":"etmp",
       "explorers":[
          {
@@ -1483,6 +1506,7 @@ const chains = [
       "shortName":"tcet",
       "chainId":53,
       "networkId":53,
+      "slip44":1,
       "explorers":[
          {
             "name":"coinexscan",
@@ -1712,11 +1736,19 @@ const chains = [
       ]
    },
    {
-      "name":"Ethereum Classic Mainnet",
+      "name":"Ethereum Classic",
+      "title":"Ethereum Classic Mainnet",
+      "status":"active",
       "chain":"ETC",
+      "icon":"ethereumclassic",
       "rpc":[
          "https://etc.rivet.link",
+         "https://besu-at.etc-network.info",
+         "https://besu-de.etc-network.info",
+         "https://geth-at.etc-network.info",
+         "https://geth-de.etc-network.info",
          "https://etc.etcdesktop.com",
+         "https://rpc.etcinscribe.com",
          "https://etc.mytokenpocket.vip"
       ],
       "features":[
@@ -1728,7 +1760,7 @@ const chains = [
          
       ],
       "nativeCurrency":{
-         "name":"Ethereum Classic Ether",
+         "name":"Ether",
          "symbol":"ETC",
          "decimals":18
       },
@@ -1739,15 +1771,48 @@ const chains = [
       "slip44":61,
       "explorers":[
          {
-            "name":"blockscout",
-            "url":"https://blockscout.com/etc/mainnet",
+            "name":"blockscout-ethereum-classic",
+            "url":"https://etc.blockscout.com",
+            "standard":"EIP3091"
+         },
+         {
+            "name":"etcnetworkinfo-blockscout-ethereum-classic",
+            "url":"https://explorer-blockscout.etc-network.info",
+            "standard":"none"
+         },
+         {
+            "name":"etcnetworkinfo-alethio-ethereum-classic",
+            "url":"https://explorer-alethio.etc-network.info",
+            "standard":"none"
+         },
+         {
+            "name":"etcnetworkinfo-expedition-ethereum-classic",
+            "url":"https://explorer-expedition.etc-network.info",
+            "standard":"none"
+         },
+         {
+            "name":"hebeblock-ethereum-classic",
+            "url":"https://etcerscan.com",
+            "standard":"EIP3091"
+         },
+         {
+            "name":"oklink-ethereum-classic",
+            "url":"https://www.oklink.com/etc",
+            "standard":"EIP3091"
+         },
+         {
+            "name":"tokenview-ethereum-classic",
+            "url":"https://etc.tokenview.io",
             "standard":"EIP3091"
          }
       ]
    },
    {
-      "name":"Ethereum Classic Testnet Morden",
+      "name":"Morden Testnet",
+      "title":"Ethereum Classic Morden Testnet",
+      "status":"deprecated",
       "chain":"ETC",
+      "icon":"ethereumclassictestnet",
       "rpc":[
          
       ],
@@ -1755,20 +1820,25 @@ const chains = [
          
       ],
       "nativeCurrency":{
-         "name":"Ethereum Classic Testnet Ether",
+         "name":"Morden Ether",
          "symbol":"TETC",
          "decimals":18
       },
-      "infoURL":"https://ethereumclassic.org",
+      "infoURL":"https://ethereumclassic.org/development/testnets",
       "shortName":"tetc",
       "chainId":62,
-      "networkId":2
+      "networkId":2,
+      "slip44":1
    },
    {
-      "name":"Ethereum Classic Testnet Mordor",
+      "name":"Mordor Testnet",
+      "title":"Ethereum Classic Mordor Testnet",
+      "status":"active",
       "chain":"ETC",
+      "icon":"ethereumclassictestnet",
       "rpc":[
-         "https://rpc.mordor.etccooperative.org"
+         "https://rpc.mordor.etccooperative.org",
+         "https://geth-mordor.etc-network.info"
       ],
       "features":[
          {
@@ -1776,24 +1846,29 @@ const chains = [
          }
       ],
       "faucets":[
-         "https://mordor.canhaz.net/",
-         "https://easy.hebeswap.com/#/faucet"
+         "https://easy.hebeswap.com/#/faucet",
+         "https://faucet.mordortest.net"
       ],
       "nativeCurrency":{
-         "name":"Mordor Classic Testnet Ether",
+         "name":"Mordor Ether",
          "symbol":"METC",
          "decimals":18
       },
-      "infoURL":"https://github.com/eth-classic/mordor/",
+      "infoURL":"https://ethereumclassic.org/development/testnets",
       "shortName":"metc",
       "chainId":63,
       "networkId":7,
-      "slip44":63,
+      "slip44":1,
       "explorers":[
          {
-            "name":"blockscout",
-            "url":"https://blockscout.com/etc/mordor",
+            "name":"blockscout-mordor",
+            "url":"https://etc-mordor.blockscout.com",
             "standard":"EIP3091"
+         },
+         {
+            "name":"etcnetworkinfo-expedition-mordor",
+            "url":"https://explorer-expedition.etc-network.info/?network=Ethereum+Classic+at+etc-network.info+GETH+Mordor",
+            "standard":"none"
          }
       ]
    },
@@ -1835,6 +1910,7 @@ const chains = [
       "shortName":"tokt",
       "chainId":65,
       "networkId":65,
+      "slip44":1,
       "explorers":[
          {
             "name":"OKLink",
@@ -1887,7 +1963,8 @@ const chains = [
       "infoURL":"http://test.dbmbp.com",
       "shortName":"dbm",
       "chainId":67,
-      "networkId":67
+      "networkId":67,
+      "slip44":1
    },
    {
       "name":"SoterOne Mainnet",
@@ -1933,7 +2010,8 @@ const chains = [
       "infoURL":"https://optimism.io",
       "shortName":"okov",
       "chainId":69,
-      "networkId":69
+      "networkId":69,
+      "slip44":1
    },
    {
       "name":"Hoo Smart Chain",
@@ -2009,7 +2087,8 @@ const chains = [
       "infoURL":"https://testnet.dxscan.io/",
       "shortName":"dxc",
       "chainId":72,
-      "networkId":72
+      "networkId":72,
+      "slip44":1
    },
    {
       "name":"FNCY",
@@ -2309,6 +2388,7 @@ const chains = [
       "shortName":"MeterTest",
       "chainId":83,
       "networkId":83,
+      "slip44":1,
       "explorers":[
          {
             "name":"Meter Testnet Scan",
@@ -2349,6 +2429,7 @@ const chains = [
       "shortName":"gttest",
       "chain":"GTTEST",
       "networkId":85,
+      "slip44":1,
       "nativeCurrency":{
          "name":"GateToken",
          "symbol":"GT",
@@ -2462,7 +2543,7 @@ const chains = [
       "shortName":"tomot",
       "chainId":89,
       "networkId":89,
-      "slip44":889
+      "slip44":1
    },
    {
       "name":"Garizon Stage0",
@@ -2717,6 +2798,7 @@ const chains = [
       "shortName":"bnbt",
       "chainId":97,
       "networkId":97,
+      "slip44":1,
       "explorers":[
          {
             "name":"bscscan-testnet",
@@ -2874,7 +2956,8 @@ const chains = [
       "infoURL":"https://web3games.org/",
       "shortName":"tw3g",
       "chainId":102,
-      "networkId":102
+      "networkId":102,
+      "slip44":1
    },
    {
       "name":"Worldland Mainnet",
@@ -2921,6 +3004,7 @@ const chains = [
       "shortName":"tklc",
       "chainId":104,
       "networkId":104,
+      "slip44":1,
       "icon":"kaiba",
       "explorers":[
          {
@@ -3005,6 +3089,7 @@ const chains = [
       "shortName":"ntn",
       "chainId":107,
       "networkId":107,
+      "slip44":1,
       "explorers":[
          {
             "name":"nebulatestnet",
@@ -3086,7 +3171,8 @@ const chains = [
       "infoURL":"https://protonchain.com",
       "shortName":"xpr",
       "chainId":110,
-      "networkId":110
+      "networkId":110,
+      "slip44":1
    },
    {
       "name":"EtherLite Chain",
@@ -3185,6 +3271,7 @@ const chains = [
       "shortName":"c2flr",
       "chainId":114,
       "networkId":114,
+      "slip44":1,
       "explorers":[
          {
             "name":"blockscout",
@@ -3213,6 +3300,7 @@ const chains = [
       "shortName":"debank-testnet",
       "chainId":115,
       "networkId":115,
+      "slip44":1,
       "explorers":[
          
       ]
@@ -3288,6 +3376,7 @@ const chains = [
       "shortName":"arcology",
       "chainId":118,
       "networkId":118,
+      "slip44":1,
       "explorers":[
          {
             "name":"arcology",
@@ -3344,6 +3433,7 @@ const chains = [
       "shortName":"enulst",
       "chainId":120,
       "networkId":120,
+      "slip44":1,
       "icon":"enuls",
       "explorers":[
          {
@@ -3472,7 +3562,7 @@ const chains = [
       "shortName":"OYchainTestnet",
       "chainId":125,
       "networkId":125,
-      "slip44":125,
+      "slip44":1,
       "explorers":[
          {
             "name":"OYchain Testnet Explorer",
@@ -3558,6 +3648,43 @@ const chains = [
       ]
    },
    {
+      "name":"Engram Testnet",
+      "chain":"tGRAM",
+      "icon":"engram",
+      "rpc":[
+         "https://tokioswift.engram.tech",
+         "https://tokio-archive.engram.tech"
+      ],
+      "features":[
+         {
+            "name":"EIP155"
+         },
+         {
+            "name":"EIP1559"
+         }
+      ],
+      "faucets":[
+         
+      ],
+      "nativeCurrency":{
+         "name":"Engram Tokio Testnet",
+         "symbol":"tGRAM",
+         "decimals":18
+      },
+      "infoURL":"https://engramnet.io",
+      "shortName":"tgram",
+      "chainId":131,
+      "networkId":131,
+      "explorers":[
+         {
+            "name":"blockscout",
+            "url":"https://tokioscan-v2.engram.tech",
+            "icon":"engram",
+            "standard":"EIP3091"
+         }
+      ]
+   },
+   {
       "name":"iExec Sidechain",
       "chain":"Bellecour",
       "icon":"rlc",
@@ -3603,6 +3730,7 @@ const chains = [
       "shortName":"AlyxTestnet",
       "chainId":135,
       "networkId":135,
+      "slip44":1,
       "explorers":[
          {
             "name":"alyx testnet scan",
@@ -3777,6 +3905,7 @@ const chains = [
       "shortName":"OPtest",
       "chainId":141,
       "networkId":141,
+      "slip44":1,
       "explorers":[
          {
             "name":"Belly Scan",
@@ -3935,6 +4064,7 @@ const chains = [
       "chain":"RBN",
       "chainId":153,
       "networkId":153,
+      "slip44":1,
       "rpc":[
          
       ],
@@ -3988,6 +4118,7 @@ const chains = [
       "shortName":"tenet-testnet",
       "chainId":155,
       "networkId":155,
+      "slip44":1,
       "explorers":[
          {
             "name":"TenetScan Testnet",
@@ -4023,6 +4154,7 @@ const chains = [
       "shortName":"obe",
       "chainId":156,
       "networkId":156,
+      "slip44":1,
       "icon":"oescan",
       "explorers":[
          {
@@ -4070,6 +4202,7 @@ const chains = [
       "shortName":"wall-e",
       "chainId":161,
       "networkId":161,
+      "slip44":1,
       "explorers":[
          {
             "name":"blockscout - evascan",
@@ -4095,7 +4228,8 @@ const chains = [
       "infoURL":"https://explorer.sirius.lightstreams.io",
       "shortName":"tpht",
       "chainId":162,
-      "networkId":162
+      "networkId":162,
+      "slip44":1
    },
    {
       "name":"Lightstreams Mainnet",
@@ -4139,6 +4273,7 @@ const chains = [
       "shortName":"omni_testnet",
       "chainId":165,
       "networkId":165,
+      "slip44":1,
       "explorers":[
          {
             "name":"Omni Explorer",
@@ -4166,6 +4301,7 @@ const chains = [
       "shortName":"atoshi",
       "chainId":167,
       "networkId":167,
+      "slip44":1,
       "explorers":[
          {
             "name":"atoshiscan",
@@ -4254,7 +4390,8 @@ const chains = [
       "infoURL":"https://www.hoosmartchain.com",
       "shortName":"hoosmartchain",
       "chainId":170,
-      "networkId":170
+      "networkId":170,
+      "slip44":1
    },
    {
       "name":"Latam-Blockchain Resil Testnet",
@@ -4274,7 +4411,8 @@ const chains = [
       "infoURL":"https://latam-blockchain.com",
       "shortName":"resil",
       "chainId":172,
-      "networkId":172
+      "networkId":172,
+      "slip44":1
    },
    {
       "name":"AME Chain Mainnet",
@@ -4372,6 +4510,7 @@ const chains = [
       "shortName":"BMCT",
       "chainId":189,
       "networkId":189,
+      "slip44":1,
       "explorers":[
          {
             "name":"Blockmeta",
@@ -4428,6 +4567,7 @@ const chains = [
       "shortName":"tokb",
       "chainId":195,
       "networkId":195,
+      "slip44":1,
       "explorers":[
          {
             "name":"OKLink",
@@ -4481,6 +4621,7 @@ const chains = [
       "shortName":"NEUTR",
       "chainId":197,
       "networkId":197,
+      "slip44":1,
       "explorers":[
          {
             "name":"blockscout",
@@ -4589,6 +4730,7 @@ const chains = [
       "shortName":"moactest",
       "chainId":201,
       "networkId":201,
+      "slip44":1,
       "explorers":[
          {
             "name":"moac testnet explorer",
@@ -4649,6 +4791,7 @@ const chains = [
       "shortName":"VCTEST",
       "chainId":206,
       "networkId":206,
+      "slip44":1,
       "icon":"vitainu-testnet",
       "explorers":[
          {
@@ -4856,6 +4999,33 @@ const chains = [
       "status":"deprecated"
    },
    {
+      "name":"Scalind Testnet",
+      "chain":"ETH",
+      "icon":"scalind",
+      "rpc":[
+         "https://rpc-sepolia.scalind.com"
+      ],
+      "faucets":[
+         "https://faucet.scalind.com"
+      ],
+      "nativeCurrency":{
+         "name":"Sepolia Ether",
+         "symbol":"ETH",
+         "decimals":18
+      },
+      "infoURL":"https://scalind.com",
+      "shortName":"sepscal",
+      "chainId":220,
+      "networkId":220,
+      "explorers":[
+         {
+            "name":"scalind",
+            "url":"https://explorer-sepolia.scalind.com",
+            "standard":"EIP3091"
+         }
+      ]
+   },
+   {
       "name":"Permission",
       "chain":"ASK",
       "rpc":[
@@ -4922,6 +5092,7 @@ const chains = [
       "shortName":"TLA",
       "chainId":226,
       "networkId":226,
+      "slip44":1,
       "explorers":[
          {
             "name":"blockscout",
@@ -4976,12 +5147,40 @@ const chains = [
       "shortName":"deamtest",
       "chainId":236,
       "networkId":236,
+      "slip44":1,
       "explorers":[
          {
             "name":"Deamchain Testnet Explorer",
             "url":"https://testnet-scan.deamchain.com",
             "standard":"EIP3091",
             "icon":"deam"
+         }
+      ]
+   },
+   {
+      "name":"Blast Mainnet",
+      "chain":"ETH",
+      "icon":"blastIcon",
+      "rpc":[
+         "https://rpc.blastblockchain.com"
+      ],
+      "faucets":[
+         
+      ],
+      "nativeCurrency":{
+         "name":"Ether",
+         "symbol":"ETH",
+         "decimals":18
+      },
+      "infoURL":"https://docs.blastblockchain.com",
+      "shortName":"blast",
+      "chainId":238,
+      "networkId":238,
+      "explorers":[
+         {
+            "name":"Blast Mainnet",
+            "url":"https://scan.blastblockchain.com",
+            "standard":"EIP3091"
          }
       ]
    },
@@ -5368,6 +5567,7 @@ const chains = [
       "shortName":"zksync-goerli",
       "chainId":280,
       "networkId":280,
+      "slip44":1,
       "icon":"zksync-era",
       "explorers":[
          {
@@ -5544,7 +5744,7 @@ const chains = [
       "shortName":"hedera-testnet",
       "chainId":296,
       "networkId":296,
-      "slip44":3030,
+      "slip44":1,
       "explorers":[
          {
             "name":"HashScan",
@@ -5659,6 +5859,7 @@ const chains = [
       "shortName":"zksync-sepolia",
       "chainId":300,
       "networkId":300,
+      "slip44":1,
       "icon":"zksync-era",
       "explorers":[
          {
@@ -5736,6 +5937,7 @@ const chains = [
       "shortName":"ncnt",
       "chainId":303,
       "networkId":303,
+      "slip44":1,
       "explorers":[
          {
             "name":"neuroscan",
@@ -5767,6 +5969,7 @@ const chains = [
       "shortName":"wyz",
       "chainId":309,
       "networkId":309,
+      "slip44":1,
       "icon":"wyzth_icon",
       "explorers":[
          {
@@ -5943,6 +6146,7 @@ const chains = [
       "shortName":"kcst",
       "chainId":322,
       "networkId":322,
+      "slip44":1,
       "explorers":[
          {
             "name":"kcc-scan-testnet",
@@ -6033,6 +6237,7 @@ const chains = [
       "shortName":"DFKTEST",
       "chainId":335,
       "networkId":335,
+      "slip44":1,
       "explorers":[
          {
             "name":"ethernal",
@@ -6099,6 +6304,7 @@ const chains = [
       "shortName":"tcro",
       "chainId":338,
       "networkId":338,
+      "slip44":1,
       "explorers":[
          {
             "name":"Cronos Testnet Explorer",
@@ -6106,37 +6312,6 @@ const chains = [
             "standard":"none"
          }
       ]
-   },
-   {
-      "name":"Yooldo Verse Mainnet",
-      "chain":"Yooldo Verse",
-      "icon":"yooldo_verse",
-      "rpc":[
-         "https://rpc.yooldo-verse.xyz/"
-      ],
-      "faucets":[
-         
-      ],
-      "nativeCurrency":{
-         "name":"OAS",
-         "symbol":"OAS",
-         "decimals":18
-      },
-      "infoURL":"https://yooldo.gg/",
-      "shortName":"YVM",
-      "chainId":345,
-      "networkId":345,
-      "explorers":[
-         {
-            "name":"Yooldo Verse Explorer",
-            "url":"https://explorer.yooldo-verse.xyz",
-            "standard":"EIP3091"
-         }
-      ],
-      "parent":{
-         "type":"L2",
-         "chain":"eip155-248"
-      }
    },
    {
       "name":"Theta Mainnet",
@@ -6182,6 +6357,7 @@ const chains = [
       "shortName":"theta-sapphire",
       "chainId":363,
       "networkId":363,
+      "slip44":1,
       "explorers":[
          {
             "name":"Theta Sapphire Testnet Explorer",
@@ -6208,6 +6384,7 @@ const chains = [
       "shortName":"theta-amber",
       "chainId":364,
       "networkId":364,
+      "slip44":1,
       "explorers":[
          {
             "name":"Theta Amber Testnet Explorer",
@@ -6234,6 +6411,7 @@ const chains = [
       "shortName":"theta-testnet",
       "chainId":365,
       "networkId":365,
+      "slip44":1,
       "explorers":[
          {
             "name":"Theta Testnet Explorer",
@@ -6310,6 +6488,7 @@ const chains = [
       "shortName":"tCNT",
       "chainId":371,
       "networkId":371,
+      "slip44":1,
       "icon":"constachain",
       "explorers":[
          {
@@ -6394,6 +6573,7 @@ const chains = [
       "shortName":"hpn",
       "chainId":400,
       "networkId":400,
+      "slip44":1,
       "explorers":[
          {
             "name":"blockscout",
@@ -6421,6 +6601,7 @@ const chains = [
       "shortName":"ozo_tst",
       "chainId":401,
       "networkId":401,
+      "slip44":1,
       "icon":"ozonechain",
       "explorers":[
          {
@@ -6540,6 +6721,7 @@ const chains = [
       "shortName":"ogor",
       "chainId":420,
       "networkId":420,
+      "slip44":1,
       "explorers":[
          {
             "name":"blockscout",
@@ -6654,6 +6836,7 @@ const chains = [
       "shortName":"obs-testnet",
       "chain":"ETH",
       "networkId":443,
+      "slip44":1,
       "nativeCurrency":{
          "name":"Sepolia Ether",
          "symbol":"ETH",
@@ -6702,6 +6885,7 @@ const chains = [
       "shortName":"synapse-sepolia",
       "chainId":444,
       "networkId":444,
+      "slip44":1,
       "redFlags":[
          "reusedChainId"
       ],
@@ -6754,7 +6938,11 @@ const chains = [
       "chain":"Areon",
       "icon":"areon",
       "rpc":[
-         "https://testnet-rpc.areon.network"
+         "https://testnet-rpc.areon.network",
+         "https://testnet-rpc2.areon.network",
+         "https://testnet-rpc3.areon.network",
+         "https://testnet-rpc4.areon.network",
+         "https://testnet-rpc5.areon.network"
       ],
       "faucets":[
          
@@ -6768,6 +6956,7 @@ const chains = [
       "shortName":"tarea",
       "chainId":462,
       "networkId":462,
+      "slip44":1,
       "explorers":[
          {
             "name":"AreonScan",
@@ -6868,6 +7057,7 @@ const chains = [
       "shortName":"Columbus",
       "chainId":501,
       "networkId":1001,
+      "slip44":1,
       "icon":"camino",
       "explorers":[
          {
@@ -6924,6 +7114,7 @@ const chains = [
       "shortName":"aact",
       "chainId":513,
       "networkId":513,
+      "slip44":1,
       "explorers":[
          {
             "name":"aacscan-testnet",
@@ -7081,6 +7272,7 @@ const chains = [
       "shortName":"PAW",
       "chainId":542,
       "networkId":542,
+      "slip44":1,
       "explorers":[
          {
             "name":"PAWCHAIN Testnet",
@@ -7156,6 +7348,7 @@ const chains = [
       "shortName":"dct",
       "chainId":568,
       "networkId":568,
+      "slip44":1,
       "explorers":[
          {
             "name":"dogechain testnet explorer",
@@ -7209,6 +7402,7 @@ const chains = [
       "shortName":"metis-stardust",
       "chainId":588,
       "networkId":588,
+      "slip44":1,
       "explorers":[
          {
             "name":"blockscout",
@@ -7288,7 +7482,7 @@ const chains = [
       "shortName":"maca",
       "chainId":595,
       "networkId":595,
-      "slip44":595,
+      "slip44":1,
       "explorers":[
          {
             "name":"blockscout",
@@ -7316,7 +7510,7 @@ const chains = [
       "shortName":"tkar",
       "chainId":596,
       "networkId":596,
-      "slip44":596,
+      "slip44":1,
       "explorers":[
          {
             "name":"blockscout",
@@ -7344,7 +7538,7 @@ const chains = [
       "shortName":"taca",
       "chainId":597,
       "networkId":597,
-      "slip44":597,
+      "slip44":1,
       "explorers":[
          {
             "name":"blockscout",
@@ -7371,6 +7565,7 @@ const chains = [
       "shortName":"metis-goerli",
       "chainId":599,
       "networkId":599,
+      "slip44":1,
       "explorers":[
          {
             "name":"blockscout",
@@ -7405,33 +7600,34 @@ const chains = [
       "infoURL":"",
       "shortName":"mesh-chain-testnet",
       "chainId":600,
-      "networkId":600
+      "networkId":600,
+      "slip44":1
    },
    {
-      "name":"PEER Testnet",
-      "chain":"PEER",
+      "name":"Vine Testnet",
+      "chain":"VINE",
       "rpc":[
-         "http://testnet-polka-host-232813573.us-west-1.elb.amazonaws.com"
+         "https://rpc-testnet.vne.network"
       ],
       "faucets":[
-         "https://testnet.peer.inc"
+         "https://vne.network/rose"
       ],
       "nativeCurrency":{
-         "name":"PEER Token",
-         "symbol":"PEER",
+         "name":"VINE",
+         "symbol":"VNE",
          "decimals":18
       },
-      "infoURL":"https://peer.inc",
-      "shortName":"PEER",
+      "infoURL":"https://www.peer.inc",
+      "shortName":"VINE",
       "chainId":601,
       "networkId":601,
-      "icon":"peer",
+      "icon":"vine",
       "explorers":[
          {
-            "name":"PEER Explorer",
-            "url":"https://testnet.peer.inc",
+            "name":"Vine Explorer",
+            "url":"https://vne.network/rose",
             "standard":"none",
-            "icon":"peer"
+            "icon":"vine"
          }
       ]
    },
@@ -7508,6 +7704,7 @@ const chains = [
       "shortName":"SX-Testnet",
       "chainId":647,
       "networkId":647,
+      "slip44":1,
       "explorers":[
          {
             "name":"SX Network Toronto Explorer",
@@ -7586,7 +7783,8 @@ const chains = [
       "infoURL":"https://scan-testnet.chain.pixie.xyz",
       "shortName":"pixie-chain-testnet",
       "chainId":666,
-      "networkId":666
+      "networkId":666,
+      "slip44":1
    },
    {
       "name":"LAOS Arrakis",
@@ -7663,6 +7861,7 @@ const chains = [
       "shortName":"juncat",
       "chainId":669,
       "networkId":669,
+      "slip44":1,
       "explorers":[
          {
             "name":"JuncaScan",
@@ -7725,6 +7924,7 @@ const chains = [
       "shortName":"SNS",
       "chainId":700,
       "networkId":700,
+      "slip44":1,
       "explorers":[
          {
             "name":"starscan",
@@ -7779,6 +7979,7 @@ const chains = [
       "shortName":"tbcs",
       "chainId":708,
       "networkId":708,
+      "slip44":1,
       "explorers":[
          {
             "name":"BlockChain Station Explorer",
@@ -7908,6 +8109,7 @@ const chains = [
       "shortName":"tcanto",
       "chainId":740,
       "networkId":740,
+      "slip44":1,
       "explorers":[
          {
             "name":"Canto Tesnet Explorer (Neobase)",
@@ -7936,6 +8138,7 @@ const chains = [
       "shortName":"vsct",
       "chainId":741,
       "networkId":741,
+      "slip44":1,
       "explorers":[
          {
             "name":"ventionscan",
@@ -7962,6 +8165,7 @@ const chains = [
       "shortName":"SPAY",
       "chainId":742,
       "networkId":742,
+      "slip44":1,
       "explorers":[
          {
             "name":"Script Explorer",
@@ -8017,6 +8221,7 @@ const chains = [
       "shortName":"opc",
       "chainId":776,
       "networkId":776,
+      "slip44":1,
       "explorers":[
          {
             "name":"OPEN CHAIN TESTNET",
@@ -8127,6 +8332,7 @@ const chains = [
       "shortName":"taero",
       "chainId":788,
       "networkId":788,
+      "slip44":1,
       "explorers":[
          {
             "name":"aeroscan",
@@ -8236,6 +8442,7 @@ const chains = [
       "shortName":"PFTEST",
       "chainId":808,
       "networkId":808,
+      "slip44":1,
       "explorers":[
          
       ]
@@ -8382,6 +8589,7 @@ const chains = [
       "shortName":"tclo",
       "chainId":821,
       "networkId":2,
+      "slip44":1,
       "status":"deprecated"
    },
    {
@@ -8430,6 +8638,7 @@ const chains = [
       "shortName":"taratest",
       "chainId":842,
       "networkId":842,
+      "slip44":1,
       "explorers":[
          {
             "name":"Taraxa Explorer",
@@ -8642,6 +8851,7 @@ const chains = [
       "shortName":"gar-test-s1",
       "chainId":901,
       "networkId":901,
+      "slip44":1,
       "explorers":[
          {
             "name":"explorer",
@@ -8674,6 +8884,7 @@ const chains = [
       "shortName":"gar-test-s2",
       "chainId":902,
       "networkId":902,
+      "slip44":1,
       "explorers":[
          {
             "name":"explorer",
@@ -8706,6 +8917,7 @@ const chains = [
       "shortName":"gar-test-s3",
       "chainId":903,
       "networkId":903,
+      "slip44":1,
       "explorers":[
          {
             "name":"explorer",
@@ -8760,7 +8972,8 @@ const chains = [
       "infoURL":"https://decentrabone.com",
       "shortName":"DBONE",
       "chainId":910,
-      "networkId":910
+      "networkId":910,
+      "slip44":1
    },
    {
       "name":"Rinia Testnet",
@@ -8781,6 +8994,7 @@ const chains = [
       "shortName":"tfire",
       "chainId":917,
       "networkId":917,
+      "slip44":1,
       "explorers":[
          
       ],
@@ -8804,6 +9018,7 @@ const chains = [
       "shortName":"modesep",
       "chainId":919,
       "networkId":919,
+      "slip44":1,
       "icon":"modeTestnet",
       "explorers":[
          {
@@ -8855,6 +9070,7 @@ const chains = [
       "chain":"tPLS",
       "chainId":940,
       "networkId":940,
+      "slip44":1,
       "infoURL":"https://pulsechain.com/",
       "rpc":[
          "https://rpc.v2.testnet.pulsechain.com/",
@@ -8876,6 +9092,7 @@ const chains = [
       "chain":"t2bPLS",
       "chainId":941,
       "networkId":941,
+      "slip44":1,
       "infoURL":"https://pulsechain.com/",
       "rpc":[
          "https://rpc.v2b.testnet.pulsechain.com/",
@@ -8897,6 +9114,7 @@ const chains = [
       "chain":"t3PLS",
       "chainId":942,
       "networkId":942,
+      "slip44":1,
       "infoURL":"https://pulsechain.com/",
       "rpc":[
          "https://rpc.v3.testnet.pulsechain.com/",
@@ -8943,7 +9161,7 @@ const chains = [
          "registry":"0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e"
       },
       "status":"active",
-      "slip44":60,
+      "slip44":1,
       "nativeCurrency":{
          "name":"Test Pulse",
          "symbol":"tPLS",
@@ -8980,7 +9198,44 @@ const chains = [
       "infoURL":"https://munode.dev/",
       "shortName":"munode",
       "chainId":956,
-      "networkId":956
+      "networkId":956,
+      "slip44":1
+   },
+   {
+      "name":"Lyra Chain",
+      "chain":"Lyra",
+      "rpc":[
+         "https://rpc.lyra.finance"
+      ],
+      "faucets":[
+         
+      ],
+      "nativeCurrency":{
+         "name":"Ether",
+         "symbol":"ETH",
+         "decimals":18
+      },
+      "features":[
+         {
+            "name":"EIP155"
+         },
+         {
+            "name":"EIP1559"
+         }
+      ],
+      "infoURL":"https://lyra.finance",
+      "shortName":"lyra",
+      "chainId":957,
+      "networkId":957,
+      "icon":"lyra",
+      "explorers":[
+         {
+            "name":"Lyra Explorer",
+            "url":"https://explorer.lyra.finance",
+            "icon":"lyra",
+            "standard":"EIP3091"
+         }
+      ]
    },
    {
       "name":"BTC20 Smart Chain",
@@ -9303,7 +9558,8 @@ const chains = [
       "infoURL":"https://testnet.wanscan.org",
       "shortName":"twan",
       "chainId":999,
-      "networkId":999
+      "networkId":999,
+      "slip44":1
    },
    {
       "name":"GTON Mainnet",
@@ -9353,6 +9609,7 @@ const chains = [
       "shortName":"Baobab",
       "chainId":1001,
       "networkId":1001,
+      "slip44":1,
       "explorers":[
          {
             "name":"klaytnscope",
@@ -9434,7 +9691,8 @@ const chains = [
       "infoURL":"https://www.newtonproject.org/",
       "shortName":"tnew",
       "chainId":1007,
-      "networkId":1007
+      "networkId":1007,
+      "slip44":1
    },
    {
       "name":"Eurus Mainnet",
@@ -9539,7 +9797,8 @@ const chains = [
       "infoURL":"https://clover.finance",
       "shortName":"tclv",
       "chainId":1023,
-      "networkId":1023
+      "networkId":1023,
+      "slip44":1
    },
    {
       "name":"CLV Parachain",
@@ -9578,6 +9837,7 @@ const chains = [
       "shortName":"tbtt",
       "chainId":1028,
       "networkId":1028,
+      "slip44":1,
       "explorers":[
          {
             "name":"testbttcscan",
@@ -9631,6 +9891,7 @@ const chains = [
       "shortName":"prx",
       "chainId":1031,
       "networkId":1031,
+      "slip44":1,
       "explorers":[
          {
             "name":"proxy network testnet",
@@ -9657,6 +9918,7 @@ const chains = [
       "shortName":"bronos-testnet",
       "chainId":1038,
       "networkId":1038,
+      "slip44":1,
       "icon":"bronos",
       "explorers":[
          {
@@ -9716,6 +9978,7 @@ const chains = [
       "shortName":"shimmerevm-testnet-deprecated",
       "chainId":1071,
       "networkId":1071,
+      "slip44":1,
       "explorers":[
          {
             "name":"explorer",
@@ -9746,6 +10009,7 @@ const chains = [
       "shortName":"shimmerevm-testnet-deprecated-1072",
       "chainId":1072,
       "networkId":1072,
+      "slip44":1,
       "explorers":[
          {
             "name":"explorer",
@@ -9776,6 +10040,7 @@ const chains = [
       "shortName":"shimmerevm-testnet",
       "chainId":1073,
       "networkId":1073,
+      "slip44":1,
       "explorers":[
          {
             "name":"explorer",
@@ -9804,6 +10069,7 @@ const chains = [
       "shortName":"mintara-testnet",
       "chainId":1079,
       "networkId":1079,
+      "slip44":1,
       "explorers":[
          {
             "name":"explorer",
@@ -10000,6 +10266,7 @@ const chains = [
       "shortName":"tblxq",
       "chainId":1107,
       "networkId":1107,
+      "slip44":1,
       "explorers":[
          {
             "name":"BLXq Explorer",
@@ -10083,6 +10350,7 @@ const chains = [
       "shortName":"twemix",
       "chainId":1112,
       "networkId":1112,
+      "slip44":1,
       "explorers":[
          {
             "name":"WEMIX Testnet Microscope",
@@ -10110,6 +10378,7 @@ const chains = [
       "shortName":"tcore",
       "chainId":1115,
       "networkId":1115,
+      "slip44":1,
       "explorers":[
          {
             "name":"Core Scan Testnet",
@@ -10219,16 +10488,18 @@ const chains = [
       "shortName":"DFI-T",
       "chainId":1131,
       "networkId":1131,
+      "slip44":1,
       "icon":"defichain-network",
       "explorers":[
          
       ]
    },
    {
-      "name":"DeFiMetaChain",
-      "icon":"changi",
+      "name":"DeFiMetaChain Changi Testnet",
+      "icon":"defichain-network",
       "chain":"DFI",
       "rpc":[
+         "https://dmc.mydefichain.com/changi",
          "https://testnet-dmc.mydefichain.com:20551"
       ],
       "faucets":[
@@ -10239,7 +10510,7 @@ const chains = [
          "symbol":"DFI",
          "decimals":18
       },
-      "infoURL":"https://defichain.com",
+      "infoURL":"https://meta.defichain.com",
       "shortName":"changi",
       "chainId":1133,
       "networkId":1133,
@@ -10270,6 +10541,7 @@ const chains = [
       "shortName":"ASARt",
       "chainId":1138,
       "networkId":1138,
+      "slip44":1,
       "explorers":[
          {
             "name":"amstarscan-testnet",
@@ -10315,7 +10587,8 @@ const chains = [
       "infoURL":"https://mathchain.org",
       "shortName":"tMATH",
       "chainId":1140,
-      "networkId":1140
+      "networkId":1140,
+      "slip44":1
    },
    {
       "name":"Symplexia Smart Chain",
@@ -10363,6 +10636,7 @@ const chains = [
       "shortName":"auoc",
       "chainId":1170,
       "networkId":1170,
+      "slip44":1,
       "icon":"origin",
       "explorers":[
          {
@@ -10399,6 +10673,7 @@ const chains = [
       "shortName":"sht",
       "chainId":1177,
       "networkId":1177,
+      "slip44":1,
       "icon":"smarthost",
       "explorers":[
          {
@@ -10453,7 +10728,8 @@ const chains = [
       "infoURL":"https://evanesco.org/",
       "shortName":"avis",
       "chainId":1201,
-      "networkId":1201
+      "networkId":1201,
+      "slip44":1
    },
    {
       "name":"World Trade Technical Chain Mainnet",
@@ -10582,6 +10858,7 @@ const chains = [
       "shortName":"UltronTestnet",
       "chainId":1230,
       "networkId":1230,
+      "slip44":1,
       "explorers":[
          {
             "name":"Ultron Testnet Explorer",
@@ -10703,6 +10980,7 @@ const chains = [
       "shortName":"TARC",
       "chainId":1244,
       "networkId":1244,
+      "slip44":1,
       "explorers":[
          {
             "name":"archiescan",
@@ -10755,6 +11033,7 @@ const chains = [
       "shortName":"CICT",
       "chainId":1252,
       "networkId":1252,
+      "slip44":1,
       "icon":"cicchain",
       "explorers":[
          {
@@ -10888,6 +11167,7 @@ const chains = [
       "shortName":"mbase",
       "chainId":1287,
       "networkId":1287,
+      "slip44":1,
       "explorers":[
          {
             "name":"moonscan",
@@ -10942,6 +11222,7 @@ const chains = [
       "shortName":"swtr",
       "chainId":1291,
       "networkId":1291,
+      "slip44":1,
       "icon":"swisstronik",
       "explorers":[
          {
@@ -11001,6 +11282,7 @@ const chains = [
       "shortName":"Bobabase",
       "chainId":1297,
       "networkId":1297,
+      "slip44":1,
       "explorers":[
          {
             "name":"Bobabase block explorer",
@@ -11119,6 +11401,7 @@ const chains = [
       "shortName":"aiatestnet",
       "chainId":1320,
       "networkId":1320,
+      "slip44":1,
       "explorers":[
          {
             "name":"AIA Chain Explorer Testnet",
@@ -11145,7 +11428,8 @@ const chains = [
       "infoURL":"https://geth.ethereum.org",
       "shortName":"geth",
       "chainId":1337,
-      "networkId":1337
+      "networkId":1337,
+      "slip44":1
    },
    {
       "name":"Elysium Testnet",
@@ -11166,6 +11450,7 @@ const chains = [
       "shortName":"ELST",
       "chainId":1338,
       "networkId":1338,
+      "slip44":1,
       "explorers":[
          {
             "name":"Elysium testnet explorer",
@@ -11388,6 +11673,7 @@ const chains = [
       "shortName":"zkevmtest",
       "chainId":1402,
       "networkId":1402,
+      "slip44":1,
       "explorers":[
          {
             "name":"blockscout",
@@ -11416,6 +11702,7 @@ const chains = [
       "shortName":"testnet-zkEVM-mango-pre-audit-upgraded",
       "chainId":1422,
       "networkId":1422,
+      "slip44":1,
       "explorers":[
          {
             "name":"Polygon zkEVM explorer",
@@ -11493,6 +11780,7 @@ const chains = [
       "shortName":"testnet-zkEVM-mango",
       "chainId":1442,
       "networkId":1442,
+      "slip44":1,
       "explorers":[
          {
             "name":"Polygon zkEVM explorer",
@@ -11520,6 +11808,7 @@ const chains = [
       "shortName":"gil",
       "chainId":1452,
       "networkId":1452,
+      "slip44":1,
       "explorers":[
          {
             "name":"GIL Explorer",
@@ -11626,6 +11915,7 @@ const chains = [
       "shortName":"SherpaxTestnet",
       "chainId":1507,
       "networkId":1507,
+      "slip44":1,
       "explorers":[
          {
             "name":"Sherpax Testnet Explorer",
@@ -11806,7 +12096,7 @@ const chains = [
       "infoURL":"https://horizen.io/",
       "chainId":1663,
       "networkId":1663,
-      "slip44":121,
+      "slip44":1,
       "explorers":[
          {
             "name":"Gobi Testnet Block Explorer",
@@ -11910,6 +12200,7 @@ const chains = [
       "shortName":"tTBSI",
       "chainId":1708,
       "networkId":1708,
+      "slip44":1,
       "explorers":[
          {
             "name":"blockscout",
@@ -12027,6 +12318,7 @@ const chains = [
       "shortName":"kerleano",
       "chainId":1804,
       "networkId":1804,
+      "slip44":1,
       "icon":"pocr",
       "explorers":[
          {
@@ -12056,6 +12348,7 @@ const chains = [
       "shortName":"rAna",
       "chainId":1807,
       "networkId":1807,
+      "slip44":1,
       "explorers":[
          {
             "name":"blockscout",
@@ -12123,7 +12416,7 @@ const chains = [
       "shortName":"cubet",
       "chainId":1819,
       "networkId":1819,
-      "slip44":1819,
+      "slip44":1,
       "explorers":[
          {
             "name":"cubetest-scan",
@@ -12205,6 +12498,7 @@ const chains = [
       "shortName":"gitshockchain",
       "chainId":1881,
       "networkId":1881,
+      "slip44":1,
       "explorers":[
          {
             "name":"blockscout",
@@ -12218,8 +12512,7 @@ const chains = [
       "chain":"Lightlink Phoenix Mainnet",
       "icon":"lightlink",
       "rpc":[
-         "https://replicator-01.phoenix.lightlink.io/rpc/v1",
-         "https://replicator-02.phoenix.lightlink.io/rpc/v1"
+         "https://replicator.phoenix.lightlink.io/rpc/v1"
       ],
       "features":[
          {
@@ -12252,8 +12545,7 @@ const chains = [
       "chain":"Lightlink Pegasus Testnet",
       "icon":"lightlink",
       "rpc":[
-         "https://replicator-01.pegasus.lightlink.io/rpc/v1",
-         "https://replicator-02.pegasus.lightlink.io/rpc/v1"
+         "https://replicator.pegasus.lightlink.io/rpc/v1"
       ],
       "features":[
          {
@@ -12261,7 +12553,7 @@ const chains = [
          }
       ],
       "faucets":[
-         "https://pegasus-faucet-react.vercel.app"
+         "https://faucet.pegasus.lightlink.io/"
       ],
       "nativeCurrency":{
          "name":"Ethereum",
@@ -12272,6 +12564,7 @@ const chains = [
       "shortName":"lightlink_pegasus",
       "chainId":1891,
       "networkId":1891,
+      "slip44":1,
       "explorers":[
          {
             "name":"pegasus",
@@ -12381,6 +12674,7 @@ const chains = [
       "shortName":"tbitci",
       "chainId":1908,
       "networkId":1908,
+      "slip44":1,
       "explorers":[
          {
             "name":"Bitci Explorer Testnet",
@@ -12417,6 +12711,33 @@ const chains = [
       ]
    },
    {
+      "name":"Scalind",
+      "chain":"ETH",
+      "icon":"scalind",
+      "rpc":[
+         "https://rpc.scalind.com"
+      ],
+      "faucets":[
+         
+      ],
+      "nativeCurrency":{
+         "name":"Ether",
+         "symbol":"ETH",
+         "decimals":18
+      },
+      "infoURL":"https://scalind.com",
+      "shortName":"scal",
+      "chainId":1911,
+      "networkId":1911,
+      "explorers":[
+         {
+            "name":"scalind",
+            "url":"https://explorer.scalind.com",
+            "standard":"EIP3091"
+         }
+      ]
+   },
+   {
       "name":"ONUS Chain Testnet",
       "title":"ONUS Chain Testnet",
       "chain":"onus",
@@ -12435,6 +12756,7 @@ const chains = [
       "shortName":"onus-testnet",
       "chainId":1945,
       "networkId":1945,
+      "slip44":1,
       "explorers":[
          {
             "name":"Onus explorer testnet",
@@ -12483,6 +12805,7 @@ const chains = [
       "shortName":"Dexilla",
       "chainId":1954,
       "networkId":1954,
+      "slip44":1,
       "explorers":[
          {
             "name":"dos-mainnet",
@@ -12520,6 +12843,7 @@ const chains = [
       "shortName":"mtc",
       "chainId":1967,
       "networkId":1967,
+      "slip44":1,
       "explorers":[
          {
             "name":"metaexplorer-eleanor",
@@ -12546,6 +12870,7 @@ const chains = [
       "shortName":"tscs",
       "chainId":1969,
       "networkId":1969,
+      "slip44":1,
       "icon":"super",
       "explorers":[
          {
@@ -12602,7 +12927,34 @@ const chains = [
       "shortName":"atlr",
       "chainId":1971,
       "networkId":1971,
+      "slip44":1,
       "icon":"atlr"
+   },
+   {
+      "name":"RedeCoin",
+      "chain":"REDEV2",
+      "rpc":[
+         "https://rpc2.redecoin.eu"
+      ],
+      "faucets":[
+         
+      ],
+      "nativeCurrency":{
+         "name":"RedeCoin",
+         "symbol":"REDEV2",
+         "decimals":18
+      },
+      "infoURL":"https://www.redecoin.eu",
+      "shortName":"rede",
+      "chainId":1972,
+      "networkId":1972,
+      "explorers":[
+         {
+            "name":"RedeCoin Explorer",
+            "url":"https://explorer3.redecoin.eu",
+            "standard":"none"
+         }
+      ]
    },
    {
       "name":"ONUS Chain Mainnet",
@@ -12651,6 +13003,7 @@ const chains = [
       "shortName":"euntest",
       "chainId":1984,
       "networkId":1984,
+      "slip44":1,
       "icon":"eurus",
       "explorers":[
          {
@@ -12707,6 +13060,7 @@ const chains = [
       "shortName":"satoshie_testnet",
       "chainId":1986,
       "networkId":1986,
+      "slip44":1,
       "icon":"satoshie",
       "explorers":[
          {
@@ -12784,11 +13138,44 @@ const chains = [
       "shortName":"edx",
       "chainId":1995,
       "networkId":1995,
+      "slip44":1,
       "icon":"edexa",
       "explorers":[
          {
             "name":"edexa-testnet",
             "url":"https://explorer.testnet.edexa.com",
+            "standard":"EIP3091"
+         }
+      ]
+   },
+   {
+      "name":"Kyoto Testnet",
+      "chain":"KYOTO",
+      "rpc":[
+         "https://rpc.testnet.kyotoprotocol.io:8545"
+      ],
+      "faucets":[
+         "https://faucet.kyotoprotocol.io"
+      ],
+      "nativeCurrency":{
+         "name":"Kyoto",
+         "symbol":"KYOTO",
+         "decimals":18
+      },
+      "features":[
+         {
+            "name":"EIP155"
+         }
+      ],
+      "infoURL":"https://kyotoprotocol.io",
+      "shortName":"kyoto-testnet",
+      "chainId":1998,
+      "networkId":1998,
+      "slip44":1,
+      "explorers":[
+         {
+            "name":"Kyotoscan",
+            "url":"https://testnet.kyotoscan.io",
             "standard":"EIP3091"
          }
       ]
@@ -12896,6 +13283,7 @@ const chains = [
       "shortName":"cloudwalk_testnet",
       "chainId":2008,
       "networkId":2008,
+      "slip44":1,
       "explorers":[
          {
             "name":"CloudWalk Testnet Explorer",
@@ -12942,7 +13330,7 @@ const chains = [
          "https://faucet.mainnetz.io"
       ],
       "nativeCurrency":{
-         "name":"MainnetZ",
+         "name":"mainnetz",
          "symbol":"NetZ",
          "decimals":18
       },
@@ -13005,7 +13393,7 @@ const chains = [
       "shortName":"pmint_test",
       "chainId":2019,
       "networkId":2019,
-      "slip44":60,
+      "slip44":1,
       "explorers":[
          {
             "name":"PublicMint Explorer",
@@ -13112,6 +13500,7 @@ const chains = [
       "shortName":"edgt",
       "chainId":2022,
       "networkId":2022,
+      "slip44":1,
       "explorers":[
          {
             "name":"Edgscan by Bharathcoorg",
@@ -13138,6 +13527,7 @@ const chains = [
       "shortName":"taycan-testnet",
       "chainId":2023,
       "networkId":2023,
+      "slip44":1,
       "icon":"shuffle",
       "explorers":[
          {
@@ -13266,6 +13656,7 @@ const chains = [
       "shortName":"kiwi",
       "chainId":2037,
       "networkId":2037,
+      "slip44":1,
       "explorers":[
          {
             "name":"KIWI Explorer",
@@ -13297,6 +13688,7 @@ const chains = [
       "shortName":"shraptest",
       "chainId":2038,
       "networkId":2038,
+      "slip44":1,
       "explorers":[
          {
             "name":"SHRAPNEL Explorer",
@@ -13362,6 +13754,7 @@ const chains = [
       "shortName":"stos-testnet",
       "chainId":2047,
       "networkId":2047,
+      "slip44":1,
       "explorers":[
          {
             "name":"Stratos EVM Explorer (Blockscout)",
@@ -13561,6 +13954,7 @@ const chains = [
       "shortName":"esp",
       "chainId":2101,
       "networkId":2101,
+      "slip44":1,
       "explorers":[
          {
             "name":"Ecoball Testnet Explorer",
@@ -13645,6 +14039,7 @@ const chains = [
       "shortName":"MEU",
       "chainId":2124,
       "networkId":2124,
+      "slip44":1,
       "explorers":[
          {
             "name":"MP1Scan",
@@ -13704,7 +14099,7 @@ const chains = [
       "shortName":"dfio-meta-test",
       "chainId":2138,
       "networkId":21,
-      "slip44":60,
+      "slip44":1,
       "ens":{
          "registry":"0x57f1887a8BF19b14fC0dF6Fd9B2acc9Af147eA85"
       },
@@ -13789,6 +14184,7 @@ const chains = [
       "shortName":"findora-testnet",
       "chainId":2153,
       "networkId":2153,
+      "slip44":1,
       "explorers":[
          {
             "name":"findorascan",
@@ -13815,6 +14211,7 @@ const chains = [
       "shortName":"findora-forge",
       "chainId":2154,
       "networkId":2154,
+      "slip44":1,
       "explorers":[
          {
             "name":"findorascan",
@@ -14149,6 +14546,7 @@ const chains = [
       "shortName":"sma",
       "chainId":2323,
       "networkId":2323,
+      "slip44":1,
       "icon":"soma",
       "explorers":[
          {
@@ -14227,6 +14625,7 @@ const chains = [
       "shortName":"deprecated-kroma-sepolia",
       "chain":"ETH",
       "networkId":2357,
+      "slip44":1,
       "nativeCurrency":{
          "name":"Sepolia Ether",
          "symbol":"ETH",
@@ -14266,6 +14665,7 @@ const chains = [
       "shortName":"kroma-sepolia",
       "chain":"ETH",
       "networkId":2358,
+      "slip44":1,
       "nativeCurrency":{
          "name":"Sepolia Ether",
          "symbol":"ETH",
@@ -14315,6 +14715,7 @@ const chains = [
       "shortName":"bombt",
       "chainId":2399,
       "networkId":2399,
+      "slip44":1,
       "icon":"bomb",
       "explorers":[
          {
@@ -14403,6 +14804,7 @@ const chains = [
       "shortName":"thrc",
       "chainId":2458,
       "networkId":2458,
+      "slip44":1,
       "icon":"hybrid",
       "explorers":[
          {
@@ -14460,6 +14862,7 @@ const chains = [
       "shortName":"u2u_nebulas",
       "chainId":2484,
       "networkId":2484,
+      "slip44":1,
       "icon":"u2u_nebulas",
       "explorers":[
          {
@@ -14488,6 +14891,7 @@ const chains = [
       "shortName":"fraxchain-testnet",
       "chainId":2522,
       "networkId":2522,
+      "slip44":1,
       "explorers":[
          
       ],
@@ -14642,6 +15046,7 @@ const chains = [
       "shortName":"Fuji-EZChain",
       "chainId":2613,
       "networkId":2613,
+      "slip44":1,
       "icon":"ezchain",
       "explorers":[
          {
@@ -14669,6 +15074,7 @@ const chains = [
       "shortName":"twbt",
       "chainId":2625,
       "networkId":2625,
+      "slip44":1,
       "icon":"whitebit-testnet",
       "explorers":[
          {
@@ -14696,6 +15102,7 @@ const chains = [
       "shortName":"tmorph",
       "chainId":2710,
       "networkId":2710,
+      "slip44":1,
       "explorers":[
          {
             "name":"Morph Testnet Explorer",
@@ -14762,6 +15169,7 @@ const chains = [
       "shortName":"BobaGoerli",
       "chainId":2888,
       "networkId":2888,
+      "slip44":1,
       "explorers":[
          {
             "name":"Blockscout",
@@ -15077,7 +15485,8 @@ const chains = [
       "infoURL":"https://arabianchain.org",
       "shortName":"testdubx",
       "chainId":3270,
-      "networkId":3270
+      "networkId":3270,
+      "slip44":1
    },
    {
       "name":"Debounce Subnet Testnet",
@@ -15098,6 +15507,7 @@ const chains = [
       "shortName":"debounce-devnet",
       "chainId":3306,
       "networkId":3306,
+      "slip44":1,
       "explorers":[
          {
             "name":"Debounce Devnet Explorer",
@@ -15124,7 +15534,8 @@ const chains = [
       "infoURL":"https://zcore.cash",
       "shortName":"zcrbeach",
       "chainId":3331,
-      "networkId":3331
+      "networkId":3331,
+      "slip44":1
    },
    {
       "name":"Web3Q Testnet",
@@ -15144,6 +15555,7 @@ const chains = [
       "shortName":"w3q-t",
       "chainId":3333,
       "networkId":3333,
+      "slip44":1,
       "explorers":[
          {
             "name":"w3q-testnet",
@@ -15224,6 +15636,7 @@ const chains = [
       "shortName":"SCAIt",
       "chainId":3434,
       "networkId":3434,
+      "slip44":1,
       "explorers":[
          {
             "name":"SecureChain",
@@ -15250,6 +15663,7 @@ const chains = [
       "shortName":"prbtestnet",
       "chainId":3500,
       "networkId":3500,
+      "slip44":1,
       "icon":"prb",
       "explorers":[
          {
@@ -15270,11 +15684,11 @@ const chains = [
       ],
       "nativeCurrency":{
          "name":"JFIN Coin",
-         "symbol":"jfin",
+         "symbol":"JFIN",
          "decimals":18
       },
       "infoURL":"https://jfinchain.com",
-      "shortName":"jfin",
+      "shortName":"JFIN",
       "chainId":3501,
       "networkId":3501,
       "explorers":[
@@ -15331,6 +15745,7 @@ const chains = [
       "shortName":"pando-testnet",
       "chainId":3602,
       "networkId":3602,
+      "slip44":1,
       "explorers":[
          {
             "name":"Pando Testnet Explorer",
@@ -15358,6 +15773,7 @@ const chains = [
       "shortName":"BTNX",
       "chainId":3636,
       "networkId":3636,
+      "slip44":1,
       "explorers":[
          {
             "name":"3xpl",
@@ -15517,6 +15933,7 @@ const chains = [
       "shortName":"SPCt",
       "chainId":3698,
       "networkId":3698,
+      "slip44":1,
       "explorers":[
          {
             "name":"SenjePowers",
@@ -15570,6 +15987,7 @@ const chains = [
       "shortName":"xplatest",
       "chainId":3701,
       "networkId":3701,
+      "slip44":1,
       "icon":"xpla",
       "explorers":[
          {
@@ -15720,6 +16138,7 @@ const chains = [
       "shortName":"kalytestnet",
       "chainId":3889,
       "networkId":3889,
+      "slip44":1,
       "explorers":[
          {
             "name":"KalyScan",
@@ -15781,6 +16200,7 @@ const chains = [
       "shortName":"dost",
       "chainId":3939,
       "networkId":3939,
+      "slip44":1,
       "icon":"doschain",
       "explorers":[
          {
@@ -15835,6 +16255,7 @@ const chains = [
       "shortName":"tdyno",
       "chainId":3967,
       "networkId":3967,
+      "slip44":1,
       "explorers":[
          {
             "name":"DYNO Explorer",
@@ -15915,6 +16336,7 @@ const chains = [
       "shortName":"PERIUM",
       "chainId":4001,
       "networkId":4001,
+      "slip44":1,
       "icon":"peperium",
       "explorers":[
          {
@@ -15945,6 +16367,7 @@ const chains = [
       "shortName":"tftm",
       "chainId":4002,
       "networkId":4002,
+      "slip44":1,
       "icon":"fantom",
       "explorers":[
          {
@@ -15973,6 +16396,7 @@ const chains = [
       "shortName":"x1-fastnet",
       "chainId":4003,
       "networkId":4003,
+      "slip44":1,
       "explorers":[
          {
             "name":"Blockscout",
@@ -16003,6 +16427,7 @@ const chains = [
       "shortName":"BobaoperaTestnet",
       "chainId":4051,
       "networkId":4051,
+      "slip44":1,
       "explorers":[
          {
             "name":"Bobaopera Testnet block explorer",
@@ -16059,6 +16484,7 @@ const chains = [
       "shortName":"Nahmii3Testnet",
       "chainId":4062,
       "networkId":4062,
+      "slip44":1,
       "icon":"nahmii",
       "explorers":[
          {
@@ -16075,6 +16501,40 @@ const chains = [
             {
                "url":"https://bridge.testnet.n3.nahmii.io"
             }
+         ]
+      }
+   },
+   {
+      "name":"Muster Mainnet",
+      "chainId":4078,
+      "shortName":"muster",
+      "chain":"Muster",
+      "icon":"muster",
+      "networkId":4078,
+      "nativeCurrency":{
+         "name":"Ether",
+         "symbol":"ETH",
+         "decimals":18
+      },
+      "rpc":[
+         "https://muster.alt.technology"
+      ],
+      "faucets":[
+         
+      ],
+      "explorers":[
+         {
+            "name":"Musterscan",
+            "url":"https://muster-explorer.alt.technology",
+            "standard":"EIP3091"
+         }
+      ],
+      "infoURL":"",
+      "parent":{
+         "type":"L2",
+         "chain":"eip155-42161",
+         "bridges":[
+            
          ]
       }
    },
@@ -16106,6 +16566,7 @@ const chains = [
       "shortName":"Oasis",
       "chainId":4090,
       "networkId":4090,
+      "slip44":1,
       "explorers":[
          {
             "name":"blockscout",
@@ -16133,6 +16594,7 @@ const chains = [
       "shortName":"BNIt",
       "chainId":4096,
       "networkId":4096,
+      "slip44":1,
       "explorers":[
          {
             "name":"Bitindi",
@@ -16187,7 +16649,7 @@ const chains = [
       "shortName":"aioz-testnet",
       "chainId":4102,
       "networkId":4102,
-      "slip44":60,
+      "slip44":1,
       "explorers":[
          {
             "name":"AIOZ Network Testnet Explorer",
@@ -16222,6 +16684,7 @@ const chains = [
       "shortName":"humans_testnet",
       "chainId":4139,
       "networkId":4139,
+      "slip44":1,
       "icon":"humans-dark"
    },
    {
@@ -16243,6 +16706,7 @@ const chains = [
       "shortName":"TPBXt",
       "chainId":4141,
       "networkId":4141,
+      "slip44":1,
       "explorers":[
          {
             "name":"Tipboxcoin",
@@ -16307,6 +16771,7 @@ const chains = [
       "shortName":"lukso-testnet",
       "chainId":4201,
       "networkId":4201,
+      "slip44":1,
       "features":[
          {
             "name":"EIP155"
@@ -16366,6 +16831,7 @@ const chains = [
       "shortName":"BobaFujiTestnet",
       "chainId":4328,
       "networkId":4328,
+      "slip44":1,
       "explorers":[
          {
             "name":"Bobafuji Testnet block explorer",
@@ -16499,6 +16965,7 @@ const chains = [
       "shortName":"orderlyl2",
       "chainId":4460,
       "networkId":4460,
+      "slip44":1,
       "icon":"orderlyTestnet",
       "explorers":[
          {
@@ -16553,6 +17020,7 @@ const chains = [
       "shortName":"iotex-testnet",
       "chainId":4690,
       "networkId":4690,
+      "slip44":1,
       "explorers":[
          {
             "name":"testnet iotexscan",
@@ -16579,6 +17047,7 @@ const chains = [
       "shortName":"TESTMEV",
       "chainId":4759,
       "networkId":4759,
+      "slip44":1,
       "icon":"meverse",
       "explorers":[
          {
@@ -16615,6 +17084,7 @@ const chains = [
       "shortName":"TBXN",
       "chainId":4777,
       "networkId":4777,
+      "slip44":1,
       "icon":"bxn",
       "explorers":[
          {
@@ -16670,6 +17140,7 @@ const chains = [
       "shortName":"txvm",
       "chainId":4918,
       "networkId":4918,
+      "slip44":1,
       "explorers":[
          {
             "name":"Venidium EVM Testnet Explorer",
@@ -16800,6 +17271,7 @@ const chains = [
       "shortName":"mantle-testnet",
       "chainId":5001,
       "networkId":5001,
+      "slip44":1,
       "explorers":[
          {
             "name":"Mantle Testnet Explorer",
@@ -16862,6 +17334,7 @@ const chains = [
       "shortName":"mnt-sep",
       "chainId":5003,
       "networkId":5003,
+      "slip44":1,
       "explorers":[
          {
             "name":"blockscout",
@@ -16897,6 +17370,7 @@ const chains = [
       "shortName":"tntest",
       "chainId":5005,
       "networkId":5005,
+      "slip44":1,
       "explorers":[
          {
             "name":"Treasurenet EVM BlockExplorer",
@@ -17085,6 +17559,7 @@ const chains = [
       "shortName":"ttrn",
       "chainId":5353,
       "networkId":5353,
+      "slip44":1,
       "icon":"tritanium",
       "explorers":[
          {
@@ -17114,6 +17589,7 @@ const chains = [
       "shortName":"VEX",
       "chainId":5522,
       "networkId":5522,
+      "slip44":1,
       "explorers":[
          {
             "name":"Vexascan-EVM-TestNet",
@@ -17177,6 +17653,7 @@ const chains = [
       "shortName":"NahmiiTestnet",
       "chainId":5553,
       "networkId":5553,
+      "slip44":1,
       "icon":"nahmii",
       "explorers":[
          {
@@ -17246,6 +17723,7 @@ const chains = [
       "shortName":"obnbt",
       "chainId":5611,
       "networkId":5611,
+      "slip44":1,
       "explorers":[
          {
             "name":"bscscan-opbnb-testnet",
@@ -17276,7 +17754,8 @@ const chains = [
       "infoURL":"https://arcturuschain.io",
       "shortName":"ARCT",
       "chainId":5616,
-      "networkId":5616
+      "networkId":5616,
+      "slip44":1
    },
    {
       "name":"Tanssi EVM ContainerChain",
@@ -17322,6 +17801,7 @@ const chains = [
       "shortName":"tsys",
       "chainId":5700,
       "networkId":5700,
+      "slip44":1,
       "explorers":[
          {
             "name":"Syscoin Testnet Block Explorer",
@@ -17377,6 +17857,7 @@ const chains = [
       "shortName":"satst",
       "chainId":5758,
       "networkId":5758,
+      "slip44":1,
       "explorers":[
          {
             "name":"SatoshiChain Testnet Explorer",
@@ -17405,6 +17886,7 @@ const chains = [
       "shortName":"ggui",
       "chainId":5777,
       "networkId":5777,
+      "slip44":1,
       "explorers":[
          
       ]
@@ -17435,6 +17917,7 @@ const chains = [
       "shortName":"OntologyTestnet",
       "chainId":5851,
       "networkId":5851,
+      "slip44":1,
       "explorers":[
          {
             "name":"explorer",
@@ -17488,6 +17971,7 @@ const chains = [
       "shortName":"TRESTEST",
       "chainId":6065,
       "networkId":6065,
+      "slip44":1,
       "icon":"tresleches",
       "explorers":[
          {
@@ -17585,6 +18069,7 @@ const chains = [
       "shortName":"UPTN-TEST",
       "chainId":6118,
       "networkId":6118,
+      "slip44":1,
       "explorers":[
          {
             "name":"UPTN Testnet Explorer",
@@ -17685,6 +18170,7 @@ const chains = [
       "shortName":"SRC-test",
       "chainId":6552,
       "networkId":6552,
+      "slip44":1,
       "icon":"scolcoin",
       "explorers":[
          {
@@ -17714,6 +18200,7 @@ const chains = [
       "shortName":"fox",
       "chainId":6565,
       "networkId":6565,
+      "slip44":1,
       "icon":"fox",
       "explorers":[
          {
@@ -17752,6 +18239,123 @@ const chains = [
       ]
    },
    {
+      "name":"Latest Chain Testnet",
+      "chain":"LATEST",
+      "icon":"latestChain",
+      "rpc":[
+         "https://testnet-rpc.latestcoin.io"
+      ],
+      "faucets":[
+         "http://faucet.latestchain.io"
+      ],
+      "nativeCurrency":{
+         "name":"Latest",
+         "symbol":"LATEST",
+         "decimals":18
+      },
+      "infoURL":"https://latestcoin.io",
+      "shortName":"LATESTt",
+      "chainId":6660,
+      "networkId":6660,
+      "explorers":[
+         {
+            "name":"Latest Chain",
+            "url":"http://testnet.latestchain.io",
+            "standard":"EIP3091"
+         }
+      ]
+   },
+   {
+      "name":"Cybria Mainnet",
+      "chain":"CYBA",
+      "rpc":[
+         "https://rpc-mainnet.cybria.io"
+      ],
+      "faucets":[
+         
+      ],
+      "nativeCurrency":{
+         "name":"Cybria",
+         "symbol":"CYBA",
+         "decimals":18
+      },
+      "features":[
+         {
+            "name":"EIP155"
+         },
+         {
+            "name":"EIP1559"
+         }
+      ],
+      "infoURL":"https://cybria.io",
+      "shortName":"cyba",
+      "chainId":6661,
+      "networkId":6661,
+      "icon":"cybria",
+      "explorers":[
+         {
+            "name":"Cybria Explorer",
+            "url":"https://cybascan.io",
+            "icon":"cybascan",
+            "standard":"EIP3091"
+         }
+      ],
+      "parent":{
+         "type":"L2",
+         "chain":"eip155-11155420",
+         "bridges":[
+            {
+               "url":"https://app.optimism.io/bridge"
+            }
+         ]
+      }
+   },
+   {
+      "name":"Cybria Testnet",
+      "chain":"CYBA",
+      "rpc":[
+         "https://l2-rpc.cybascan.io"
+      ],
+      "faucets":[
+         "https://faucet.cybascan.io"
+      ],
+      "nativeCurrency":{
+         "name":"Cybria",
+         "symbol":"CYBA",
+         "decimals":18
+      },
+      "features":[
+         {
+            "name":"EIP155"
+         },
+         {
+            "name":"EIP1559"
+         }
+      ],
+      "infoURL":"https://cybria.io",
+      "shortName":"tcyba",
+      "chainId":6666,
+      "networkId":6666,
+      "icon":"cybria",
+      "explorers":[
+         {
+            "name":"Cybria Explorer",
+            "url":"https://explorer.cybascan.io",
+            "icon":"cybascan",
+            "standard":"EIP3091"
+         }
+      ],
+      "parent":{
+         "type":"L2",
+         "chain":"eip155-11155420",
+         "bridges":[
+            {
+               "url":"https://app.optimism.io/bridge"
+            }
+         ]
+      }
+   },
+   {
       "name":"IRIShub",
       "chain":"IRIShub",
       "rpc":[
@@ -17786,6 +18390,35 @@ const chains = [
             "url":"https://irishub.iobscan.io",
             "standard":"none",
             "icon":"irishub"
+         }
+      ]
+   },
+   {
+      "name":"Compverse Mainnet",
+      "chain":"CPV",
+      "icon":"compverse",
+      "rpc":[
+         "https://rpc.compverse.io/",
+         "https://rpc-useast1.compverse.io/"
+      ],
+      "faucets":[
+         
+      ],
+      "nativeCurrency":{
+         "name":"compverse",
+         "symbol":"CPV",
+         "decimals":18
+      },
+      "infoURL":"https://compverse.io",
+      "shortName":"compverse",
+      "chainId":6779,
+      "networkId":6779,
+      "slip44":7779,
+      "explorers":[
+         {
+            "name":"cpvscan",
+            "url":"https://scan.compverse.io",
+            "standard":"EIP3091"
          }
       ]
    },
@@ -17919,6 +18552,7 @@ const chains = [
       "shortName":"zetachain-athens",
       "chainId":7001,
       "networkId":7001,
+      "slip44":1,
       "status":"active",
       "explorers":[
          {
@@ -17989,6 +18623,35 @@ const chains = [
          {
             "name":"Planq Cosmos Explorer (BigDipper)",
             "url":"https://explorer.planq.network",
+            "standard":"none"
+         }
+      ]
+   },
+   {
+      "name":"Nume",
+      "title":"Nume",
+      "chain":"Nume",
+      "rpc":[
+         "https://rpc.numecrypto.com"
+      ],
+      "faucets":[
+         
+      ],
+      "nativeCurrency":{
+         "name":"Dai Stablecoin",
+         "symbol":"DAI",
+         "decimals":18
+      },
+      "infoURL":"https://numecrypto.com",
+      "shortName":"nume",
+      "chainId":7100,
+      "networkId":7100,
+      "icon":"nume",
+      "explorers":[
+         {
+            "name":"numeexplorer",
+            "url":"https://explorer.numecrypto.com",
+            "icon":"nume",
             "standard":"none"
          }
       ]
@@ -18195,6 +18858,7 @@ const chains = [
       "shortName":"tadil",
       "chainId":7575,
       "networkId":7575,
+      "slip44":1,
       "explorers":[
          {
             "name":"ADIL Testnet Explorer",
@@ -18276,6 +18940,7 @@ const chains = [
       "shortName":"trn-porcini",
       "chainId":7672,
       "networkId":7672,
+      "slip44":1,
       "explorers":[
          {
             "name":"rootnet",
@@ -18352,6 +19017,7 @@ const chains = [
       "shortName":"TestnetCanto",
       "chainId":7701,
       "networkId":7701,
+      "slip44":1,
       "explorers":[
          {
             "name":"Canto Testnet EVM Explorer (Blockscout)",
@@ -18385,6 +19051,7 @@ const chains = [
       "shortName":"tbitrock",
       "chainId":7771,
       "networkId":7771,
+      "slip44":1,
       "explorers":[
          {
             "name":"Bitrock Testnet Explorer",
@@ -18415,6 +19082,7 @@ const chains = [
       "shortName":"RiseOfTheWarbotsTestnet",
       "chainId":7777,
       "networkId":7777,
+      "slip44":1,
       "explorers":[
          {
             "name":"avascan",
@@ -18443,6 +19111,7 @@ const chains = [
       "shortName":"maal-test",
       "chainId":7860,
       "networkId":7860,
+      "slip44":1,
       "explorers":[
          {
             "name":"maalscan testnet",
@@ -18470,6 +19139,7 @@ const chains = [
       "shortName":"tscas",
       "chainId":7878,
       "networkId":7878,
+      "slip44":1,
       "explorers":[
          {
             "name":"Hazlor Testnet Explorer",
@@ -18586,6 +19256,7 @@ const chains = [
       "shortName":"teleport-testnet",
       "chainId":8001,
       "networkId":8001,
+      "slip44":1,
       "icon":"teleport",
       "explorers":[
          {
@@ -18619,7 +19290,8 @@ const chains = [
       "infoURL":"https://mdgl.io",
       "shortName":"mdgl",
       "chainId":8029,
-      "networkId":8029
+      "networkId":8029,
+      "slip44":1
    },
    {
       "name":"Shardeum Liberty 1.X",
@@ -18734,6 +19406,28 @@ const chains = [
       ]
    },
    {
+      "name":"E-Dollar",
+      "chain":"USD",
+      "rpc":[
+         "https://rpc.e-dollar.org"
+      ],
+      "faucets":[
+         
+      ],
+      "nativeCurrency":{
+         "name":"E-Dollar",
+         "symbol":"USD",
+         "decimals":18
+      },
+      "infoURL":"https://e-dollar.org",
+      "shortName":"E-Dollar",
+      "chainId":8087,
+      "networkId":8087,
+      "explorers":[
+         
+      ]
+   },
+   {
       "name":"StreamuX Blockchain",
       "chain":"StreamuX",
       "rpc":[
@@ -18772,6 +19466,7 @@ const chains = [
       "shortName":"meertest",
       "chainId":8131,
       "networkId":8131,
+      "slip44":1,
       "icon":"meer",
       "explorers":[
          {
@@ -18905,6 +19600,7 @@ const chains = [
       "shortName":"tBOC",
       "chainId":8181,
       "networkId":8181,
+      "slip44":1,
       "icon":"beonechain",
       "explorers":[
          {
@@ -18962,6 +19658,7 @@ const chains = [
       "shortName":"ttqf",
       "chainId":8194,
       "networkId":8194,
+      "slip44":1,
       "explorers":[
          {
             "name":"blockscout",
@@ -19042,7 +19739,8 @@ const chains = [
       "infoURL":"https://www.kortho.io/",
       "shortName":"Kortho",
       "chainId":8285,
-      "networkId":8285
+      "networkId":8285,
+      "slip44":1
    },
    {
       "name":"Dracones Financial Services",
@@ -19155,6 +19853,7 @@ const chains = [
       "shortName":"toki-testnet",
       "chainId":8655,
       "networkId":8655,
+      "slip44":1,
       "icon":"toki",
       "explorers":[
          
@@ -19232,7 +19931,7 @@ const chains = [
       "shortName":"tolo",
       "chainId":8724,
       "networkId":8724,
-      "slip44":479
+      "slip44":1
    },
    {
       "name":"Alph Network",
@@ -19391,6 +20090,7 @@ const chains = [
       "shortName":"opl",
       "chainId":8882,
       "networkId":8882,
+      "slip44":1,
       "explorers":[
          {
             "name":"Unique Scan / Opal",
@@ -19519,6 +20219,7 @@ const chains = [
       "faucets":[
          
       ],
+      "icon":"jbc",
       "features":[
          {
             "name":"EIP155"
@@ -19611,6 +20312,7 @@ const chains = [
       "shortName":"evmos-testnet",
       "chainId":9000,
       "networkId":9000,
+      "slip44":1,
       "icon":"evmos",
       "explorers":[
          {
@@ -19718,6 +20420,7 @@ const chains = [
       "shortName":"_old_tfire",
       "chainId":9170,
       "networkId":9170,
+      "slip44":1,
       "explorers":[
          
       ],
@@ -19769,6 +20472,7 @@ const chains = [
       "shortName":"DOGSt",
       "chainId":9339,
       "networkId":9339,
+      "slip44":1,
       "explorers":[
          {
             "name":"Dogcoin",
@@ -19796,6 +20500,7 @@ const chains = [
       "shortName":"trpg",
       "chainId":9527,
       "networkId":9527,
+      "slip44":1,
       "explorers":[
          {
             "name":"rangersscan-robin",
@@ -19822,6 +20527,7 @@ const chains = [
       "shortName":"QETTest",
       "chainId":9528,
       "networkId":9528,
+      "slip44":1,
       "explorers":[
          {
             "name":"QEasyWeb3 Explorer",
@@ -19848,6 +20554,7 @@ const chains = [
       "shortName":"testneon",
       "chainId":9559,
       "networkId":9559,
+      "slip44":1,
       "icon":"neonlink",
       "explorers":[
          {
@@ -19910,6 +20617,7 @@ const chains = [
       "shortName":"BobaBnbTestnet",
       "chainId":9728,
       "networkId":9728,
+      "slip44":1,
       "explorers":[
          {
             "name":"Boba BNB Testnet block explorer",
@@ -19946,6 +20654,7 @@ const chains = [
       "shortName":"NetZt",
       "chainId":9768,
       "networkId":9768,
+      "slip44":1,
       "explorers":[
          {
             "name":"MainnetZ",
@@ -20024,6 +20733,7 @@ const chains = [
       "shortName":"carbon-testnet",
       "chainId":9792,
       "networkId":9792,
+      "slip44":1,
       "explorers":[
          
       ]
@@ -20047,6 +20757,7 @@ const chains = [
       "shortName":"tIMP",
       "chainId":9818,
       "networkId":9818,
+      "slip44":1,
       "icon":"timp",
       "explorers":[
          {
@@ -20106,10 +20817,38 @@ const chains = [
       "shortName":"tMIND",
       "chainId":9977,
       "networkId":9977,
+      "slip44":1,
       "explorers":[
          {
             "name":"Mind Chain explorer",
             "url":"https://testnet.mindscan.info",
+            "standard":"EIP3091"
+         }
+      ]
+   },
+   {
+      "name":"Combo Mainnet",
+      "chain":"Combo",
+      "icon":"combo",
+      "rpc":[
+         "https://rpc.combonetwork.io"
+      ],
+      "faucets":[
+         
+      ],
+      "nativeCurrency":{
+         "name":"BNB Chain Native Token",
+         "symbol":"BNB",
+         "decimals":18
+      },
+      "infoURL":"https://combonetwork.io",
+      "shortName":"combo-mainnet",
+      "chainId":9980,
+      "networkId":9980,
+      "explorers":[
+         {
+            "name":"combotrace explorer",
+            "url":"https://combotrace.nodereal.io",
             "standard":"EIP3091"
          }
       ]
@@ -20154,6 +20893,7 @@ const chains = [
          "https://rpc-msc.mindchain.info/",
          "https://seednode.mindchain.info",
          "https://archive.mindchain.info/",
+         "https://mind-smart-chain.rpc.thirdweb.com",
          "wss://archive.mindchain.info/ws",
          "wss://seednode.mindchain.info/ws"
       ],
@@ -20203,6 +20943,7 @@ const chains = [
       "shortName":"alt-testnet",
       "chainId":9997,
       "networkId":9997,
+      "slip44":1,
       "icon":"altlayer",
       "explorers":[
          {
@@ -20230,7 +20971,8 @@ const chains = [
       "infoURL":"https://docs.bccloud.net/",
       "shortName":"myn",
       "chainId":9999,
-      "networkId":9999
+      "networkId":9999,
+      "slip44":1
    },
    {
       "name":"Smart Bitcoin Cash",
@@ -20272,7 +21014,8 @@ const chains = [
       "infoURL":"http://smartbch.org/",
       "shortName":"smartbchtest",
       "chainId":10001,
-      "networkId":10001
+      "networkId":10001,
+      "slip44":1
    },
    {
       "name":"Gon Chain",
@@ -20324,6 +21067,7 @@ const chains = [
       "shortName":"joct",
       "chainId":10081,
       "networkId":10081,
+      "slip44":1,
       "explorers":[
          {
             "name":"Testnet Block Explorer",
@@ -20395,6 +21139,7 @@ const chains = [
       "shortName":"chi",
       "chainId":10200,
       "networkId":10200,
+      "slip44":1,
       "explorers":[
          {
             "name":"blockscout-chiadochain",
@@ -20458,6 +21203,7 @@ const chains = [
       "shortName":"aa",
       "chainId":10243,
       "networkId":10243,
+      "slip44":1,
       "explorers":[
          {
             "name":"blockscout",
@@ -20512,6 +21258,7 @@ const chains = [
       "shortName":"TWLC",
       "chainId":10395,
       "networkId":10395,
+      "slip44":1,
       "explorers":[
          {
             "name":"Worldland Explorer",
@@ -20567,6 +21314,7 @@ const chains = [
       "shortName":"Snow",
       "chainId":10508,
       "networkId":10508,
+      "slip44":1,
       "explorers":[
          {
             "name":"ethernal",
@@ -20653,6 +21401,7 @@ const chains = [
       "shortName":"quadranstestnet",
       "chainId":10947,
       "networkId":10947,
+      "slip44":1,
       "explorers":[
          {
             "name":"explorer",
@@ -20742,6 +21491,7 @@ const chains = [
       "shortName":"astra-testnet",
       "chainId":11115,
       "networkId":11115,
+      "slip44":1,
       "icon":"astra",
       "explorers":[
          {
@@ -20832,6 +21582,7 @@ const chains = [
       "shortName":"shyftt",
       "chainId":11437,
       "networkId":11437,
+      "slip44":1,
       "explorers":[
          {
             "name":"Shyft Testnet BX",
@@ -20859,6 +21610,7 @@ const chains = [
       "shortName":"SRDXt",
       "chainId":11612,
       "networkId":11612,
+      "slip44":1,
       "explorers":[
          {
             "name":"Sardis",
@@ -20978,6 +21730,7 @@ const chains = [
       "shortName":"tZERO",
       "chainId":12051,
       "networkId":12051,
+      "slip44":1,
       "explorers":[
          {
             "name":"zeroscan",
@@ -21098,7 +21851,8 @@ const chains = [
       "infoURL":"https://blgchain.com",
       "shortName":"blgchain",
       "chainId":12321,
-      "networkId":12321
+      "networkId":12321,
+      "slip44":1
    },
    {
       "name":"Step Testnet",
@@ -21120,6 +21874,7 @@ const chains = [
       "shortName":"steptest",
       "chainId":12345,
       "networkId":12345,
+      "slip44":1,
       "explorers":[
          {
             "name":"StepScan",
@@ -21185,6 +21940,7 @@ const chains = [
       "shortName":"tRIK",
       "chainId":12715,
       "networkId":12715,
+      "slip44":1,
       "explorers":[
          {
             "name":"Rikeza Blockchain explorer",
@@ -21212,6 +21968,7 @@ const chains = [
       "shortName":"tqnet",
       "chainId":12890,
       "networkId":12890,
+      "slip44":1,
       "explorers":[
          {
             "name":"Quantum Scan Testnet",
@@ -21308,11 +22065,40 @@ const chains = [
       "icon":"beam",
       "chainId":13337,
       "networkId":13337,
+      "slip44":1,
       "explorers":[
          {
             "name":"Beam Explorer",
             "url":"https://subnets-test.avax.network/beam",
             "standard":"EIP3091"
+         }
+      ]
+   },
+   {
+      "name":"Immutable zkEVM",
+      "chain":"Immutable zkEVM",
+      "rpc":[
+         "https://rpc.immutable.com"
+      ],
+      "faucets":[
+         "https://docs.immutable.com/docs/zkEVM/guides/faucet"
+      ],
+      "nativeCurrency":{
+         "name":"IMX",
+         "symbol":"IMX",
+         "decimals":18
+      },
+      "infoURL":"https://www.immutable.com",
+      "shortName":"imx",
+      "chainId":13371,
+      "networkId":13371,
+      "icon":"immutable",
+      "explorers":[
+         {
+            "name":"Immutable explorer",
+            "url":"https://explorer.immutable.com",
+            "standard":"EIP3091",
+            "icon":"immutable"
          }
       ]
    },
@@ -21361,6 +22147,7 @@ const chains = [
       "shortName":"imx-testnet",
       "chainId":13473,
       "networkId":13473,
+      "slip44":1,
       "icon":"immutable",
       "explorers":[
          {
@@ -21415,6 +22202,7 @@ const chains = [
       "shortName":"SPS-Test",
       "chainId":14000,
       "networkId":14000,
+      "slip44":1,
       "explorers":[
          {
             "name":"SPS Test Explorer",
@@ -21441,6 +22229,7 @@ const chains = [
       "shortName":"hmnd-t5",
       "chainId":14853,
       "networkId":14853,
+      "slip44":1,
       "icon":"humanode",
       "explorers":[
          
@@ -21518,6 +22307,7 @@ const chains = [
       "shortName":"TrustTestnet",
       "chainId":15555,
       "networkId":15555,
+      "slip44":1,
       "explorers":[
          {
             "name":"Trust EVM Explorer",
@@ -21545,6 +22335,7 @@ const chains = [
       "shortName":"eos-testnet",
       "chainId":15557,
       "networkId":15557,
+      "slip44":1,
       "explorers":[
          {
             "name":"EOS EVM Explorer",
@@ -21598,7 +22389,8 @@ const chains = [
       "infoURL":"https://metadot.network",
       "shortName":"mtttest",
       "chainId":16001,
-      "networkId":16001
+      "networkId":16001,
+      "slip44":1
    },
    {
       "name":"Genesys Mainnet",
@@ -21653,6 +22445,7 @@ const chains = [
       "shortName":"nyancat",
       "chainId":16688,
       "networkId":16688,
+      "slip44":1,
       "icon":"nyancat",
       "explorers":[
          {
@@ -21709,6 +22502,7 @@ const chains = [
       "shortName":"tivar",
       "chainId":16888,
       "networkId":16888,
+      "slip44":1,
       "explorers":[
          {
             "name":"ivarscan",
@@ -21739,6 +22533,7 @@ const chains = [
       "shortName":"holesky",
       "chainId":17000,
       "networkId":17000,
+      "slip44":1,
       "icon":"ethereum",
       "status":"incubating",
       "explorers":[
@@ -21780,6 +22575,7 @@ const chains = [
       "shortName":"redstone",
       "chainId":17001,
       "networkId":17001,
+      "slip44":1,
       "icon":"redstone",
       "explorers":[
          {
@@ -21838,6 +22634,7 @@ const chains = [
       "shortName":"PCT",
       "chainId":17180,
       "networkId":17180,
+      "slip44":1,
       "icon":"PLT",
       "explorers":[
          {
@@ -21904,6 +22701,7 @@ const chains = [
       "shortName":"ZKST",
       "chainId":18000,
       "networkId":18000,
+      "slip44":1,
       "infoURL":"https://goexosphere.com",
       "explorers":[
          {
@@ -21991,6 +22789,7 @@ const chains = [
       "shortName":"G8Ct",
       "chainId":18181,
       "networkId":18181,
+      "slip44":1,
       "explorers":[
          {
             "name":"G8Chain",
@@ -22127,7 +22926,8 @@ const chains = [
       "infoURL":"https://callisto.network",
       "shortName":"CLOTestnet",
       "chainId":20729,
-      "networkId":79
+      "networkId":79,
+      "slip44":1
    },
    {
       "name":"P12 Chain",
@@ -22298,6 +23098,7 @@ const chains = [
       "shortName":"airdao-test",
       "chainId":22040,
       "networkId":22040,
+      "slip44":1,
       "explorers":[
          {
             "name":"AirDAO Network Explorer",
@@ -22381,6 +23182,7 @@ const chains = [
       "shortName":"ABNt",
       "chainId":23006,
       "networkId":23006,
+      "slip44":1,
       "explorers":[
          {
             "name":"Antofy Testnet",
@@ -22407,6 +23209,7 @@ const chains = [
       "shortName":"opside",
       "chainId":23118,
       "networkId":23118,
+      "slip44":1,
       "icon":"opside",
       "explorers":[
          {
@@ -22464,10 +23267,38 @@ const chains = [
       "shortName":"sapphire-testnet",
       "chainId":23295,
       "networkId":23295,
+      "slip44":1,
       "explorers":[
          {
             "name":"Oasis Sapphire Testnet Explorer",
             "url":"https://testnet.explorer.sapphire.oasis.dev",
+            "standard":"EIP3091"
+         }
+      ]
+   },
+   {
+      "name":"Blast Testnet",
+      "chain":"ETH",
+      "icon":"blastIcon",
+      "rpc":[
+         "http://testnet-rpc.blastblockchain.com"
+      ],
+      "faucets":[
+         
+      ],
+      "nativeCurrency":{
+         "name":"Ether",
+         "symbol":"ETH",
+         "decimals":18
+      },
+      "infoURL":"https://docs.blastblockchain.com",
+      "shortName":"blastT",
+      "chainId":23888,
+      "networkId":23888,
+      "explorers":[
+         {
+            "name":"Blast Testnet",
+            "url":"http://testnet-explorer.blastblockchain.com",
             "standard":"EIP3091"
          }
       ]
@@ -22557,6 +23388,7 @@ const chains = [
       "shortName":"bkct",
       "chainId":25925,
       "networkId":25925,
+      "slip44":1,
       "explorers":[
          {
             "name":"bkcscan-testnet",
@@ -22592,6 +23424,7 @@ const chains = [
       "shortName":"frm",
       "chainId":26026,
       "networkId":26026,
+      "slip44":1,
       "explorers":[
          {
             "name":"polkadotjs",
@@ -22685,6 +23518,7 @@ const chains = [
       "shortName":"obgor",
       "chainId":28528,
       "networkId":28528,
+      "slip44":1,
       "explorers":[
          {
             "name":"blockscout",
@@ -22743,6 +23577,7 @@ const chains = [
       "shortName":"Piece",
       "chainId":30067,
       "networkId":30067,
+      "slip44":1,
       "explorers":[
          {
             "name":"Piece Scan",
@@ -22770,6 +23605,7 @@ const chains = [
       "shortName":"ceri",
       "chainId":30103,
       "networkId":30103,
+      "slip44":1,
       "explorers":[
          {
             "name":"canxium explorer",
@@ -22844,6 +23680,7 @@ const chains = [
       "shortName":"CLD",
       "chainId":31224,
       "networkId":31224,
+      "slip44":1,
       "explorers":[
          {
             "name":"cloudtxexplorer",
@@ -22870,7 +23707,7 @@ const chains = [
       "shortName":"got",
       "chainId":31337,
       "networkId":31337,
-      "slip44":6060,
+      "slip44":1,
       "explorers":[
          {
             "name":"GoChain Testnet Explorer",
@@ -23045,6 +23882,7 @@ const chains = [
       "shortName":"zil-testnet",
       "chainId":33101,
       "networkId":33101,
+      "slip44":1,
       "explorers":[
          {
             "name":"Zilliqa EVM Explorer",
@@ -23282,6 +24120,7 @@ const chains = [
       "shortName":"q-testnet",
       "chainId":35443,
       "networkId":35443,
+      "slip44":1,
       "icon":"q",
       "explorers":[
          {
@@ -23585,6 +24424,7 @@ const chains = [
       "shortName":"emerald-testnet",
       "chainId":42261,
       "networkId":42261,
+      "slip44":1,
       "explorers":[
          {
             "name":"Oasis Emerald Testnet Explorer",
@@ -23622,6 +24462,44 @@ const chains = [
       ]
    },
    {
+      "name":"ZKFair Mainnet",
+      "title":"ZKFair Mainnet",
+      "chain":"ZKFair",
+      "rpc":[
+         "https://rpc.zkfair.io"
+      ],
+      "faucets":[
+         
+      ],
+      "nativeCurrency":{
+         "name":"USDC Token",
+         "symbol":"USDC",
+         "decimals":18
+      },
+      "infoURL":"https://zkfair.io",
+      "shortName":"ZKFair-Mainnet",
+      "chainId":42766,
+      "networkId":42766,
+      "icon":"zkfair",
+      "explorers":[
+         {
+            "name":"blockscout",
+            "url":"https://scan.zkfair.io",
+            "icon":"zkfair",
+            "standard":"EIP3091"
+         }
+      ],
+      "parent":{
+         "type":"L2",
+         "chain":"eip155-1",
+         "bridges":[
+            {
+               "url":"https://wallet.zkfair.io"
+            }
+         ]
+      }
+   },
+   {
       "name":"Gesoten Verse Testnet",
       "chain":"Gesoten Verse",
       "rpc":[
@@ -23640,6 +24518,7 @@ const chains = [
       "icon":"gesoten",
       "chainId":42801,
       "networkId":42801,
+      "slip44":1,
       "explorers":[
          {
             "name":"Gesoten Verse Testnet Explorer",
@@ -23675,6 +24554,7 @@ const chains = [
       "shortName":"keth",
       "chainId":42888,
       "networkId":42888,
+      "slip44":1,
       "explorers":[
          {
             "name":"kintoscan",
@@ -23723,6 +24603,7 @@ const chains = [
       "shortName":"Fuji",
       "chainId":43113,
       "networkId":1,
+      "slip44":1,
       "explorers":[
          {
             "name":"snowtrace",
@@ -23821,6 +24702,7 @@ const chains = [
       "shortName":"ZKFair-Testnet",
       "chainId":43851,
       "networkId":43851,
+      "slip44":1,
       "icon":"zkfair",
       "explorers":[
          {
@@ -23865,6 +24747,7 @@ const chains = [
       "shortName":"ALFA",
       "chain":"CELO",
       "networkId":44787,
+      "slip44":1,
       "nativeCurrency":{
          "name":"CELO",
          "symbol":"CELO",
@@ -23943,7 +24826,7 @@ const chains = [
       "shortName":"tfsn",
       "chainId":46688,
       "networkId":46688,
-      "slip44":288,
+      "slip44":1,
       "explorers":[
          {
             "name":"fsnscan",
@@ -24001,6 +24884,7 @@ const chains = [
       "shortName":"floripa",
       "chainId":49049,
       "networkId":49049,
+      "slip44":1,
       "explorers":[
          {
             "name":"Wire Explorer",
@@ -24029,6 +24913,7 @@ const chains = [
       "shortName":"tbfc",
       "chainId":49088,
       "networkId":49088,
+      "slip44":1,
       "icon":"bifrost",
       "explorers":[
          {
@@ -24056,7 +24941,7 @@ const chains = [
       "shortName":"tnrg",
       "chainId":49797,
       "networkId":49797,
-      "slip44":49797
+      "slip44":1
    },
    {
       "name":"Liveplex OracleEVM",
@@ -24081,6 +24966,69 @@ const chains = [
       ]
    },
    {
+      "name":"Yooldo Verse Mainnet",
+      "chain":"Yooldo Verse",
+      "icon":"yooldo_verse",
+      "rpc":[
+         "https://rpc.yooldo-verse.xyz/"
+      ],
+      "faucets":[
+         
+      ],
+      "nativeCurrency":{
+         "name":"OAS",
+         "symbol":"OAS",
+         "decimals":18
+      },
+      "infoURL":"https://yooldo.gg/",
+      "shortName":"YVM",
+      "chainId":50005,
+      "networkId":50005,
+      "explorers":[
+         {
+            "name":"Yooldo Verse Explorer",
+            "url":"https://explorer.yooldo-verse.xyz",
+            "standard":"EIP3091"
+         }
+      ],
+      "parent":{
+         "type":"L2",
+         "chain":"eip155-248"
+      }
+   },
+   {
+      "name":"Yooldo Verse Testnet",
+      "chain":"Yooldo Verse",
+      "icon":"yooldo_verse",
+      "rpc":[
+         "https://rpc.testnet.yooldo-verse.xyz/"
+      ],
+      "faucets":[
+         
+      ],
+      "nativeCurrency":{
+         "name":"OAS",
+         "symbol":"OAS",
+         "decimals":18
+      },
+      "infoURL":"https://yooldo.gg/",
+      "shortName":"YVT",
+      "chainId":50006,
+      "networkId":50006,
+      "slip44":1,
+      "explorers":[
+         {
+            "name":"Yooldo Verse Explorer",
+            "url":"https://explorer.testnet.yooldo-verse.xyz",
+            "standard":"EIP3091"
+         }
+      ],
+      "parent":{
+         "type":"L2",
+         "chain":"eip155-248"
+      }
+   },
+   {
       "name":"GTON Testnet",
       "chain":"GTON Testnet",
       "rpc":[
@@ -24098,6 +25046,7 @@ const chains = [
       "shortName":"tgton",
       "chainId":50021,
       "networkId":50021,
+      "slip44":1,
       "explorers":[
          {
             "name":"GTON Testnet Network Explorer",
@@ -24137,6 +25086,7 @@ const chains = [
       "shortName":"Lumoz-Testnet",
       "chainId":51178,
       "networkId":51178,
+      "slip44":1,
       "icon":"opside-new",
       "explorers":[
          {
@@ -24256,6 +25206,7 @@ const chains = [
       "shortName":"ISLMT",
       "chainId":54211,
       "networkId":54211,
+      "slip44":1,
       "explorers":[
          {
             "name":"TestEdge HAQQ Explorer",
@@ -24283,6 +25234,7 @@ const chains = [
       "shortName":"ToronetTestnet",
       "chainId":54321,
       "networkId":54321,
+      "slip44":1,
       "ens":{
          "registry":"0x059C474f26D65B0458F9da10A649a7322aB02C09"
       },
@@ -24367,6 +25319,7 @@ const chains = [
       "shortName":"trei",
       "chainId":55556,
       "networkId":55556,
+      "slip44":1,
       "explorers":[
          {
             "name":"reiscan",
@@ -24462,6 +25415,7 @@ const chains = [
       "shortName":"tsys-rollux",
       "chainId":57000,
       "networkId":57000,
+      "slip44":1,
       "explorers":[
          {
             "name":"Rollux Testnet Explorer",
@@ -24537,6 +25491,7 @@ const chains = [
       "shortName":"linea-testnet",
       "chainId":59140,
       "networkId":59140,
+      "slip44":1,
       "icon":"linea",
       "parent":{
          "type":"L2",
@@ -24663,6 +25618,7 @@ const chains = [
       "shortName":"TKM-test0",
       "chainId":60000,
       "networkId":60000,
+      "slip44":1,
       "explorers":[
          {
             "name":"thinkiumscan",
@@ -24689,6 +25645,7 @@ const chains = [
       "shortName":"TKM-test1",
       "chainId":60001,
       "networkId":60001,
+      "slip44":1,
       "explorers":[
          {
             "name":"thinkiumscan",
@@ -24715,6 +25672,7 @@ const chains = [
       "shortName":"TKM-test2",
       "chainId":60002,
       "networkId":60002,
+      "slip44":1,
       "explorers":[
          {
             "name":"thinkiumscan",
@@ -24741,6 +25699,7 @@ const chains = [
       "shortName":"TKM-test103",
       "chainId":60103,
       "networkId":60103,
+      "slip44":1,
       "explorers":[
          {
             "name":"thinkiumscan",
@@ -24845,6 +25804,7 @@ const chains = [
       "shortName":"BKLV",
       "chain":"CELO",
       "networkId":62320,
+      "slip44":1,
       "nativeCurrency":{
          "name":"CELO",
          "symbol":"CELO",
@@ -24933,6 +25893,7 @@ const chains = [
       "shortName":"ecs-testnet",
       "chainId":63001,
       "networkId":63001,
+      "slip44":1,
       "icon":"ecredits",
       "explorers":[
          {
@@ -24989,6 +25950,7 @@ const chains = [
       "shortName":"janusnetwork-testnet",
       "chainId":66988,
       "networkId":66988,
+      "slip44":1,
       "status":"active",
       "explorers":[
          {
@@ -25094,6 +26056,7 @@ const chains = [
       "shortName":"cndr",
       "chainId":69420,
       "networkId":69420,
+      "slip44":1,
       "explorers":[
          {
             "name":"Condrieu explorer",
@@ -25255,7 +26218,8 @@ const chains = [
       "infoURL":"https://github.com/nervosnetwork/godwoken",
       "shortName":"ckb",
       "chainId":71393,
-      "networkId":1
+      "networkId":1,
+      "slip44":1
    },
    {
       "name":"Godwoken Testnet v1",
@@ -25276,6 +26240,7 @@ const chains = [
       "shortName":"gw-testnet-v1",
       "chainId":71401,
       "networkId":71401,
+      "slip44":1,
       "explorers":[
          {
             "name":"GWScan Block Explorer",
@@ -25355,7 +26320,8 @@ const chains = [
       "infoURL":"https://energyweb.org",
       "shortName":"vt",
       "chainId":73799,
-      "networkId":73799
+      "networkId":73799,
+      "slip44":1
    },
    {
       "name":"Mixin Virtual Machine",
@@ -25431,6 +26397,7 @@ const chains = [
       "shortName":"fnc",
       "chainId":77238,
       "networkId":77238,
+      "slip44":1,
       "explorers":[
          {
             "name":"Foundry Scan Testnet",
@@ -25513,7 +26480,8 @@ const chains = [
       "infoURL":"https://primusmoney.com",
       "shortName":"firenze",
       "chainId":78110,
-      "networkId":78110
+      "networkId":78110,
+      "slip44":1
    },
    {
       "name":"Dragonfly Mainnet (Hexapod)",
@@ -25569,6 +26537,7 @@ const chains = [
       "shortName":"amplify",
       "chainId":78430,
       "networkId":78430,
+      "slip44":1,
       "explorers":[
          {
             "name":"AMPLIFY Explorer",
@@ -25600,6 +26569,7 @@ const chains = [
       "shortName":"bulletin",
       "chainId":78431,
       "networkId":78431,
+      "slip44":1,
       "explorers":[
          {
             "name":"BULLETIN Explorer",
@@ -25631,6 +26601,7 @@ const chains = [
       "shortName":"conduit",
       "chainId":78432,
       "networkId":78432,
+      "slip44":1,
       "explorers":[
          {
             "name":"CONDUIT Explorer",
@@ -25658,6 +26629,7 @@ const chains = [
       "shortName":"STANDt",
       "chainId":79879,
       "networkId":79879,
+      "slip44":1,
       "explorers":[
          {
             "name":"Gold Smart Chain",
@@ -25690,6 +26662,7 @@ const chains = [
       "shortName":"maticmum",
       "chainId":80001,
       "networkId":80001,
+      "slip44":1,
       "explorers":[
          {
             "name":"polygonscan",
@@ -25701,6 +26674,7 @@ const chains = [
    {
       "name":"Nordek Mainnet",
       "chain":"Nordek",
+      "icon":"nordek",
       "rpc":[
          "https://mainnet-rpc.nordekscan.com"
       ],
@@ -25743,6 +26717,7 @@ const chains = [
       "icon":"meer",
       "chainId":81341,
       "networkId":81341,
+      "slip44":1,
       "status":"incubating"
    },
    {
@@ -25806,6 +26781,7 @@ const chains = [
       "icon":"meer",
       "chainId":81351,
       "networkId":81351,
+      "slip44":1,
       "status":"incubating"
    },
    {
@@ -25869,6 +26845,7 @@ const chains = [
       "icon":"meer",
       "chainId":81361,
       "networkId":81361,
+      "slip44":1,
       "status":"incubating"
    },
    {
@@ -25962,6 +26939,7 @@ const chains = [
       "shortName":"basegor",
       "chainId":84531,
       "networkId":84531,
+      "slip44":1,
       "icon":"baseTestnet",
       "explorers":[
          {
@@ -26001,6 +26979,7 @@ const chains = [
       "shortName":"basesep",
       "chainId":84532,
       "networkId":84532,
+      "slip44":1,
       "icon":"baseTestnet",
       "explorers":[
          {
@@ -26077,6 +27056,7 @@ const chains = [
       "shortName":"NAUTTest",
       "chainId":88002,
       "networkId":88002,
+      "slip44":1,
       "explorers":[
          {
             "name":"Nautscan",
@@ -26105,6 +27085,7 @@ const chains = [
       "shortName":"chz",
       "chainId":88880,
       "networkId":88880,
+      "slip44":1,
       "explorers":[
          {
             "name":"scoville-explorer",
@@ -26197,6 +27178,33 @@ const chains = [
       ]
    },
    {
+      "name":"Combo Testnet",
+      "chain":"Combo",
+      "icon":"combo",
+      "rpc":[
+         "https://test-rpc.combonetwork.io"
+      ],
+      "faucets":[
+         
+      ],
+      "nativeCurrency":{
+         "name":"BNB Chain Native Token",
+         "symbol":"tcBNB",
+         "decimals":18
+      },
+      "infoURL":"https://combonetwork.io",
+      "shortName":"combo-testnet",
+      "chainId":91715,
+      "networkId":91715,
+      "explorers":[
+         {
+            "name":"combotrace explorer",
+            "url":"https://combotrace-testnet.nodereal.io",
+            "standard":"EIP3091"
+         }
+      ]
+   },
+   {
       "name":"Lambda Testnet",
       "chain":"Lambda",
       "rpc":[
@@ -26214,6 +27222,7 @@ const chains = [
       "shortName":"lambda-testnet",
       "chainId":92001,
       "networkId":92001,
+      "slip44":1,
       "icon":"lambda",
       "explorers":[
          {
@@ -26248,6 +27257,7 @@ const chains = [
       "shortName":"mantis",
       "chainId":96970,
       "networkId":96970,
+      "slip44":1,
       "explorers":[
          {
             "name":"Mantis Blockscout",
@@ -26303,6 +27313,7 @@ const chains = [
       "shortName":"ELt",
       "chainId":99099,
       "networkId":99099,
+      "slip44":1,
       "explorers":[
          {
             "name":"eLiberty Testnet",
@@ -26328,7 +27339,8 @@ const chains = [
       "infoURL":"https://www.ubchain.site",
       "shortName":"usctest",
       "chainId":99998,
-      "networkId":99998
+      "networkId":99998,
+      "slip44":1
    },
    {
       "name":"UB Smart Chain",
@@ -26665,6 +27677,7 @@ const chains = [
       "shortName":"vechain-testnet",
       "chainId":100010,
       "networkId":100010,
+      "slip44":1,
       "explorers":[
          {
             "name":"VeChain Explorer",
@@ -26716,6 +27729,7 @@ const chains = [
       "shortName":"SVRNt",
       "chainId":101010,
       "networkId":101010,
+      "slip44":1,
       "explorers":[
          {
             "name":"Soverun",
@@ -27067,6 +28081,7 @@ const chains = [
       "shortName":"testsbr",
       "chainId":111000,
       "networkId":111000,
+      "slip44":1,
       "icon":"siberium",
       "explorers":[
          {
@@ -27243,6 +28258,7 @@ const chains = [
       "shortName":"taiko-a2",
       "chainId":167004,
       "networkId":167004,
+      "slip44":1,
       "explorers":[
          {
             "name":"blockscout",
@@ -27380,6 +28396,7 @@ const chains = [
       "shortName":"condor",
       "chainId":188881,
       "networkId":188881,
+      "slip44":1,
       "explorers":[
          {
             "name":"CondorScan",
@@ -27408,6 +28425,7 @@ const chains = [
       "shortName":"milkTAda",
       "chainId":200101,
       "networkId":200101,
+      "slip44":1,
       "explorers":[
          {
             "name":"Blockscout",
@@ -27435,6 +28453,7 @@ const chains = [
       "shortName":"milkTAlgo",
       "chainId":200202,
       "networkId":200202,
+      "slip44":1,
       "explorers":[
          {
             "name":"Blockscout",
@@ -27510,6 +28529,7 @@ const chains = [
       "shortName":"alayadev",
       "chainId":201030,
       "networkId":1,
+      "slip44":1,
       "icon":"alaya",
       "explorers":[
          {
@@ -27581,6 +28601,7 @@ const chains = [
       "shortName":"tDSC",
       "chainId":202020,
       "networkId":202020,
+      "slip44":1,
       "icon":"dsc",
       "explorers":[
          {
@@ -27625,6 +28646,7 @@ const chains = [
       "chain":"ETH",
       "chainId":202624,
       "networkId":202624,
+      "slip44":1,
       "icon":"twala",
       "nativeCurrency":{
          "name":"Twala Coin",
@@ -27790,6 +28812,7 @@ const chains = [
       "shortName":"reap-testnet",
       "chainId":221231,
       "networkId":221231,
+      "slip44":1,
       "icon":"reapchain",
       "explorers":[
          {
@@ -27828,6 +28851,72 @@ const chains = [
       ]
    },
    {
+      "name":"CONET Sebolia Testnet",
+      "chain":"CONET",
+      "rpc":[
+         "https://rpc1.conet.network"
+      ],
+      "faucets":[
+         
+      ],
+      "nativeCurrency":{
+         "name":"CONET Sebolia",
+         "symbol":"CONET",
+         "decimals":18
+      },
+      "features":[
+         {
+            "name":"EIP155"
+         }
+      ],
+      "infoURL":"https://conet.network",
+      "shortName":"conet-sebolia",
+      "chainId":224422,
+      "networkId":224422,
+      "slip44":1,
+      "icon":"conet",
+      "explorers":[
+         {
+            "name":"CONET Scan",
+            "url":"https://scan.conet.network",
+            "standard":"EIP3091"
+         }
+      ]
+   },
+   {
+      "name":"CONET Holesky",
+      "chain":"CONET Holesky",
+      "rpc":[
+         "https://holeskyrpc1.conet.network"
+      ],
+      "faucets":[
+         
+      ],
+      "nativeCurrency":{
+         "name":"CONET Holesky",
+         "symbol":"CONET",
+         "decimals":18
+      },
+      "features":[
+         {
+            "name":"EIP155"
+         }
+      ],
+      "infoURL":"https://conet.network",
+      "shortName":"conet-holesky",
+      "chainId":224433,
+      "networkId":224433,
+      "slip44":2147708081,
+      "icon":"conet",
+      "explorers":[
+         {
+            "name":"CONET Holesky Scan",
+            "url":"https://scan.conet.network",
+            "standard":"EIP3091"
+         }
+      ]
+   },
+   {
       "name":"HashKey Chain Testnet",
       "chain":"HashKey",
       "rpc":[
@@ -27845,6 +28934,7 @@ const chains = [
       "shortName":"hsktest",
       "chainId":230315,
       "networkId":230315,
+      "slip44":1,
       "icon":"hsk",
       "explorers":[
          {
@@ -27871,7 +28961,8 @@ const chains = [
       "infoURL":"https://haymoswap.web.app/",
       "shortName":"hym",
       "chainId":234666,
-      "networkId":234666
+      "networkId":234666,
+      "slip44":1
    },
    {
       "name":"ARTIS sigma1",
@@ -27910,7 +29001,8 @@ const chains = [
       "infoURL":"https://artis.network",
       "shortName":"atstau",
       "chainId":246785,
-      "networkId":246785
+      "networkId":246785,
+      "slip44":1
    },
    {
       "name":"Saakuru Testnet",
@@ -27931,6 +29023,7 @@ const chains = [
       "shortName":"saakuru-testnet",
       "chainId":247253,
       "networkId":247253,
+      "slip44":1,
       "explorers":[
          {
             "name":"saakuru-explorer-testnet",
@@ -27984,7 +29077,7 @@ const chains = [
       "shortName":"gz-testnet",
       "chainId":266256,
       "networkId":266256,
-      "slip44":266256,
+      "slip44":1,
       "explorers":[
          
       ]
@@ -28008,6 +29101,7 @@ const chains = [
       "shortName":"EGONt",
       "chainId":271271,
       "networkId":271271,
+      "slip44":1,
       "explorers":[
          {
             "name":"EgonCoin Testnet",
@@ -28144,6 +29238,7 @@ const chains = [
       "shortName":"avst",
       "chainId":333331,
       "networkId":333331,
+      "slip44":1,
       "icon":"aves",
       "explorers":[
          {
@@ -28161,6 +29256,7 @@ const chains = [
       "chain":"N3-Test",
       "icon":"nativ3",
       "networkId":333333,
+      "slip44":1,
       "nativeCurrency":{
          "name":"USNT",
          "symbol":"USNT",
@@ -28209,6 +29305,7 @@ const chains = [
       "shortName":"oonetest",
       "chainId":333666,
       "networkId":333666,
+      "slip44":1,
       "explorers":[
          {
             "name":"blockscout",
@@ -28261,7 +29358,8 @@ const chains = [
       "infoURL":"https://polis.tech",
       "shortName":"sparta",
       "chainId":333888,
-      "networkId":333888
+      "networkId":333888,
+      "slip44":1
    },
    {
       "name":"Polis Mainnet",
@@ -28301,6 +29399,7 @@ const chains = [
       "shortName":"Bitfinity",
       "chainId":355113,
       "networkId":355113,
+      "slip44":1,
       "explorers":[
          {
             "name":"Bitfinity Block Explorer",
@@ -28348,6 +29447,7 @@ const chains = [
       "shortName":"hap-testnet",
       "chainId":373737,
       "networkId":373737,
+      "slip44":1,
       "icon":"hap",
       "explorers":[
          {
@@ -28485,6 +29585,7 @@ const chains = [
       "shortName":"tKEK",
       "chainId":420666,
       "networkId":1,
+      "slip44":1,
       "icon":"kek",
       "explorers":[
          {
@@ -28514,6 +29615,7 @@ const chains = [
       "shortName":"alterium",
       "chainId":420692,
       "networkId":420692,
+      "slip44":1,
       "parent":{
          "type":"L2",
          "chain":"eip155-5",
@@ -28538,6 +29640,7 @@ const chains = [
       "shortName":"arb-rinkeby",
       "chain":"ETH",
       "networkId":421611,
+      "slip44":1,
       "nativeCurrency":{
          "name":"Arbitrum Rinkeby Ether",
          "symbol":"ETH",
@@ -28579,6 +29682,7 @@ const chains = [
       "shortName":"arb-goerli",
       "chain":"ETH",
       "networkId":421613,
+      "slip44":1,
       "nativeCurrency":{
          "name":"Arbitrum Goerli Ether",
          "symbol":"AGOR",
@@ -28615,7 +29719,8 @@ const chains = [
       "title":"Arbitrum Sepolia Rollup Testnet",
       "chain":"ETH",
       "rpc":[
-         "https://sepolia-rollup.arbitrum.io/rpc"
+         "https://sepolia-rollup.arbitrum.io/rpc",
+         "https://arbitrum-sepolia.infura.io/v3/${INFURA_API_KEY}"
       ],
       "faucets":[
          
@@ -28629,6 +29734,7 @@ const chains = [
       "shortName":"arb-sep",
       "chainId":421614,
       "networkId":421614,
+      "slip44":1,
       "explorers":[
          {
             "name":"Arbitrum Sepolia Rollup Testnet Explorer",
@@ -28673,6 +29779,7 @@ const chains = [
       "shortName":"fastexTestnet",
       "chainId":424242,
       "networkId":424242,
+      "slip44":1,
       "explorers":[
          {
             "name":"blockscout",
@@ -28724,6 +29831,7 @@ const chains = [
       "shortName":"dexalot-testnet",
       "chainId":432201,
       "networkId":432201,
+      "slip44":1,
       "explorers":[
          {
             "name":"Avalanche Subnet Testnet Explorer",
@@ -28777,6 +29885,7 @@ const chains = [
       "shortName":"wlkt",
       "chainId":444900,
       "networkId":444900,
+      "slip44":1,
       "explorers":[
          {
             "name":"weelink-testnet",
@@ -28802,7 +29911,44 @@ const chains = [
       "infoURL":"https://patex.io/",
       "shortName":"psep",
       "chainId":471100,
-      "networkId":471100
+      "networkId":471100,
+      "slip44":1
+   },
+   {
+      "name":"Ultra Pro Mainnet",
+      "chain":"ultrapro",
+      "icon":"ultrapro",
+      "rpc":[
+         "https://mainnet-rpc.ultraproscan.io"
+      ],
+      "features":[
+         {
+            "name":"EIP155"
+         },
+         {
+            "name":"EIP1559"
+         }
+      ],
+      "faucets":[
+         
+      ],
+      "nativeCurrency":{
+         "name":"Ultra Pro",
+         "symbol":"UPRO",
+         "decimals":18
+      },
+      "infoURL":"https://ultrapro.info",
+      "shortName":"ultrapro",
+      "chainId":473861,
+      "networkId":473861,
+      "explorers":[
+         {
+            "name":"ultraproscan",
+            "url":"https://ultraproscan.io",
+            "icon":"ultrapro",
+            "standard":"EIP3091"
+         }
+      ]
    },
    {
       "name":"OpenChain Mainnet",
@@ -28849,6 +29995,7 @@ const chains = [
       "shortName":"cmp",
       "chainId":512512,
       "networkId":512512,
+      "slip44":1,
       "explorers":[
          {
             "name":"Galaxy Scan",
@@ -28905,6 +30052,7 @@ const chains = [
       "shortName":"scr-sepolia",
       "chainId":534351,
       "networkId":534351,
+      "slip44":1,
       "explorers":[
          {
             "name":"Scroll Sepolia Etherscan",
@@ -28990,6 +30138,7 @@ const chains = [
       "shortName":"scr-alpha",
       "chainId":534353,
       "networkId":534353,
+      "slip44":1,
       "explorers":[
          {
             "name":"Scroll Alpha Testnet Block Explorer",
@@ -29024,6 +30173,7 @@ const chains = [
       "shortName":"scr-prealpha",
       "chainId":534354,
       "networkId":534354,
+      "slip44":1,
       "explorers":[
          
       ]
@@ -29089,7 +30239,8 @@ const chains = [
          "https://rpc.hypra.network",
          "https://rpc.rethereum.org",
          "https://rethereum.rpc.restratagem.com",
-         "https://rpc.rthcentral.org"
+         "https://rpc.rthcentral.org",
+         "https://hypra.rpc.thirdweb.com"
       ],
       "faucets":[
          
@@ -29194,7 +30345,7 @@ const chains = [
       "shortName":"vpioneer",
       "chainId":666666,
       "networkId":666666,
-      "slip44":60
+      "slip44":1
    },
    {
       "name":"Hela Official Runtime Testnet",
@@ -29215,6 +30366,7 @@ const chains = [
       "shortName":"hela-testnet",
       "chainId":666888,
       "networkId":666888,
+      "slip44":1,
       "explorers":[
          {
             "name":"Hela Official Runtime Testnet Explorer",
@@ -29242,6 +30394,7 @@ const chains = [
       "shortName":"BRNKCTEST",
       "chainId":751230,
       "networkId":751230,
+      "slip44":1,
       "explorers":[
          {
             "name":"brnktestscan",
@@ -29488,6 +30641,33 @@ const chains = [
       ]
    },
    {
+      "name":"Astria EVM Dusknet",
+      "chain":"RIA",
+      "icon":"astria",
+      "chainId":912559,
+      "networkId":912559,
+      "infoURL":"https://docs.astria.org",
+      "shortName":"ria-dev",
+      "nativeCurrency":{
+         "name":"RIA",
+         "symbol":"RIA",
+         "decimals":18
+      },
+      "rpc":[
+         "https://rpc.evm.dusk-2.devnet.astria.org"
+      ],
+      "faucets":[
+         "https://faucet.evm.dusk-2.devnet.astria.org/"
+      ],
+      "explorers":[
+         {
+            "name":"Astria EVM Dusknet Explorer",
+            "url":"https://explorer.evm.dusk-2.devnet.astria.org",
+            "standard":"EIP3091"
+         }
+      ]
+   },
+   {
       "name":"Posichain Devnet Shard 0",
       "chain":"PSC",
       "rpc":[
@@ -29557,6 +30737,7 @@ const chains = [
       "shortName":"tFNCY",
       "chainId":923018,
       "networkId":923018,
+      "slip44":1,
       "icon":"fncy",
       "explorers":[
          {
@@ -29860,6 +31041,7 @@ const chains = [
       "shortName":"dbk",
       "chainId":2021398,
       "networkId":2021398,
+      "slip44":1,
       "explorers":[
          {
             "name":"DeBank Chain Explorer",
@@ -29913,6 +31095,7 @@ const chains = [
       "shortName":"platondev",
       "chainId":2203181,
       "networkId":1,
+      "slip44":1,
       "icon":"platon",
       "status":"deprecated",
       "explorers":[
@@ -29942,6 +31125,7 @@ const chains = [
       "shortName":"platondev2",
       "chainId":2206132,
       "networkId":1,
+      "slip44":1,
       "icon":"platon",
       "explorers":[
          {
@@ -30021,6 +31205,7 @@ const chains = [
       "shortName":"mantaTestnet",
       "chainId":3441005,
       "networkId":3441005,
+      "slip44":1,
       "icon":"manta",
       "explorers":[
          {
@@ -30116,6 +31301,7 @@ const chains = [
       "shortName":"MXC",
       "chainId":5167003,
       "networkId":5167003,
+      "slip44":1,
       "explorers":[
          {
             "name":"MXC Wannsee zkEVM Testnet",
@@ -30150,6 +31336,7 @@ const chains = [
       "shortName":"etn-testnet",
       "chainId":5201420,
       "networkId":5201420,
+      "slip44":1,
       "icon":"electroneum",
       "explorers":[
          {
@@ -30214,6 +31401,7 @@ const chains = [
       "shortName":"imversed-testnet",
       "chainId":5555558,
       "networkId":5555558,
+      "slip44":1,
       "icon":"imversed",
       "explorers":[
          {
@@ -30303,6 +31491,7 @@ const chains = [
       "shortName":"tqom",
       "chainId":7668378,
       "networkId":7668378,
+      "slip44":1,
       "icon":"qom",
       "explorers":[
          {
@@ -30391,6 +31580,33 @@ const chains = [
       }
    },
    {
+      "name":"Hokum",
+      "chain":"Hokum",
+      "icon":"hokum",
+      "rpc":[
+         "https://mainnet.hokum.gg"
+      ],
+      "faucets":[
+         
+      ],
+      "nativeCurrency":{
+         "name":"Ether",
+         "symbol":"ETH",
+         "decimals":18
+      },
+      "infoURL":"https://hokum.gg",
+      "shortName":"hokum",
+      "chainId":8080808,
+      "networkId":8080808,
+      "explorers":[
+         {
+            "name":"Hokum Explorer",
+            "url":"https://explorer.hokum.gg",
+            "standard":"EIP3091"
+         }
+      ]
+   },
+   {
       "name":"HAPchain",
       "chain":"HAPchain",
       "rpc":[
@@ -30437,6 +31653,7 @@ const chains = [
       "shortName":"quarix-testnet",
       "chainId":8888881,
       "networkId":8888881,
+      "slip44":1,
       "icon":"quarix",
       "explorers":[
          
@@ -30542,6 +31759,7 @@ const chains = [
       "shortName":"plian-testnet-l2",
       "chainId":10067275,
       "networkId":10067275,
+      "slip44":1,
       "explorers":[
          {
             "name":"piscan",
@@ -30609,6 +31827,7 @@ const chains = [
       "shortName":"sep",
       "chainId":11155111,
       "networkId":11155111,
+      "slip44":1,
       "explorers":[
          {
             "name":"etherscan-sepolia",
@@ -30640,6 +31859,7 @@ const chains = [
       "shortName":"opsep",
       "chainId":11155420,
       "networkId":11155420,
+      "slip44":1,
       "explorers":[
          {
             "name":"opscout",
@@ -30714,6 +31934,7 @@ const chains = [
       "shortName":"plian-testnet",
       "chainId":16658437,
       "networkId":16658437,
+      "slip44":1,
       "explorers":[
          {
             "name":"piscan",
@@ -30828,6 +32049,33 @@ const chains = [
       ]
    },
    {
+      "name":"Hokum Testnet",
+      "chain":"HokumTestnet",
+      "icon":"hokum",
+      "rpc":[
+         "https://testnet.hokum.gg"
+      ],
+      "faucets":[
+         
+      ],
+      "nativeCurrency":{
+         "name":"Ether",
+         "symbol":"ETH",
+         "decimals":18
+      },
+      "infoURL":"https://hokum.gg",
+      "shortName":"hokum-testnet",
+      "chainId":20482050,
+      "networkId":20482050,
+      "explorers":[
+         {
+            "name":"Hokum Explorer",
+            "url":"https://testnet-explorer.hokum.gg",
+            "standard":"EIP3091"
+         }
+      ]
+   },
+   {
       "name":"Excelon Mainnet",
       "chain":"XLON",
       "icon":"xlon",
@@ -30873,6 +32121,7 @@ const chains = [
       "shortName":"exlvolta",
       "chainId":27082017,
       "networkId":27082017,
+      "slip44":1,
       "explorers":[
          {
             "name":"exlscan",
@@ -31027,6 +32276,7 @@ const chains = [
       "shortName":"mais",
       "chainId":43214913,
       "networkId":43214913,
+      "slip44":1,
       "explorers":[
          {
             "name":"maistesntet",
@@ -31075,6 +32325,7 @@ const chains = [
       "shortName":"bakerloo-0",
       "chainId":65010000,
       "networkId":65010000,
+      "slip44":1,
       "icon":"autonity",
       "explorers":[
          {
@@ -31103,6 +32354,7 @@ const chains = [
       "shortName":"bakerloo-01",
       "chainId":65010001,
       "networkId":65010001,
+      "slip44":1,
       "icon":"autonity",
       "explorers":[
          {
@@ -31114,10 +32366,10 @@ const chains = [
    },
    {
       "name":"Autonity Piccadilly (Thames) Testnet",
+      "status":"deprecated",
       "chain":"AUT",
       "rpc":[
-         "https://rpc1.piccadilly.autonity.org/",
-         "wss://rpc1.piccadilly.autonity.org/ws/"
+         
       ],
       "faucets":[
          "https://faucet.autonity.org/"
@@ -31131,6 +32383,36 @@ const chains = [
       "shortName":"piccadilly-0",
       "chainId":65100000,
       "networkId":65100000,
+      "slip44":1,
+      "icon":"autonity",
+      "explorers":[
+         {
+            "name":"autonity-blockscout",
+            "url":"https://piccadilly.autonity.org",
+            "standard":"EIP3091"
+         }
+      ]
+   },
+   {
+      "name":"Autonity Piccadilly (Barada) Testnet",
+      "chain":"AUT",
+      "rpc":[
+         "https://rpc1.piccadilly.autonity.org/",
+         "wss://rpc1.piccadilly.autonity.org/ws/"
+      ],
+      "faucets":[
+         
+      ],
+      "nativeCurrency":{
+         "name":"Piccadilly Auton",
+         "symbol":"ATN",
+         "decimals":18
+      },
+      "infoURL":"https://autonity.org/",
+      "shortName":"piccadilly-01",
+      "chainId":65100001,
+      "networkId":65100001,
+      "slip44":1,
       "icon":"autonity",
       "explorers":[
          {
@@ -31159,6 +32441,7 @@ const chains = [
       "shortName":"frametest",
       "chainId":68840142,
       "networkId":68840142,
+      "slip44":1,
       "explorers":[
          {
             "name":"Frame Testnet Explorer",
@@ -31219,7 +32502,8 @@ const chains = [
       "infoURL":"https://joys.digital",
       "shortName":"TOYS",
       "chainId":99415706,
-      "networkId":99415706
+      "networkId":99415706,
+      "slip44":1
    },
    {
       "name":"Gather Mainnet Network",
@@ -31272,6 +32556,7 @@ const chains = [
       "shortName":"kanazawa",
       "chainId":222000222,
       "networkId":222000222,
+      "slip44":1,
       "explorers":[
          {
             "name":"explorer",
@@ -31366,6 +32651,7 @@ const chains = [
       "shortName":"neonevm-testnet",
       "chainId":245022940,
       "networkId":245022940,
+      "slip44":1,
       "explorers":[
          {
             "name":"native",
@@ -31485,6 +32771,7 @@ const chains = [
       "shortName":"calypso-testnet",
       "chainId":344106930,
       "networkId":344106930,
+      "slip44":1,
       "explorers":[
          {
             "name":"Blockscout",
@@ -31511,6 +32798,7 @@ const chains = [
       "shortName":"tGTH",
       "chainId":356256156,
       "networkId":356256156,
+      "slip44":1,
       "icon":"gather",
       "explorers":[
          {
@@ -31541,6 +32829,7 @@ const chains = [
       "shortName":"europa-testnet",
       "chainId":476158412,
       "networkId":476158412,
+      "slip44":1,
       "explorers":[
          {
             "name":"Blockscout",
@@ -31595,6 +32884,7 @@ const chains = [
       "shortName":"nebula-testnet",
       "chainId":503129905,
       "networkId":503129905,
+      "slip44":1,
       "explorers":[
          {
             "name":"Blockscout",
@@ -31622,6 +32912,7 @@ const chains = [
       "shortName":"zsep",
       "chainId":999999999,
       "networkId":999999999,
+      "slip44":1,
       "explorers":[
          {
             "name":"Zora Sepolia Testnet Network Explorer",
@@ -31751,6 +33042,7 @@ const chains = [
       "shortName":"aurora-testnet",
       "chainId":1313161555,
       "networkId":1313161555,
+      "slip44":1,
       "explorers":[
          {
             "name":"aurorascan.dev",
@@ -31825,6 +33117,7 @@ const chains = [
       "shortName":"chaos-tenet",
       "chainId":1351057110,
       "networkId":1351057110,
+      "slip44":1,
       "explorers":[
          {
             "name":"Blockscout",
@@ -31915,6 +33208,7 @@ const chains = [
       "shortName":"titan-testnet",
       "chainId":1517929550,
       "networkId":1517929550,
+      "slip44":1,
       "explorers":[
          {
             "name":"Blockscout",
@@ -32240,6 +33534,7 @@ const chains = [
       "shortName":"a8",
       "chainId":2863311531,
       "networkId":2863311531,
+      "slip44":1,
       "explorers":[
          {
             "name":"a8scan-testnet",
@@ -32287,6 +33582,7 @@ const chains = [
       "shortName":"frankenstein",
       "chainId":4216137055,
       "networkId":4216137055,
+      "slip44":1,
       "explorers":[
          {
             "name":"OneLedger Block Explorer",
@@ -32314,6 +33610,7 @@ const chains = [
       "shortName":"tpalm",
       "chainId":11297108099,
       "networkId":11297108099,
+      "slip44":1,
       "explorers":[
          {
             "name":"Palm Testnet Explorer",
@@ -32425,6 +33722,7 @@ const chains = [
       "shortName":"ntt-haradev",
       "chainId":197710212031,
       "networkId":197710212031,
+      "slip44":1,
       "icon":"ntity",
       "explorers":[
          {
@@ -32524,6 +33822,7 @@ const chains = [
       "shortName":"gw-testnet-v1-deprecated",
       "chainId":868455272153094,
       "networkId":868455272153094,
+      "slip44":1,
       "status":"deprecated",
       "explorers":[
          {

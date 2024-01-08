@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import useOnBlock from "./OnBlock";
 import usePoller from "./Poller";
 
@@ -22,6 +22,10 @@ const DEBUG = false;
 
 export default function useBalance(provider, address, pollTime = 0) {
   const [balance, setBalance] = useState();
+
+  useEffect(() => {
+    setBalance();
+  }, [provider]);
 
   const pollBalance = useCallback(
     async (provider, address) => {

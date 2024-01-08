@@ -1,32 +1,15 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 // Hook from useHooks! (https://usehooks.com/useLocalStorage/)
+
 export default function useLocalStorage(key, initialValue, ttl) {
+
   // State to store our value
   // Pass initial state function to useState so logic is only executed once
-  const [storedValue, setStoredValue] = useState(() => {
-    try {
-      // Get from local storage by key
-      const item = window.localStorage.getItem(key);
-      const parsedItem = item ? JSON.parse(item) : initialValue;
+  const [storedValue, setStoredValue] = useState(() => getItemFromLocalStorage(key, initialValue, ttl));
 
-      if (typeof parsedItem === "object" && parsedItem !== null && "expiry" in parsedItem && "value" in parsedItem) {
-        const now = new Date();
-        if (ttl && now.getTime() > parsedItem.expiry) {
-          // If the item is expired, delete the item from storage
-          // and return null
-          window.localStorage.removeItem(key);
-          return initialValue;
-        }
-        return parsedItem.value;
-      }
-      // Parse stored json or if none return initialValue
-      return parsedItem;
-    } catch (error) {
-      // If error also return initialValue
-      console.log(error);
-      return initialValue;
-    }
-  });
+  useEffect(() => {
+    setStoredValue(getItemFromLocalStorage(key, initialValue, ttl));
+  }, [key]);
 
   // Return a wrapped version of useState's setter function that ...
   // ... persists the new value to localStorage.
@@ -57,4 +40,30 @@ export default function useLocalStorage(key, initialValue, ttl) {
   };
 
   return [storedValue, setValue];
+}
+
+const getItemFromLocalStorage = (key, initialValue, ttl) => {
+  try {
+    // Get from local storage by key
+    const item = window.localStorage.getItem(key);
+
+    const parsedItem = item ? JSON.parse(item) : initialValue;
+
+    if (typeof parsedItem === "object" && parsedItem !== null && "expiry" in parsedItem && "value" in parsedItem) {
+      const now = new Date();
+      if (ttl && now.getTime() > parsedItem.expiry) {
+        // If the item is expired, delete the item from storage
+        // and return null
+        window.localStorage.removeItem(key);
+        return initialValue;
+      }
+      return parsedItem.value;
+    }
+    // Parse stored json or if none return initialValue
+    return parsedItem;
+  } catch (error) {
+    // If error also return initialValue
+    console.log(error);
+    return initialValue;
+  }
 }

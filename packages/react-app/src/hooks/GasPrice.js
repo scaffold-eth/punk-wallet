@@ -1,11 +1,17 @@
 import axios from "axios";
 import { usePoller } from "eth-hooks";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ETHERSCAN_KEY } from "../constants";
 import { ethers } from "ethers";
 
 export default function useGasPrice(targetNetwork, speed, providerToAsk) {
   const [gasPrice, setGasPrice] = useState();
+
+  useEffect(() => {
+    setGasPrice();
+    loadGasPrice();
+  }, [targetNetwork]);
+
   const loadGasPrice = async () => {
     
     if (targetNetwork.gasPrice) {

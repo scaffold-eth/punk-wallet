@@ -56,8 +56,9 @@ import { getMemo, getNewMoneriumClient, getFilteredOrders, isValidIban, placeIba
 
 import { SettingsHelper } from "./helpers/SettingsHelper";
 
-import { SELECTED_BLOCK_EXPORER_NAME_KEY, getBLockExplorer, migrateSelectedNetworkStorageSetting } from "./helpers/NetworkSettingsHelper";
-import { getSelectedErc20Token, getStorageKey, getTokens, migrateSelectedTokenStorageSetting } from "./helpers/TokenSettingsHelper";
+import { NETWORK_SETTINGS_STORAGE_KEY, SELECTED_BLOCK_EXPORER_NAME_KEY, migrateSelectedNetworkStorageSetting, getNetworkWithSettings } from "./helpers/NetworkSettingsHelper";
+
+import { TOKEN_SETTINGS_STORAGE_KEY, getSelectedErc20Token, getTokens, migrateSelectedTokenStorageSetting } from "./helpers/TokenSettingsHelper";
 
 import { getChain} from "./helpers/ChainHelper";
 
@@ -85,32 +86,6 @@ const { OrderState } = require("@monerium/sdk");
     You can also bring in contract artifacts in `constants.js`
     (and then use the `useExternalContractLoader()` hook!)
 */
-
-/// 📡 What chain are your contracts deployed to?
-
-const networkSettingsStorageKey = "networkSettings";
-
-// ToDo: Check if network settings can be stored in state, currently page refresh is used on network changes
-const cachedNetwork = JSON.parse(window.localStorage.getItem(networkSettingsStorageKey))?.selectedName;
-let targetNetwork = NETWORKS[cachedNetwork || "ethereum"]; // <------- select your target frontend network (localhost, rinkeby, xdai, mainnet)
-if (!targetNetwork) {
-  targetNetwork = NETWORKS["ethereum"];
-}
-// 😬 Sorry for all the console logging
-const DEBUG = false;
-
-// 🛰 providers
-if (DEBUG) console.log("📡 Connecting to Mainnet Ethereum");
-
-// 🏠 Your local provider is usually pointed at your local blockchain
-const localProviderUrl = targetNetwork.rpcUrl;
-// as you deploy to other networks you can set REACT_APP_PROVIDER=https://dai.poa.network in packages/react-app/.env
-const localProviderUrlFromEnv = process.env.REACT_APP_PROVIDER ? process.env.REACT_APP_PROVIDER : localProviderUrl;
-if (DEBUG) console.log("🏠 Connecting to provider:", localProviderUrlFromEnv);
-let localProvider = new StaticJsonRpcProvider(localProviderUrlFromEnv);
-
-// 🔭 block explorer URL
-let blockExplorer = targetNetwork.blockExplorer;
 
 let scanner;
 
@@ -140,33 +115,34 @@ const web3Modal = new Web3Modal({
   },
 });
 
-const networkName = targetNetwork.name;
-const erc20Tokens = targetNetwork?.erc20Tokens;
-const tokens = getTokens(targetNetwork?.nativeToken, erc20Tokens);
-const tokenSettingsStorageKey = networkName + getStorageKey();
+// 😬 Sorry for all the console logging
+const DEBUG = false;
 
 const networks = Object.values(NETWORKS);
 
 function App(props) {
   const [networkSettingsModalOpen, setNetworkSettingsModalOpen] = useState(false);
-  const [networkSettings, setNetworkSettings] = useLocalStorage(networkSettingsStorageKey, {});
-  const networkSettingsHelper = networks ? new SettingsHelper(networkSettingsStorageKey, networks, networkSettings, setNetworkSettings) : undefined;
+  const [networkSettings, setNetworkSettings] = useLocalStorage(NETWORK_SETTINGS_STORAGE_KEY, {});
+  const networkSettingsHelper = new SettingsHelper(NETWORK_SETTINGS_STORAGE_KEY, networks, networkSettings, setNetworkSettings, getNetworkWithSettings);
 
-  if (networkSettingsHelper) {
-    const selectedBlockExplorerName = networkSettingsHelper.getItemSettings(targetNetwork)[SELECTED_BLOCK_EXPORER_NAME_KEY];
+  const [targetNetwork, setTargetNetwork] = useState(() => networkSettingsHelper.getSelectedItem(true));
 
-    if (selectedBlockExplorerName) {
-      const selectedBlockExplorer = getBLockExplorer(getChain(targetNetwork.chainId), selectedBlockExplorerName);
+  const [localProvider, setLocalProvider] = useState(() => new StaticJsonRpcProvider(targetNetwork.rpcUrl));
+  useEffect(() => {
+    setLocalProvider((prevProvider) => (localProvider?.connection?.url == targetNetwork.rpcUrl) ? prevProvider : new StaticJsonRpcProvider(targetNetwork.rpcUrl))
+  }, [targetNetwork]);
 
-      if (selectedBlockExplorer) {
-        blockExplorer = selectedBlockExplorer.url + "/";
-        targetNetwork.blockExplorer = selectedBlockExplorer.url + "/";
-      }
-    }
-  }
+  // 🔭 block explorer URL
+  const blockExplorer = targetNetwork.blockExplorer;
 
+  const networkName = targetNetwork.name;
+  const erc20Tokens = targetNetwork?.erc20Tokens;
+
+  const tokenSettingsStorageKey = networkName + TOKEN_SETTINGS_STORAGE_KEY;
+  const tokens = getTokens(targetNetwork?.nativeToken, erc20Tokens);
   const [tokenSettingsModalOpen, setTokenSettingsModalOpen] = useState(false);
   const [tokenSettings, setTokenSettings] = useLocalStorage(tokenSettingsStorageKey, {});
+
   const tokenSettingsHelper = tokens ? new SettingsHelper(tokenSettingsStorageKey, tokens, tokenSettings, setTokenSettings) : undefined;
 
   useEffect(() => {
@@ -958,10 +934,11 @@ function App(props) {
         <SettingsModal
           settingsHelper={networkSettingsHelper}
           itemCoreDisplay={(network) => <NetworkDisplay network={network}/>}
-          itemDetailedDisplay={(networkSettingsHelper, network, networkCoreDisplay, setItemDetailed) => <NetworkDetailedDisplay networkSettingsHelper={networkSettingsHelper} network={network} networkCoreDisplay={networkCoreDisplay} setItemDetailed={setItemDetailed} />}
+          itemDetailedDisplay={(networkSettingsHelper, networkDetailed, networkCoreDisplay, network, setItemDetailed, setTargetNetwork) => <NetworkDetailedDisplay networkSettingsHelper={networkSettingsHelper} network={networkDetailed} networkCoreDisplay={networkCoreDisplay} setTargetNetwork={setTargetNetwork} />}
           modalOpen={networkSettingsModalOpen}
           setModalOpen={setNetworkSettingsModalOpen}
-          title={"Network Settings"} 
+          title={"Network Settings"}
+          setTargetNetwork={setTargetNetwork}
         />
       }
 
@@ -969,7 +946,7 @@ function App(props) {
         <SettingsModal
           settingsHelper={tokenSettingsHelper}
           itemCoreDisplay={(token) => <TokenDisplay token={token} divStyle={{display: "flex", alignItems: "center", justifyContent: "center"}} spanStyle={{paddingLeft:"0.2em"}}/>}
-          itemDetailedDisplay={(tokenSettingsHelper, token, tokenCoreDisplay, network, setItemDetailed) => <TokenDetailedDisplay tokenSettingsHelper={tokenSettingsHelper} token={token} tokenCoreDisplay={tokenCoreDisplay} network={network} setItemDetailed={setItemDetailed} />}
+          itemDetailedDisplay={(tokenSettingsHelper, tokenDetailed, tokenCoreDisplay, network, setItemDetailed) => <TokenDetailedDisplay tokenSettingsHelper={tokenSettingsHelper} token={tokenDetailed} tokenCoreDisplay={tokenCoreDisplay} network={network} setItemDetailed={setItemDetailed} />}
           itemImportDisplay={(tokenSettingsHelper, tokenCoreDisplay, tokenDetailedDisplay, network, setImportView) => <TokenImportDisplay tokenSettingsHelper={tokenSettingsHelper} tokenCoreDisplay={tokenCoreDisplay} tokenDetailedDisplay={tokenDetailedDisplay} network={network} setImportView={setImportView}/>}
           modalOpen={tokenSettingsModalOpen}
           setModalOpen={setTokenSettingsModalOpen}
@@ -1057,12 +1034,9 @@ function App(props) {
                 settingsHelper={networkSettingsHelper}
                 settingsModalOpen={setNetworkSettingsModalOpen}
                 itemCoreDisplay={(network) => <NetworkDisplay network={network}/>}
-                onChange={() => setTimeout(
-                    () => {
-                      window.location.reload();
-                    },
-                    1
-                  )
+                onChange={(value) => {
+                    setTargetNetwork(networkSettingsHelper.getSelectedItem(true));
+                  }
                 }       
                 optionStyle={{lineHeight:1.1}}
               />

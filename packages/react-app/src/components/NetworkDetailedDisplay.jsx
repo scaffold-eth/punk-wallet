@@ -3,10 +3,10 @@ import React, { useState } from "react";
 import { Button, Select, Tooltip } from 'antd';
 import { DeleteOutlined } from "@ant-design/icons";
 
-import { getChain  } from "../helpers/ChainHelper";
-import { SELECTED_BLOCK_EXPORER_NAME_KEY, getBLockExplorer, getBLockExplorers  } from "../helpers/NetworkSettingsHelper";
+import { getBLockExplorer, getBLockExplorers, getChain } from "../helpers/ChainHelper";
+import { SELECTED_BLOCK_EXPORER_NAME_KEY } from "../helpers/NetworkSettingsHelper";
 
-export default function NetworkDetailedDisplay({ networkSettingsHelper, network, networkCoreDisplay, setItemDetailed }) {
+export default function NetworkDetailedDisplay({ networkSettingsHelper, network, networkCoreDisplay, setTargetNetwork }) {
     const chain = getChain(network.chainId);
 
     return (
@@ -22,7 +22,7 @@ export default function NetworkDetailedDisplay({ networkSettingsHelper, network,
                     <DataDisplay description={"Native Currency"} data={chain.nativeCurrency.symbol}/>
 
                     <div style={{paddingTop:"1em", paddingBottom:"1em"}}>
-                        <BlockExplorerSelector networkSettingsHelper={networkSettingsHelper} network={network} chain={chain}/>
+                        <BlockExplorerSelector networkSettingsHelper={networkSettingsHelper} network={network} chain={chain} setTargetNetwork={setTargetNetwork}/>
                     </div>
 
                     <DataDisplay description={"Info"} data={chain.infoURL} isLink={true}/>
@@ -32,7 +32,7 @@ export default function NetworkDetailedDisplay({ networkSettingsHelper, network,
     );
 }
 
-const BlockExplorerSelector = ({ networkSettingsHelper, network, chain}) => {
+const BlockExplorerSelector = ({ networkSettingsHelper, network, chain, setTargetNetwork}) => {
     const blockExplorers = getBLockExplorers(chain);
     const options = blockExplorers.map((blockExplorer) => option(blockExplorer));
 
@@ -54,6 +54,7 @@ const BlockExplorerSelector = ({ networkSettingsHelper, network, chain}) => {
                         onChange={(blockExplorerName) => {
                             setCurrentBLockExplorerName(blockExplorerName);
                             networkSettingsHelper.updateItemSettings(network, {[SELECTED_BLOCK_EXPORER_NAME_KEY]:blockExplorerName});
+                            setTargetNetwork(networkSettingsHelper.getSelectedItem(true));
                         }}
                         value={currentBlockExplorerName}
                     >
