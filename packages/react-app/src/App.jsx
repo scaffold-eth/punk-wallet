@@ -121,6 +121,8 @@ const DEBUG = false;
 const networks = Object.values(NETWORKS);
 
 function App(props) {
+  const [dollarMode, setDollarMode] = useLocalStorage("dollarMode", true);
+
   const [networkSettingsModalOpen, setNetworkSettingsModalOpen] = useState(false);
   const [networkSettings, setNetworkSettings] = useLocalStorage(NETWORK_SETTINGS_STORAGE_KEY, {});
   const networkSettingsHelper = new SettingsHelper(NETWORK_SETTINGS_STORAGE_KEY, networks, networkSettings, setNetworkSettings, getNetworkWithSettings);
@@ -1014,16 +1016,22 @@ function App(props) {
         <div>
           {selectedErc20Token ?
             <ERC20Balance
+              targetNetwork={targetNetwork}
               token={selectedErc20Token}
               rpcURL={targetNetwork.rpcUrl}
               size={12 + window.innerWidth / 16}
               address={address}
+              dollarMode={dollarMode}
+              setDollarMode={setDollarMode}
             />
             :
             <Balance
               value={yourLocalBalance}
               size={12 + window.innerWidth / 16}
-              price={price} />
+              price={price}
+              dollarMode={dollarMode}
+              setDollarMode={setDollarMode}
+            />
           }
         </div>
 
