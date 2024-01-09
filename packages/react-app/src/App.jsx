@@ -138,6 +138,8 @@ const DEBUG = false;
 const networks = Object.values(NETWORKS);
 
 function App(props) {
+  const [dollarMode, setDollarMode] = useLocalStorage("dollarMode", true);
+
   const [networkSettingsModalOpen, setNetworkSettingsModalOpen] = useState(false);
   const [networkSettings, setNetworkSettings] = useLocalStorage(NETWORK_SETTINGS_STORAGE_KEY, {});
   const networkSettingsHelper = new SettingsHelper(
@@ -369,7 +371,7 @@ function App(props) {
   const isIbanTransferReady =
     moneriumConnected && punkConnectedToMonerium && selectedErc20Token && selectedErc20Token.name == "EURe";
 
-  // if you don't have any money, scan the other networks for money
+  // if you don't have any money, scan the other net;works for money
   // lol this poller is a bad idea why does it keep
   /*usePoller(() => {
     if (!cachedNetwork) {
@@ -1082,13 +1084,22 @@ function App(props) {
         <div>
           {selectedErc20Token ? (
             <ERC20Balance
+              targetNetwork={targetNetwork}
               token={selectedErc20Token}
               rpcURL={targetNetwork.rpcUrl}
               size={12 + window.innerWidth / 16}
               address={address}
+              dollarMode={dollarMode}
+              setDollarMode={setDollarMode}
             />
           ) : (
-            <Balance value={yourLocalBalance} size={12 + window.innerWidth / 16} price={price} />
+            <Balance
+              value={yourLocalBalance}
+              size={12 + window.innerWidth / 16}
+              price={price}
+              dollarMode={dollarMode}
+              setDollarMode={setDollarMode}
+            />
           )}
         </div>
 
