@@ -101,7 +101,7 @@ export default function TransactionDisplay({
       {txHash && (
         <div>
           <a
-            style={{ color: "rgb(24, 144, 255)" }}
+            style={{ color: `var(--link-color)` }}
             href={blockExplorer + "tx/" + txHash}
             target="_blank"
             rel="noopener noreferrer"
