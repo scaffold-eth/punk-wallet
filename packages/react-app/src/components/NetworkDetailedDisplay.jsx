@@ -92,7 +92,7 @@ const DataDisplay = ({ description, data, isLink }) => (
   <div style={{ display: "flex", alignItems: "center", justifyContent: "center", paddingBottom: "0.5em" }}>
     <Tooltip title={description}>
       {isLink ? (
-        <a href={data} target="_blank" rel="noopener noreferrer" style={{ color: "rgb(24, 144, 255)" }}>
+        <a href={data} target="_blank" rel="noopener noreferrer" style={{ color: `var(--link-color)` }}>
           {data}
         </a>
       ) : (
