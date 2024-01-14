@@ -29,7 +29,7 @@ export default function TokenDetailedDisplay({
         {token.hasOwnProperty("address") ? (
           <div
             // Todo: Create a link blue variable somewhere
-            style={{ cursor: "pointer", color: "rgb(24, 144, 255)", fontSize: "15px" }}
+            style={{ cursor: "pointer", color: `var(--link-color)`, fontSize: "15px" }}
             onClick={() => window.open(tokenLink, "_blank")}
           >
             {token.address}
