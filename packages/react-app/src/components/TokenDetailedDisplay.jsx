@@ -12,6 +12,14 @@ export default function TokenDetailedDisplay({
 }) {
   const tokenLink = network.blockExplorer + "token/" + token.address;
 
+  const copyToClipboard = async text => {
+    try {
+      await navigator.clipboard.writeText(text);
+    } catch (err) {
+      console.error("Error in copying text: ", err);
+    }
+  };
+
   return (
     <>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
