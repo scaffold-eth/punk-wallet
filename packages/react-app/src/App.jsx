@@ -33,7 +33,7 @@ import {
   TransactionResponses,
   Wallet,
   WalletConnectTransactionPopUp,
-  WalletConnectV2ConnectionError
+  WalletConnectV2ConnectionError,
 } from "./components";
 import { INFURA_ID, NETWORK, NETWORKS } from "./constants";
 import { Transactor } from "./helpers";
@@ -47,20 +47,37 @@ import {
   connectWalletConnectV2,
   updateWalletConnectSession,
   createWeb3wallet,
-  onSessionProposal
+  onSessionProposal,
 } from "./helpers/WalletConnectV2Helper";
 
 import { sendTransaction } from "./helpers/EIP1559Helper";
 
-import { getMemo, getNewMoneriumClient, getFilteredOrders, isValidIban, placeIbanOrder, isIbanAddressObjectValid } from "./helpers/MoneriumHelper";
+import {
+  getMemo,
+  getNewMoneriumClient,
+  getFilteredOrders,
+  isValidIban,
+  placeIbanOrder,
+  isIbanAddressObjectValid,
+} from "./helpers/MoneriumHelper";
 
 import { SettingsHelper } from "./helpers/SettingsHelper";
 
-import { NETWORK_SETTINGS_STORAGE_KEY, SELECTED_BLOCK_EXPORER_NAME_KEY, migrateSelectedNetworkStorageSetting, getNetworkWithSettings } from "./helpers/NetworkSettingsHelper";
+import {
+  NETWORK_SETTINGS_STORAGE_KEY,
+  SELECTED_BLOCK_EXPORER_NAME_KEY,
+  migrateSelectedNetworkStorageSetting,
+  getNetworkWithSettings,
+} from "./helpers/NetworkSettingsHelper";
 
-import { TOKEN_SETTINGS_STORAGE_KEY, getSelectedErc20Token, getTokens, migrateSelectedTokenStorageSetting } from "./helpers/TokenSettingsHelper";
+import {
+  TOKEN_SETTINGS_STORAGE_KEY,
+  getSelectedErc20Token,
+  getTokens,
+  migrateSelectedTokenStorageSetting,
+} from "./helpers/TokenSettingsHelper";
 
-import { getChain} from "./helpers/ChainHelper";
+import { getChain } from "./helpers/ChainHelper";
 
 const { confirm } = Modal;
 
@@ -123,13 +140,23 @@ const networks = Object.values(NETWORKS);
 function App(props) {
   const [networkSettingsModalOpen, setNetworkSettingsModalOpen] = useState(false);
   const [networkSettings, setNetworkSettings] = useLocalStorage(NETWORK_SETTINGS_STORAGE_KEY, {});
-  const networkSettingsHelper = new SettingsHelper(NETWORK_SETTINGS_STORAGE_KEY, networks, networkSettings, setNetworkSettings, getNetworkWithSettings);
+  const networkSettingsHelper = new SettingsHelper(
+    NETWORK_SETTINGS_STORAGE_KEY,
+    networks,
+    networkSettings,
+    setNetworkSettings,
+    getNetworkWithSettings,
+  );
 
   const [targetNetwork, setTargetNetwork] = useState(() => networkSettingsHelper.getSelectedItem(true));
 
   const [localProvider, setLocalProvider] = useState(() => new StaticJsonRpcProvider(targetNetwork.rpcUrl));
   useEffect(() => {
-    setLocalProvider((prevProvider) => (localProvider?.connection?.url == targetNetwork.rpcUrl) ? prevProvider : new StaticJsonRpcProvider(targetNetwork.rpcUrl))
+    setLocalProvider(prevProvider =>
+      localProvider?.connection?.url == targetNetwork.rpcUrl
+        ? prevProvider
+        : new StaticJsonRpcProvider(targetNetwork.rpcUrl),
+    );
   }, [targetNetwork]);
 
   // 🔭 block explorer URL
@@ -143,14 +170,21 @@ function App(props) {
   const [tokenSettingsModalOpen, setTokenSettingsModalOpen] = useState(false);
   const [tokenSettings, setTokenSettings] = useLocalStorage(tokenSettingsStorageKey, {});
 
-  const tokenSettingsHelper = tokens ? new SettingsHelper(tokenSettingsStorageKey, tokens, tokenSettings, setTokenSettings) : undefined;
+  const tokenSettingsHelper = tokens
+    ? new SettingsHelper(tokenSettingsStorageKey, tokens, tokenSettings, setTokenSettings)
+    : undefined;
 
   useEffect(() => {
     migrateSelectedTokenStorageSetting(networkName, tokenSettingsHelper);
     migrateSelectedNetworkStorageSetting(networkSettingsHelper);
   }, []);
 
-  const selectedErc20Token = tokenSettingsHelper ? getSelectedErc20Token(tokenSettingsHelper.getSelectedItem(), erc20Tokens.concat(tokenSettingsHelper.getCustomItems())): undefined;
+  const selectedErc20Token = tokenSettingsHelper
+    ? getSelectedErc20Token(
+        tokenSettingsHelper.getSelectedItem(),
+        erc20Tokens.concat(tokenSettingsHelper.getCustomItems()),
+      )
+    : undefined;
 
   //const [isWalletModalVisible, setIsWalletModalVisible] = useState(false);
   //const [walletModalData, setWalletModalData] = useState();
@@ -270,34 +304,36 @@ function App(props) {
   const [moneriumOrders, setMoneriumOrders] = useState(null);
 
   const memoizedMonerium = useMemo(
-    () => <Monerium
-          moneriumClient={moneriumClient}
-          setMoneriumClient={setMoneriumClient}
-          moneriumConnected={moneriumConnected}
-          setMoneriumConnected={setMoneriumConnected}
-          punkConnectedToMonerium={punkConnectedToMonerium}
-          setPunkConnectedToMonerium={setPunkConnectedToMonerium}
-          currentPunkAddress={address}
-        />, [moneriumClient, moneriumConnected, punkConnectedToMonerium, address]
+    () => (
+      <Monerium
+        moneriumClient={moneriumClient}
+        setMoneriumClient={setMoneriumClient}
+        moneriumConnected={moneriumConnected}
+        setMoneriumConnected={setMoneriumConnected}
+        punkConnectedToMonerium={punkConnectedToMonerium}
+        setPunkConnectedToMonerium={setPunkConnectedToMonerium}
+        currentPunkAddress={address}
+      />
+    ),
+    [moneriumClient, moneriumConnected, punkConnectedToMonerium, address],
   );
 
-  const initMoneriumOrders = async (sleepMs) => {
+  const initMoneriumOrders = async sleepMs => {
     if (sleepMs) {
       await new Promise(r => setTimeout(r, sleepMs));
     }
 
     const filterObject = {
       address: address,
-    }
+    };
 
     try {
       const moneriumOrders = await getFilteredOrders(moneriumClient, filterObject);
       setMoneriumOrders(moneriumOrders);
-    }
-    catch(error) {
+    } catch (error) {
       console.log("Something went wrong", error);
-    }      
-  }
+    }
+  };
 
   useEffect(() => {
     if (!moneriumConnected || !punkConnectedToMonerium || !address) {
@@ -316,8 +352,8 @@ function App(props) {
 
     for (const order of moneriumOrders) {
       const state = order?.meta?.state;
-      if (state && (state == OrderState.placed) || (state == OrderState.pending)) {
-        console.log("There is a pending order", order)
+      if ((state && state == OrderState.placed) || state == OrderState.pending) {
+        console.log("There is a pending order", order);
         pendingOrder = true;
         break;
       }
@@ -330,7 +366,8 @@ function App(props) {
 
   const [ibanAddressObject, setIbanAddressObject] = useState({});
 
-  const isIbanTransferReady = moneriumConnected && punkConnectedToMonerium && selectedErc20Token && selectedErc20Token.name == "EURe";
+  const isIbanTransferReady =
+    moneriumConnected && punkConnectedToMonerium && selectedErc20Token && selectedErc20Token.name == "EURe";
 
   // if you don't have any money, scan the other networks for money
   // lol this poller is a bad idea why does it keep
@@ -410,9 +447,7 @@ function App(props) {
 
       console.log("call_request payload", payload);
 
-      WalletConnectTransactionPopUp(
-        payload, userProvider, connector, undefined,
-        targetNetwork.chainId);
+      WalletConnectTransactionPopUp(payload, userProvider, connector, undefined, targetNetwork.chainId);
     });
 
     connector.on("disconnect", (error, payload) => {
@@ -430,10 +465,9 @@ function App(props) {
       if (wallectConnectConnector) {
         console.log("Disconnect from Wallet Connect V1");
         await wallectConnectConnector.killSession();
-      }   
-    }
-    catch (error) {
-      console.error("Coudn't disconnect from Wallet Connect V1", error)
+      }
+    } catch (error) {
+      console.error("Coudn't disconnect from Wallet Connect V1", error);
     }
 
     try {
@@ -441,15 +475,14 @@ function App(props) {
         console.log("Disconnect from Wallet Connect V2");
         await disconnectWallectConnectV2Sessions(web3wallet);
       }
-    }
-    catch (error) {
-      console.error("Coudn't disconnect from Wallet Connect V2", error)
+    } catch (error) {
+      console.error("Coudn't disconnect from Wallet Connect V2", error);
 
       // This is a hack to remove the session manually
       // Otherwise if an old session is stuck, we cannot delete it
       localStorage.removeItem("wc@2:client:0.3//session");
-    }    
-    
+    }
+
     setWalletConnectUrl("");
     setWalletConnectPeerMeta();
     setWallectConnectConnector();
@@ -457,7 +490,7 @@ function App(props) {
 
     // This has to be the last, so we don't try to reconnect in "Wallet Connect Hook" too early
     setWalletConnectConnected(false);
-  }
+  };
 
   const [walletConnectUrl, setWalletConnectUrl] = useLocalStorage("walletConnectUrl");
   const [walletConnectConnected, setWalletConnectConnected] = useState();
@@ -479,55 +512,51 @@ function App(props) {
     async function initWeb3wallet() {
       const web3wallet = await createWeb3wallet();
 
-      web3wallet.on(
-        "session_proposal",
-        (proposal) => {
-          onSessionProposal(
-            web3wallet,
-            address,
-            proposal,
-            disconnectFromWalletConnect,
-            setWalletConnectUrl,
-            setWalletConnectConnected,
-            setWalletConnectPeerMeta);
-        }
-      )
-
-      web3wallet.on("session_request", async (requestEvent) => {
-        console.log("session_request requestEvent", requestEvent);
-
-        WalletConnectTransactionPopUp(
-        requestEvent, userProvider, undefined, web3wallet,
-        targetNetwork.chainId);
+      web3wallet.on("session_proposal", proposal => {
+        onSessionProposal(
+          web3wallet,
+          address,
+          proposal,
+          disconnectFromWalletConnect,
+          setWalletConnectUrl,
+          setWalletConnectConnected,
+          setWalletConnectPeerMeta,
+        );
       });
 
-      web3wallet.on("session_update", async (event) => {
+      web3wallet.on("session_request", async requestEvent => {
+        console.log("session_request requestEvent", requestEvent);
+
+        WalletConnectTransactionPopUp(requestEvent, userProvider, undefined, web3wallet, targetNetwork.chainId);
+      });
+
+      web3wallet.on("session_update", async event => {
         console.log("session_update event", event);
       });
 
-      web3wallet.on("session_delete", async (event) => {
+      web3wallet.on("session_delete", async event => {
         console.log("session_delete event", event);
 
         await disconnectFromWalletConnect(undefined, web3wallet);
       });
 
-      web3wallet.on("session_event", async (event) => {
+      web3wallet.on("session_event", async event => {
         console.log("session_event", event);
       });
 
-      web3wallet.on("session_ping", async (event) => {
+      web3wallet.on("session_ping", async event => {
         console.log("session_ping", event);
       });
 
-      web3wallet.on("session_expire", async (event) => {
+      web3wallet.on("session_expire", async event => {
         console.log("session_expire", event);
       });
 
-      web3wallet.on("session_extend", async (event) => {
+      web3wallet.on("session_extend", async event => {
         console.log("session_extend", event);
       });
 
-      web3wallet.on("proposal_expire", async (event) => {
+      web3wallet.on("proposal_expire", async event => {
         console.log("proposal_expire", event);
       });
 
@@ -557,13 +586,13 @@ function App(props) {
         console.log("Kill Wallet Connect V1 session");
         wallectConnectConnector.killSession();
       }
-    }
+    };
 
     web3wallet.on("session_proposal", listener);
 
     return () => {
-      web3wallet.off("session_proposal", listener);      
-    }
+      web3wallet.off("session_proposal", listener);
+    };
   }, [web3wallet, wallectConnectConnector]);
 
   useEffect(() => {
@@ -603,7 +632,7 @@ function App(props) {
         console.log("NOT CONNECTED AND wallectConnectConnectorSession", wallectConnectConnectorSession);
         connectWallet(wallectConnectConnectorSession);
         setWalletConnectConnected(true);
-      } else if (walletConnectUrl ) {
+      } else if (walletConnectUrl) {
         // Version 2 is handled separately
         if (walletConnectUrl.includes("@2")) {
           return;
@@ -639,12 +668,16 @@ function App(props) {
 
   useEffect(() => {
     async function pairWalletConnectV2() {
-      if (walletConnectUrl && walletConnectUrl.includes("@2") && web3wallet && !isWalletConnectV2Connected(web3wallet)) {
+      if (
+        walletConnectUrl &&
+        walletConnectUrl.includes("@2") &&
+        web3wallet &&
+        !isWalletConnectV2Connected(web3wallet)
+      ) {
         console.log(" 📡 Connecting to Wallet Connect V2....", walletConnectUrl);
         try {
-         await web3wallet.core.pairing.pair({ uri:walletConnectUrl })  
-        }
-        catch (error) {
+          await web3wallet.core.pairing.pair({ uri: walletConnectUrl });
+        } catch (error) {
           console.log("Cannot create pairing", error);
           WalletConnectV2ConnectionError(error, undefined);
           setWalletConnectUrl("");
@@ -653,7 +686,6 @@ function App(props) {
     }
 
     pairWalletConnectV2();
-    
   }, [walletConnectUrl, web3wallet]);
 
   useMemo(() => {
@@ -930,30 +962,66 @@ function App(props) {
 
   return (
     <div className="App">
-      {networkSettingsHelper && 
+      {networkSettingsHelper && (
         <SettingsModal
           settingsHelper={networkSettingsHelper}
-          itemCoreDisplay={(network) => <NetworkDisplay network={network}/>}
-          itemDetailedDisplay={(networkSettingsHelper, networkDetailed, networkCoreDisplay, network, setItemDetailed, setTargetNetwork) => <NetworkDetailedDisplay networkSettingsHelper={networkSettingsHelper} network={networkDetailed} networkCoreDisplay={networkCoreDisplay} setTargetNetwork={setTargetNetwork} />}
+          itemCoreDisplay={network => <NetworkDisplay network={network} />}
+          itemDetailedDisplay={(
+            networkSettingsHelper,
+            networkDetailed,
+            networkCoreDisplay,
+            network,
+            setItemDetailed,
+            setTargetNetwork,
+          ) => (
+            <NetworkDetailedDisplay
+              networkSettingsHelper={networkSettingsHelper}
+              network={networkDetailed}
+              networkCoreDisplay={networkCoreDisplay}
+              setTargetNetwork={setTargetNetwork}
+            />
+          )}
           modalOpen={networkSettingsModalOpen}
           setModalOpen={setNetworkSettingsModalOpen}
           title={"Network Settings"}
           setTargetNetwork={setTargetNetwork}
         />
-      }
+      )}
 
-      {tokenSettingsHelper && 
+      {tokenSettingsHelper && (
         <SettingsModal
           settingsHelper={tokenSettingsHelper}
-          itemCoreDisplay={(token) => <TokenDisplay token={token} divStyle={{display: "flex", alignItems: "center", justifyContent: "center"}} spanStyle={{paddingLeft:"0.2em"}}/>}
-          itemDetailedDisplay={(tokenSettingsHelper, tokenDetailed, tokenCoreDisplay, network, setItemDetailed) => <TokenDetailedDisplay tokenSettingsHelper={tokenSettingsHelper} token={tokenDetailed} tokenCoreDisplay={tokenCoreDisplay} network={network} setItemDetailed={setItemDetailed} />}
-          itemImportDisplay={(tokenSettingsHelper, tokenCoreDisplay, tokenDetailedDisplay, network, setImportView) => <TokenImportDisplay tokenSettingsHelper={tokenSettingsHelper} tokenCoreDisplay={tokenCoreDisplay} tokenDetailedDisplay={tokenDetailedDisplay} network={network} setImportView={setImportView}/>}
+          itemCoreDisplay={token => (
+            <TokenDisplay
+              token={token}
+              divStyle={{ display: "flex", alignItems: "center", justifyContent: "center" }}
+              spanStyle={{ paddingLeft: "0.2em" }}
+            />
+          )}
+          itemDetailedDisplay={(tokenSettingsHelper, tokenDetailed, tokenCoreDisplay, network, setItemDetailed) => (
+            <TokenDetailedDisplay
+              tokenSettingsHelper={tokenSettingsHelper}
+              token={tokenDetailed}
+              tokenCoreDisplay={tokenCoreDisplay}
+              network={network}
+              setItemDetailed={setItemDetailed}
+            />
+          )}
+          itemImportDisplay={(tokenSettingsHelper, tokenCoreDisplay, tokenDetailedDisplay, network, setImportView) => (
+            <TokenImportDisplay
+              tokenSettingsHelper={tokenSettingsHelper}
+              tokenCoreDisplay={tokenCoreDisplay}
+              tokenDetailedDisplay={tokenDetailedDisplay}
+              network={network}
+              setImportView={setImportView}
+            />
+          )}
           modalOpen={tokenSettingsModalOpen}
           setModalOpen={setTokenSettingsModalOpen}
           title={"Token Settings"} // ToDo: Reuse TOKEN_SETTINGS_STORAGE_KEY and colored network name
           network={targetNetwork}
         />
-      }
+      )}
 
       <div className="site-page-header-ghost-wrapper">
         <Header
@@ -1012,41 +1080,42 @@ function App(props) {
         style={{ clear: "both", opacity: yourLocalBalance ? 1 : 0.2, width: 500, margin: "auto", position: "relative" }}
       >
         <div>
-          {selectedErc20Token ?
+          {selectedErc20Token ? (
             <ERC20Balance
               token={selectedErc20Token}
               rpcURL={targetNetwork.rpcUrl}
               size={12 + window.innerWidth / 16}
               address={address}
             />
-            :
-            <Balance
-              value={yourLocalBalance}
-              size={12 + window.innerWidth / 16}
-              price={price} />
-          }
+          ) : (
+            <Balance value={yourLocalBalance} size={12 + window.innerWidth / 16} price={price} />
+          )}
         </div>
 
         <span style={{ verticalAlign: "middle" }}>
-          <div style={{ display: "flex", justifyContent: erc20Tokens ? "space-evenly" : "center", alignItems: "center" }}>
+          <div
+            style={{ display: "flex", justifyContent: erc20Tokens ? "space-evenly" : "center", alignItems: "center" }}
+          >
             <div>
               <SelectorWithSettings
                 settingsHelper={networkSettingsHelper}
                 settingsModalOpen={setNetworkSettingsModalOpen}
-                itemCoreDisplay={(network) => <NetworkDisplay network={network}/>}
-                onChange={(value) => {
-                    setTargetNetwork(networkSettingsHelper.getSelectedItem(true));
-                  }
-                }       
-                optionStyle={{lineHeight:1.1}}
+                itemCoreDisplay={network => <NetworkDisplay network={network} />}
+                onChange={value => {
+                  setTargetNetwork(networkSettingsHelper.getSelectedItem(true));
+                }}
+                optionStyle={{ lineHeight: 1.1 }}
               />
             </div>
-            <div> {tokenSettingsHelper &&
-              <SelectorWithSettings
-                settingsHelper={tokenSettingsHelper}
-                settingsModalOpen={setTokenSettingsModalOpen}
-                itemCoreDisplay={(token) => <TokenDisplay token={token}/>}
-              />}
+            <div>
+              {" "}
+              {tokenSettingsHelper && (
+                <SelectorWithSettings
+                  settingsHelper={tokenSettingsHelper}
+                  settingsModalOpen={setTokenSettingsModalOpen}
+                  itemCoreDisplay={token => <TokenDisplay token={token} />}
+                />
+              )}
             </div>
           </div>
           {faucetHint}
@@ -1104,28 +1173,21 @@ function App(props) {
         <div style={{ padding: 10 }}>
           {walletConnectTx ? (
             <Input disabled={true} value={amount} />
-          ) : 
-            (
-            selectedErc20Token ? 
-              <ERC20Input
-                token={selectedErc20Token}
-                amount={amount}
-                setAmount={setAmount}
-              />
-            :
-              <EtherInput
-                price={price || targetNetwork.price}
-                value={amount}
-                token={targetNetwork.token || "ETH"}
-                address={address}
-                provider={localProvider}
-                gasPrice={gasPrice}
-                onChange={value => {
-                  setAmount(value);
-                }}
-              />
-            )
-          }
+          ) : selectedErc20Token ? (
+            <ERC20Input token={selectedErc20Token} amount={amount} setAmount={setAmount} />
+          ) : (
+            <EtherInput
+              price={price || targetNetwork.price}
+              value={amount}
+              token={targetNetwork.token || "ETH"}
+              address={address}
+              provider={localProvider}
+              gasPrice={gasPrice}
+              onChange={value => {
+                setAmount(value);
+              }}
+            />
+          )}
         </div>
         {/*
           <div style={{ padding: 10 }}>
@@ -1144,7 +1206,12 @@ function App(props) {
           <Button
             key="submit"
             type="primary"
-            disabled={loading || !amount || !toAddress || (isValidIban(toAddress) && !isIbanAddressObjectValid(ibanAddressObject))}
+            disabled={
+              loading ||
+              !amount ||
+              !toAddress ||
+              (isValidIban(toAddress) && !isIbanAddressObjectValid(ibanAddressObject))
+            }
             loading={loading}
             onClick={async () => {
               setLoading(true);
@@ -1152,10 +1219,9 @@ function App(props) {
               if (isValidIban(toAddress)) {
                 const order = await placeIbanOrder(moneriumClient, address, ibanAddressObject, amount, networkName);
                 await initMoneriumOrders();
-              }
-              else {
+              } else {
                 let txConfig = {
-                  chainId: selectedChainId
+                  chainId: selectedChainId,
                 };
 
                 if (!selectedErc20Token) {
@@ -1175,14 +1241,13 @@ function App(props) {
 
                   txConfig.to = toAddress;
                   txConfig.value = value;
-                }
-                else {
+                } else {
                   if (selectedErc20Token) {
                     txConfig.erc20 = {
                       token: selectedErc20Token,
                       to: toAddress,
-                      amount: amount
-                    }
+                      amount: amount,
+                    };
                   }
                 }
 
@@ -1210,16 +1275,22 @@ function App(props) {
                 console.log(result);
               }
 
-              
               // setToAddress("")
               setAmount("");
               setData("");
-              
+
               setShowHistory(true);
               setLoading(false);
             }}
           >
-            {loading || !amount || !toAddress || (isValidIban(toAddress) && !isIbanAddressObjectValid(ibanAddressObject)) ? <CaretUpOutlined /> : <SendOutlined style={{ color: "#FFFFFF" }} />}{" "}
+            {loading ||
+            !amount ||
+            !toAddress ||
+            (isValidIban(toAddress) && !isIbanAddressObjectValid(ibanAddressObject)) ? (
+              <CaretUpOutlined />
+            ) : (
+              <SendOutlined style={{ color: "#FFFFFF" }} />
+            )}{" "}
             Send
           </Button>
         </div>
@@ -1339,18 +1410,19 @@ function App(props) {
 */}
 
       <div style={{ padding: 16, backgroundColor: "#FFFFFF", width: 420, margin: "auto" }}>
-        {<TransactionResponses
-          provider={userProvider}
-          signer={userProvider.getSigner()}
-          injectedProvider={injectedProvider}
-          address={address}
-          chainId={targetNetwork.chainId}
-          blockExplorer={blockExplorer}
-          moneriumOrders={moneriumOrders}
-          showHistory={showHistory}
-          setShowHistory={setShowHistory}
-        />}
-          
+        {
+          <TransactionResponses
+            provider={userProvider}
+            signer={userProvider.getSigner()}
+            injectedProvider={injectedProvider}
+            address={address}
+            chainId={targetNetwork.chainId}
+            blockExplorer={blockExplorer}
+            moneriumOrders={moneriumOrders}
+            showHistory={showHistory}
+            setShowHistory={setShowHistory}
+          />
+        }
       </div>
 
       <div style={{ zIndex: -1, paddingTop: 20, opacity: 0.5, fontSize: 12 }}>
@@ -1394,9 +1466,7 @@ function App(props) {
                   )}
                 </span>
               ) : (
-                <span style={{ fontSize: 30, paddingRight: 10 }}>
-                  ✅
-                </span>
+                <span style={{ fontSize: 30, paddingRight: 10 }}>✅</span>
               )}
             </>
           ) : (
@@ -1426,10 +1496,7 @@ function App(props) {
         </div>
         <IFrame address={address} userProvider={userProvider} />
 
-        <div style={{ paddingTop:"2em" }}>
-          {memoizedMonerium}
-        </div>
-
+        <div style={{ paddingTop: "2em" }}>{memoizedMonerium}</div>
       </div>
 
       {networkName == "ethereum" ? (
