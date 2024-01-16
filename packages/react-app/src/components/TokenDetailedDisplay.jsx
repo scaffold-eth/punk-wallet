@@ -3,6 +3,8 @@ import React, { useState } from "react";
 import { Button } from "antd";
 import { DeleteOutlined } from "@ant-design/icons";
 
+import { copy } from "../helpers/EditorHelper";
+
 export default function TokenDetailedDisplay({
   tokenSettingsHelper,
   token,
@@ -13,16 +15,6 @@ export default function TokenDetailedDisplay({
   const [addressCopied, setAddressCopied] = useState(false);
 
   const tokenLink = network.blockExplorer + "token/" + token.address;
-
-  const copyToClipboard = async text => {
-    try {
-      await navigator.clipboard.writeText(text);
-      setAddressCopied(true);
-      setTimeout(() => setAddressCopied(false), 2000);
-    } catch (err) {
-      console.error("Error in copying text: ", err);
-    }
-  };
 
   return (
     <>
@@ -56,7 +48,7 @@ export default function TokenDetailedDisplay({
             </div>
             <div
               style={{ cursor: "pointer", color: `var(--link-color)`, fontSize: "15px" }}
-              onClick={() => copyToClipboard(token.address)}
+              onClick={() => copy(token.address)}
             >
               {addressCopied ? (
                 <img
