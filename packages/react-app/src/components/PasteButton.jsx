@@ -6,18 +6,17 @@ import { CopyOutlined } from "@ant-design/icons";
 export default function PasteButton({ setState }) {
 	return (
 		<Tooltip title="Paste">
-         	<Button
-         		icon={<CopyOutlined />} 
-         		onClick={ async () => {	
+			<Button
+				icon={<CopyOutlined />}
+				onClick={async () => {
 					try {
 						const text = await navigator.clipboard.readText();
 						setState(text);
-					}
-					catch (err) {
-						console.error('Failed to read clipboard:', err);
+					} catch (err) {
+						console.error("Failed to read clipboard:", err);
 					}
 				}}
-         	/>
-        </Tooltip>
+			/>
+		</Tooltip>
 	);
-};
+}
