@@ -1,13 +1,13 @@
 import React from "react";
 
 import { Button, Tooltip } from "antd";
-import { CopyOutlined } from "@ant-design/icons";
+import { SnippetsOutlined } from "@ant-design/icons";
 
 export default function PasteButton({ setState }) {
 	return (
 		<Tooltip title="Paste">
 			<Button
-				icon={<CopyOutlined />}
+				icon={<SnippetsOutlined />}
 				onClick={async () => {
 					try {
 						const text = await navigator.clipboard.readText();
