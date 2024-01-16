@@ -2499,10 +2499,12 @@
   resolved "https://registry.yarnpkg.com/@metamask/safe-event-emitter/-/safe-event-emitter-2.0.0.tgz#af577b477c683fad17c619a78208cede06f9605c"
   integrity sha512-/kSXhY692qiV1MXu6EeOZvg5nECLclxNXcKCxJ3cXQgYuRymRHpdx/t7JXfsK+JLjwA1e1c1/SBrlQYpusC29Q==
 
-"@monerium/sdk@^2.6.1":
-  version "2.6.1"
-  resolved "https://registry.yarnpkg.com/@monerium/sdk/-/sdk-2.6.1.tgz#eee6f40ae15d70533910ab12025d58c423595a71"
-  integrity sha512-RYoTEW3Or8O34uXBQDr4v1RnLY50vT3TeipvESc+GrmsldES48bnE7MFF/DZBGWe+d8nhOF5wTh1YAigG1/Z3Q==
+"@monerium/sdk@^2.10.0":
+  version "2.10.0"
+  resolved "https://registry.yarnpkg.com/@monerium/sdk/-/sdk-2.10.0.tgz#7b843f767433ed3609d4ef6eb74c3a921d3b6dda"
+  integrity sha512-e9qCbG5DgTR8hchc2YNXlhpOrScmnaasFJisCv3l+rUnaZkrL46le3Xoand0g43HCk5OOLQtA3SO/tCE53wffw==
+  dependencies:
+    crypto-js "^4.2.0"
 
 "@mrmlnc/readdir-enhanced@^2.2.1":
   version "2.2.1"
@@ -7221,6 +7223,11 @@ crypto-es@^1.2.2:
   version "1.2.6"
   resolved "https://registry.yarnpkg.com/crypto-es/-/crypto-es-1.2.6.tgz#468f3573a5d7b82e3b63b0004f55f905a6d3b12c"
   integrity sha512-PQnrovdr5ibmOxqAh/Vy+A30RokHom7kb9Z61EPwfASfbcJCrCG4+vNNegmebNVHiXvS7WjYpHDePxnE/biEbA==
+
+crypto-js@^4.2.0:
+  version "4.2.0"
+  resolved "https://registry.yarnpkg.com/crypto-js/-/crypto-js-4.2.0.tgz#4d931639ecdfd12ff80e8186dba6af2c2e856631"
+  integrity sha512-KALDyEYgpY+Rlob/iriUtjV6d5Eq+Y191A5g4UqLAi8CyGP9N1+FdVbkc1SxKc2r4YAYqG8JzO2KGL+AizD70Q==
 
 css-blank-pseudo@^0.1.4:
   version "0.1.4"
