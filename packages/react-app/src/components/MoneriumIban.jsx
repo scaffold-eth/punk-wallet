@@ -5,34 +5,15 @@ import QR from "qrcode.react";
 import { Alert, Input, message } from "antd";
 import { CopyOutlined, QrcodeOutlined, WarningOutlined } from "@ant-design/icons";
 
-import { LogoOnLogo, TokenDisplay } from "./";
-import { getShortAddress } from "../helpers/MoneriumHelper";
 import { useLocalStorage } from "../hooks";
+
+import { LogoOnLogo, TokenDisplay } from "./";
+
+import { copy } from "../helpers/EditorHelper";
+import { getShortAddress } from "../helpers/MoneriumHelper";
 
 //const generateQrCode = require('sepa-payment-qr-code')
 import { generateQrCode } from "../helpers/SepaPaymentQrCodeHelper";
-
-const handleCopy = async iban => {
-  let copySuccessful = false;
-
-  try {
-    await navigator.clipboard.writeText(iban);
-    copySuccessful = true;
-  } catch (error) {
-    console.error("navigator.clipboard.writeText is not supported by your browser", error);
-  }
-
-  if (!copySuccessful) {
-    const el = document.createElement("textarea");
-    el.value = iban;
-    document.body.appendChild(el);
-    el.select();
-    document.execCommand("copy");
-    document.body.removeChild(el);
-  }
-
-  message.success(<span style={{ position: "relative" }}>Copied IBAN</span>);
-};
 
 export default function MoneriumIban({ clientData, currentPunkAddress }) {
   const accountArrayIban = clientData.accountArrayIban;
@@ -118,9 +99,7 @@ export default function MoneriumIban({ clientData, currentPunkAddress }) {
 
         <div
           style={{ display: "flex", flexDirection: "column", backgroundColor: "", cursor: "pointer" }}
-          onClick={() => {
-            handleCopy(iban);
-          }}
+          onClick={() => copy(iban, () => message.success(<span style={{ position: "relative" }}>Copied IBAN</span>))}
         >
           <div style={{ alignItems: "flex-start" }}>
             <div
