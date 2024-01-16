@@ -1,7 +1,10 @@
 import React from "react";
 import QR from "qrcode.react";
-import { Blockie, Punk } from ".";
 import { message } from "antd";
+
+import { Blockie, Punk } from ".";
+
+import { copy } from "../helpers/EditorHelper";
 
 export default function QRPunkBlockie({ address, showAddress, withQr, scale }) {
   const hardcodedSizeForNow = 380;
@@ -15,24 +18,18 @@ export default function QRPunkBlockie({ address, showAddress, withQr, scale }) {
 
   return (
     <span
-      onClick={() => {
-        // Todo: this part is duplicated in MoneriumIban
-        const el = document.createElement("textarea");
-        el.value = address;
-        document.body.appendChild(el);
-        el.select();
-        document.execCommand("copy");
-        document.body.removeChild(el);
-        const iconPunkSize = 40;
-        message.success(
-          <span style={{ position: "relative" }}>
-            Copied Address
-            <div style={{ position: "absolute", left: -60, top: -14, zIndex: 1 }}>
-              <Punk address={address} size={iconPunkSize} />
-            </div>
-          </span>,
-        );
-      }}
+      onClick={() =>
+        copy(address, () =>
+          message.success(
+            <span style={{ position: "relative" }}>
+              Copied Address
+              <div style={{ position: "absolute", left: -60, top: -14, zIndex: 1 }}>
+                <Punk address={address} size={40} />
+              </div>
+            </span>,
+          ),
+        )
+      }
     >
       <div
         style={{
