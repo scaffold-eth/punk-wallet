@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 
-import { Button } from "antd";
-import { DeleteOutlined } from "@ant-design/icons";
+import { Button, message } from "antd";
+import { CopyOutlined, DeleteOutlined } from "@ant-design/icons";
 
 import { copy } from "../helpers/EditorHelper";
 
@@ -24,49 +24,33 @@ export default function TokenDetailedDisplay({
 
       <div
         style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
           paddingTop: setItemDetailed ? "1em" : "0.5em",
         }}
       >
         {token.hasOwnProperty("address") ? (
-          <>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
             <div
               style={{
                 cursor: "pointer",
                 color: `var(--link-color)`,
                 fontSize: "15px",
-                marginRight: "7px",
+                marginRight: "15px",
               }}
               onClick={() => window.open(tokenLink, "_blank")}
             >
               {token.address}
-
-              {/* ToDo: A copy button might be better here - added but still has the link capability */}
-              <img src="/open_in_new.svg" alt="open_in_new.svg" style={{ paddingBottom: "0.2em" }} />
             </div>
-            <div
-              style={{ cursor: "pointer", color: `var(--link-color)`, fontSize: "15px" }}
-              onClick={() => copy(token.address)}
-            >
-              {addressCopied ? (
-                <img
-                  src="/greenCheckmark.svg"
-                  alt="Copy"
-                  style={{ paddingBottom: "0.2em", width: "25px", height: "25px", transform: "scale(1.1)" }}
-                />
-              ) : (
-                <img
-                  src="/paste-svgrepo-com.svg"
-                  alt="Copy"
-                  style={{ paddingBottom: "0.2em", width: "25px", height: "25px", transform: "scale(1.1)" }}
-                />
-              )}
-            </div>
-          </>
+            <CopyOutlined
+              style={{ fontSize: 20, cursor: "pointer" }}
+              onClick={() =>
+                copy(token.address, () =>
+                  message.success(<span style={{ position: "relative" }}>Copied Contract Address</span>),
+                )
+              }
+            />
+          </div>
         ) : (
-          <div>Native Token</div>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>Native Token</div>
         )}
       </div>
 
