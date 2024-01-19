@@ -22,6 +22,8 @@ import {
   Header,
   IFrame,
   Monerium,
+  MoneriumCrossChainAddressSelector,
+  MoneriumOnChainCrossChainRadio,
   NetworkDisplay,
   NetworkDetailedDisplay,
   SettingsModal,
@@ -53,10 +55,15 @@ import {
 import { sendTransaction } from "./helpers/EIP1559Helper";
 
 import {
+  ON_CHAIN_IBAN_VALUE,
+  getAvailableTargetChainNames,
+  isCrossChain,
   getMemo,
   getNewMoneriumClient,
   getFilteredOrders,
+  getShortAddress,
   isValidIban,
+  placeCrossChainOrder,
   placeIbanOrder,
   isIbanAddressObjectValid,
 } from "./helpers/MoneriumHelper";
@@ -302,8 +309,18 @@ function App(props) {
 
   const [moneriumClient, setMoneriumClient] = useState(getNewMoneriumClient());
   const [moneriumConnected, setMoneriumConnected] = useState(false);
+  const [moneriumClientData, setMoneriumClientData] = useState(null);
   const [punkConnectedToMonerium, setPunkConnectedToMonerium] = useState(false);
   const [moneriumOrders, setMoneriumOrders] = useState(null);
+  const [moneriumRadio, setMoneriumRadio] = useLocalStorage("moneriumRadio", ON_CHAIN_IBAN_VALUE);
+  const [moneriumTargetChain, setMoneriumTargetChain] = useLocalStorage(
+    networkName + "MoneriumTargetChain",
+    getAvailableTargetChainNames(networkName)[0],
+  );
+  const [moneriumTargetAddress, setMoneriumTargetAddress] = useState(address);
+  useEffect(() => {
+    setMoneriumTargetAddress(prevAddress => (prevAddress == address ? prevAddress : address));
+  }, [address]);
 
   const memoizedMonerium = useMemo(
     () => (
@@ -312,12 +329,14 @@ function App(props) {
         setMoneriumClient={setMoneriumClient}
         moneriumConnected={moneriumConnected}
         setMoneriumConnected={setMoneriumConnected}
+        clientData={moneriumClientData}
+        setClientData={setMoneriumClientData}
         punkConnectedToMonerium={punkConnectedToMonerium}
         setPunkConnectedToMonerium={setPunkConnectedToMonerium}
         currentPunkAddress={address}
       />
     ),
-    [moneriumClient, moneriumConnected, punkConnectedToMonerium, address],
+    [moneriumClient, moneriumConnected, moneriumClientData, punkConnectedToMonerium, address],
   );
 
   const initMoneriumOrders = async sleepMs => {
@@ -368,7 +387,9 @@ function App(props) {
 
   const [ibanAddressObject, setIbanAddressObject] = useState({});
 
-  const isIbanTransferReady =
+  const isMoneriumDataLoading =
+    moneriumConnected && !moneriumClientData && selectedErc20Token && selectedErc20Token.name == "EURe";
+  const isMoneriumTransferReady =
     moneriumConnected && punkConnectedToMonerium && selectedErc20Token && selectedErc20Token.name == "EURe";
 
   // if you don't have any money, scan the other net;works for money
@@ -1139,46 +1160,65 @@ function App(props) {
         </div>
       )}
 
-      <div style={{ position: "relative", width: 320, margin: "auto", textAlign: "center", marginTop: 32 }}>
+      <div style={{ position: "relative", width: 320, margin: "auto", textAlign: "center", marginTop: 32, backgroundColor:"" }}>
         <div style={{ padding: 10 }}>
-          <AddressInput
-            ensProvider={mainnetProvider}
-            placeholder={isIbanTransferReady ? "to address / IBAN" : "to address"}
-            disabled={walletConnectTx}
-            value={toAddress}
-            setAmount={setAmount}
-            setToAddress={setToAddress}
-            hoistScanner={toggle => {
-              scanner = toggle;
-            }}
-            isIbanTransferReady={isIbanTransferReady}
-            ibanAddressObject={ibanAddressObject}
-            setIbanAddressObject={setIbanAddressObject}
-            walletConnect={async wcLink => {
-              //if(walletConnectUrl){
-              /*try{
-                  //setWalletConnectConnected(false);
-                  //setWalletConnectUrl();
-                  //if(wallectConnectConnector) wallectConnectConnector.killSession();
-                  //if(wallectConnectConnectorSession) setWallectConnectConnectorSession("");
-                  setWalletConnectConnected(false);
-                  //if(wallectConnectConnector) wallectConnectConnector.killSession();
-                  localStorage.removeItem("walletConnectUrl")
-                  localStorage.removeItem("wallectConnectConnectorSession")
-                }catch(e){console.log(e)}
-              }
+          {isMoneriumDataLoading && (
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                marginTop: -25,
+                paddingBottom: 25,
+              }}
+            >
+              <img
+                src={"/MoneriumLogo.png"}
+                alt={"Monerium Data loading"}
+                style={{
+                  width: "2em",
+                  height: "2em",
+                }}
+              />
+              <Spin />
+            </div>
+          )}
+          {isMoneriumTransferReady && (
+            <MoneriumOnChainCrossChainRadio moneriumRadio={moneriumRadio} setMoneriumRadio={setMoneriumRadio} />
+          )}
+          {isMoneriumTransferReady && isCrossChain(moneriumRadio) ? (
+            <MoneriumCrossChainAddressSelector
+              clientData={moneriumClientData}
+              currentPunkAddress={address}
+              targetChain={moneriumTargetChain}
+              setTargetChain={setMoneriumTargetChain}
+              targetAddress={moneriumTargetAddress}
+              setTargetAddress={setMoneriumTargetAddress}
+              networkName={targetNetwork.name}
+            />
+          ) : (
+            <AddressInput
+              ensProvider={mainnetProvider}
+              placeholder={isMoneriumTransferReady ? "to address / IBAN" : "to address"}
+              disabled={walletConnectTx}
+              value={toAddress}
+              setAmount={setAmount}
+              setToAddress={setToAddress}
+              hoistScanner={toggle => {
+                scanner = toggle;
+              }}
+              isMoneriumTransferReady={isMoneriumTransferReady}
+              ibanAddressObject={ibanAddressObject}
+              setIbanAddressObject={setIbanAddressObject}
+              walletConnect={async wcLink => {
+                if (walletConnectConnected) {
+                  await disconnectFromWalletConnect(wallectConnectConnector, web3wallet);
+                }
 
-              setTimeout(()=>{
-                window.location.replace('/wc?uri='+wcLink);
-              },500)*/
-
-              if (walletConnectConnected) {
-                await disconnectFromWalletConnect(wallectConnectConnector, web3wallet);
-              }
-
-              setWalletConnectUrl(wcLink);
-            }}
-          />
+                setWalletConnectUrl(wcLink);
+              }}
+            />
+          )}
         </div>
 
         <div style={{ padding: 10 }}>
@@ -1213,97 +1253,109 @@ function App(props) {
           </div>
           */}
         <div style={{ position: "relative", top: 10, left: 40 }}> {networkDisplay} </div>
+
         <div style={{ padding: 10 }}>
-          <Button
-            key="submit"
-            type="primary"
-            disabled={
-              loading ||
-              !amount ||
-              !toAddress ||
-              (isValidIban(toAddress) && !isIbanAddressObjectValid(ibanAddressObject))
-            }
-            loading={loading}
-            onClick={async () => {
-              setLoading(true);
-
-              if (isValidIban(toAddress)) {
-                const order = await placeIbanOrder(moneriumClient, address, ibanAddressObject, amount, networkName);
-                await initMoneriumOrders();
-              } else {
-                let txConfig = {
-                  chainId: selectedChainId,
-                };
-
-                if (!selectedErc20Token) {
-                  let value;
-                  try {
-                    console.log("PARSE ETHER", amount);
-                    value = parseEther("" + amount);
-                    console.log("PARSEDVALUE", value);
-                  } catch (e) {
-                    const floatVal = parseFloat(amount).toFixed(8);
-
-                    console.log("floatVal", floatVal);
-                    // failed to parseEther, try something else
-                    value = parseEther("" + floatVal);
-                    console.log("PARSEDfloatVALUE", value);
-                  }
-
-                  txConfig.to = toAddress;
-                  txConfig.value = value;
-                } else {
-                  if (selectedErc20Token) {
-                    txConfig.erc20 = {
-                      token: selectedErc20Token,
-                      to: toAddress,
-                      amount: amount,
-                    };
-                  }
-                }
-
-                if (networkName == "arbitrum") {
-                  //txConfig.gasLimit = 21000;
-                  //ask rpc for gas price
-                } else if (networkName == "optimism") {
-                  //ask rpc for gas price
-                } else if (networkName == "gnosis") {
-                  //ask rpc for gas price
-                } else if (networkName == "polygon") {
-                  //ask rpc for gas price
-                } else if (networkName == "goerli") {
-                  //ask rpc for gas price
-                } else if (networkName == "sepolia") {
-                  //ask rpc for gas price
-                } else {
-                  txConfig.gasPrice = gasPrice;
-                }
-
-                console.log("SEND AND NETWORK", targetNetwork);
-
-                let result = tx(txConfig);
-                result = await result;
-                console.log(result);
+          {
+            <Button
+              key="submit"
+              type="primary"
+              disabled={
+                loading ||
+                !amount ||
+                (!toAddress && !(isMoneriumTransferReady && isCrossChain(moneriumRadio))) ||
+                (isValidIban(toAddress) && !isIbanAddressObjectValid(ibanAddressObject))
               }
+              loading={loading}
+              onClick={async () => {
+                setLoading(true);
 
-              // setToAddress("")
-              setAmount("");
-              setData("");
+                if (isMoneriumTransferReady && isCrossChain(moneriumRadio)) {
+                  const order = await placeCrossChainOrder(
+                    moneriumClient,
+                    address,
+                    { targetChainName: moneriumTargetChain, address: moneriumTargetAddress },
+                    amount,
+                    networkName,
+                  );
+                  await initMoneriumOrders();
+                } else if (isValidIban(toAddress)) {
+                  const order = await placeIbanOrder(moneriumClient, address, ibanAddressObject, amount, networkName);
+                  await initMoneriumOrders();
+                } else {
+                  let txConfig = {
+                    chainId: selectedChainId,
+                  };
 
-              setShowHistory(true);
-              setLoading(false);
-            }}
-          >
-            {loading ||
-            !amount ||
-            !toAddress ||
-            (isValidIban(toAddress) && !isIbanAddressObjectValid(ibanAddressObject)) ? (
-              <CaretUpOutlined />
-            ) : (
-              <SendOutlined style={{ color: "#FFFFFF" }} />
-            )}{" "}
-            Send
-          </Button>
+                  if (!selectedErc20Token) {
+                    let value;
+                    try {
+                      console.log("PARSE ETHER", amount);
+                      value = parseEther("" + amount);
+                      console.log("PARSEDVALUE", value);
+                    } catch (e) {
+                      const floatVal = parseFloat(amount).toFixed(8);
+
+                      console.log("floatVal", floatVal);
+                      // failed to parseEther, try something else
+                      value = parseEther("" + floatVal);
+                      console.log("PARSEDfloatVALUE", value);
+                    }
+
+                    txConfig.to = toAddress;
+                    txConfig.value = value;
+                  } else {
+                    if (selectedErc20Token) {
+                      txConfig.erc20 = {
+                        token: selectedErc20Token,
+                        to: toAddress,
+                        amount: amount,
+                      };
+                    }
+                  }
+
+                  if (networkName == "arbitrum") {
+                    //txConfig.gasLimit = 21000;
+                    //ask rpc for gas price
+                  } else if (networkName == "optimism") {
+                    //ask rpc for gas price
+                  } else if (networkName == "gnosis") {
+                    //ask rpc for gas price
+                  } else if (networkName == "polygon") {
+                    //ask rpc for gas price
+                  } else if (networkName == "goerli") {
+                    //ask rpc for gas price
+                  } else if (networkName == "sepolia") {
+                    //ask rpc for gas price
+                  } else {
+                    txConfig.gasPrice = gasPrice;
+                  }
+
+                  console.log("SEND AND NETWORK", targetNetwork);
+
+                  let result = tx(txConfig);
+                  result = await result;
+                  console.log(result);
+                }
+
+                // setToAddress("")
+                setAmount("");
+                setData("");
+
+                setShowHistory(true);
+                setLoading(false);
+              }}
+            >
+              {loading ||
+              !amount ||
+              (!toAddress && !(isMoneriumTransferReady && isCrossChain(moneriumRadio))) ||
+              (isValidIban(toAddress) && !isIbanAddressObjectValid(ibanAddressObject)) ? (
+                <CaretUpOutlined />
+              ) : (
+                <SendOutlined style={{ color: "#FFFFFF" }} />
+              )}{" "}
+              Send
+            </Button>
+          }
         </div>
       </div>
 

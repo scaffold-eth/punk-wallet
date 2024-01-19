@@ -56,7 +56,7 @@ const PasteButton = ({ stateSetter }) => {
   };
 
 export default function AddressInput(props) {
-  const { ensProvider, setAmount, setToAddress, ibanAddressObject, setIbanAddressObject, isIbanTransferReady } = props;
+  const { ensProvider, setAmount, setToAddress, ibanAddressObject, setIbanAddressObject, isMoneriumTransferReady } = props;
 
   const [value, setValue] = useState(props.address);
 
@@ -74,7 +74,7 @@ export default function AddressInput(props) {
   const ens = useLookupAddress(props.ensProvider, currentValue);
 
   useEffect(() => {
-    if (!isIbanTransferReady) {
+    if (!isMoneriumTransferReady) {
       return;
     }
 
@@ -91,7 +91,7 @@ export default function AddressInput(props) {
     else {
       setIsIbanAddress(false);
     }
-  }, [ens, currentValue, value, isIbanTransferReady]);
+  }, [ens, currentValue, value, isMoneriumTransferReady]);
 
   useEffect(() => {
     setIbanAddressObject({
@@ -297,8 +297,8 @@ export default function AddressInput(props) {
   });
 
   return (
-    <div>
-      <div style={{ position: "absolute", left: -202, top: 26 }}>
+    <div style={{ position: "relative"}}>
+      <div style={{ position: "absolute", left: -212, top: 16 }}>
         {currentValue && currentValue.length > 41 ? <QRPunkBlockie scale={0.6} address={currentValue} /> : ""}
       </div>
 

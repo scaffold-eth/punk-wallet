@@ -17,12 +17,13 @@ export default function Monerium({
   setMoneriumClient,
   moneriumConnected,
   setMoneriumConnected,
+  clientData,
+  setClientData,
   punkConnectedToMonerium,
   setPunkConnectedToMonerium,
   currentPunkAddress,
 }) {
   const [open, setOpen] = useState(false);
-  const [clientData, setClientData] = useState(null);
 
   // Handle the authorization code if the URL contains it
   useEffect(() => {

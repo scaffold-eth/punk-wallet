@@ -4,9 +4,11 @@ import { NETWORKS } from "../constants";
 
 import { LOCAL_STORAGE_CHANGED_EVENT_NAME } from "./TransactionManager";
 
-const { AccountState, MoneriumClient, placeOrderMessage, constants } = require("@monerium/sdk");
+const { AccountState, MoneriumClient, PaymentStandard, placeOrderMessage, constants } = require("@monerium/sdk");
 
 const ibantools = require("ibantools");
+
+const { ethers } = require("ethers");
 
 const MONERIUM_AUTHORIZATION_CLIENT_ID = process.env.REACT_APP_MONERIUM_AUTHORIZATION_CLIENT_ID;
 const RELAYER_PK = process.env.REACT_APP_RELAYER_PK;
@@ -15,11 +17,27 @@ const REDIRECT_URI = "https://punkwallet.io/";
 //const REDIRECT_URI = "https://localhost:3000/";
 //const REDIRECT_URI = "https://redirectmeto.com/http://localhost:3000";
 //const REDIRECT_URI = "https://redirectmeto.com/http://192.168.0.101:3000/";
-//const REDIRECT_URI = "https://redirectmeto.com/http://192.168.0.102:3000/";
+//const REDIRECT_URI = "https://redirectmeto.com/http://192.168.1.76:3000/";
 
 const KEY_CODE_VERIFIER = "moneriumCodeVerifier";
 const KEY_REFRESH_TOKEN = "moneriumRefreshToken";
 const KEY_DELETED_ODER_IDS = "moneriumDeletedOrderIds";
+
+export const ON_CHAIN_IBAN_VALUE = "OnChainIban";
+export const CROSS_CHAIN_VALUE = "CrossChain";
+export const isCrossChain = value => {
+  return value == CROSS_CHAIN_VALUE;
+};
+
+const TARGET_CHAIN_NAMES = ["ethereum", "gnosis", "polygon"];
+export const getAvailableTargetChainNames = currentChainName =>
+  TARGET_CHAIN_NAMES.filter(targetChainName => targetChainName.toLowerCase() !== currentChainName.toLowerCase());
+
+export const capitalizeFirstLetter = networkName => networkName.charAt(0).toUpperCase() + networkName.slice(1);
+export const getNetwork = networkName =>
+  Object.values(NETWORKS).find(network => network.name.toLowerCase() == networkName.toLowerCase());
+export const getNetworkColor = networkName => getNetwork(networkName).color;
+export const getNetworkChainId = networkName => getNetwork(networkName).chainId;
 
 export const getNewMoneriumClient = () => {
   return new MoneriumClient("production");
@@ -108,6 +126,7 @@ export const getData = async (client, currentPunkAddress) => {
     }
 
     const addressesArray = Array.from(addressesSet);
+    placeAddressToFirstPlace(currentPunkAddress, addressesArray);
 
     const punkConnected = addressesArray.includes(currentPunkAddress);
 
@@ -137,6 +156,7 @@ export const getData = async (client, currentPunkAddress) => {
       name,
       accountArrayIban,
       addressesArray,
+      //addressesArray: addressesArray.toSpliced(1, addressesArray.length - 4),
       punkConnected,
       punkBalances,
     };
@@ -187,7 +207,15 @@ export const linkAddress = async (client, currentPunkAddress) => {
 };
 
 export const getShortAddress = address => {
-  return address.slice(0, 6) + "..." + address.slice(address.length - 2);
+  let checksummedAddress = address;
+
+  try {
+    checksummedAddress = ethers.utils.getAddress(address);
+  } catch (error) {
+    console.error("Coudn't get checksummed address", error);
+  }
+
+  return checksummedAddress.slice(0, 6) + "..." + checksummedAddress.slice(checksummedAddress.length - 2);
 };
 
 export const getMemo = address => {
@@ -205,6 +233,45 @@ export const getFilteredOrders = async (client, filterObject) => {
   return orders;
 };
 
+export const placeCrossChainOrder = async (client, currentPunkAddress, crossChainObject, amount, chain) => {
+  try {
+    amount = amount.toString();
+
+    const placeOrderMessageString = placeOrderMessage(
+      amount,
+      crossChainObject.address,
+      getNetworkChainId(crossChainObject.targetChainName),
+    );
+
+    const signedPlaceOrderMessage = await signMessage(placeOrderMessageString);
+
+    const counterpart = {
+      identifier: {
+        standard: PaymentStandard.chain,
+        address: crossChainObject.address,
+        chain: crossChainObject.targetChainName,
+        network: "mainnet",
+      },
+    };
+
+    const orderObject = {
+      amount: amount,
+      message: placeOrderMessageString,
+      signature: signedPlaceOrderMessage,
+      address: currentPunkAddress,
+      counterpart: counterpart,
+      chain: chain,
+      network: "mainnet",
+    };
+
+    const order = await client.placeOrder(orderObject);
+
+    return order;
+  } catch (error) {
+    console.log("Something went wrong", error);
+  }
+};
+
 export const placeIbanOrder = async (client, currentPunkAddress, ibanAddressObject, amount, chain) => {
   try {
     amount = amount.toString();
@@ -215,8 +282,7 @@ export const placeIbanOrder = async (client, currentPunkAddress, ibanAddressObje
 
     const counterpart = {
       identifier: {
-        //standard: PaymentStandard.iban,
-        standard: "iban",
+        standard: PaymentStandard.iban,
         iban: removeWhiteSpaces(ibanAddressObject.iban),
       },
       details: {
@@ -225,34 +291,17 @@ export const placeIbanOrder = async (client, currentPunkAddress, ibanAddressObje
       },
     };
 
-    /*
-            // counterpart for crosschain transfer
-            const counterpart = {
-                identifier: {
-                    //standard: PaymentStandard.iban,
-                    standard: 'chain',
-                    address: "0x44b7Cda759e46cdb427495C702cA5B67c1A07e82",
-                    //chain: "gnosis",
-                    chain: "polygon",
-                    network: "mainnet"
-                },
-                details: {}
-            }
-        */
-
     const orderObject = {
-      //amount: '0.01',
       amount: amount,
       message: placeOrderMessageString,
       signature: signedPlaceOrderMessage,
       address: currentPunkAddress,
       counterpart: counterpart,
-      //chain: 'gnosis',
       chain: chain,
     };
 
     if (ibanAddressObject?.memo) {
-      orderObject.memo = ibanAddressObject.memo;
+      orderObject.memo = ibanAddressObject.memo; // ToDo: Question mark breaks the memo: "field must be between 5 and 140 regular characters"
     }
 
     const order = await client.placeOrder(orderObject);
@@ -269,6 +318,14 @@ export const removeWhiteSpaces = stringy => {
   }
 
   return stringy.trim().replace(/\s+/g, "");
+};
+
+export const isIbanAddressObjectValid = ibanAddressObject => {
+  const firstName = ibanAddressObject.firstName;
+  const lastName = ibanAddressObject.lastName;
+  const memo = ibanAddressObject.memo;
+
+  return isNameValid(firstName) && isNameValid(lastName) && isMemoValid(memo);
 };
 
 export const isValidIban = iban => {
@@ -321,10 +378,18 @@ const isMemoValid = memo => {
   return true;
 };
 
-export const isIbanAddressObjectValid = ibanAddressObject => {
-  const firstName = ibanAddressObject.firstName;
-  const lastName = ibanAddressObject.lastName;
-  const memo = ibanAddressObject.memo;
+const placeAddressToFirstPlace = (address, addressesArray) => {
+  try {
+    const index = addressesArray.indexOf(address);
 
-  return isNameValid(firstName) && isNameValid(lastName) && isMemoValid(memo);
+    if (index !== -1) {
+      addressesArray.splice(index, 1);
+
+      addressesArray.unshift(address);
+    }
+  } catch (error) {
+    console.error("Coudn't place address to first place", address, addressesArray, error);
+  }
 };
+
+

@@ -5,3 +5,23 @@
 :root {
   --link-color: rgb(24, 144, 255);
 }
+
+/*
+  Stacking DIVs on top of each other?
+  https://stackoverflow.com/questions/1909648/stacking-divs-on-top-of-each-other
+*/
+.outer {
+  display: grid;
+  grid-template: 1fr / 1fr;
+  place-items: center;
+}
+.outer > * {
+  grid-column: 1 / 1;
+  grid-row: 1 / 1;
+}
+.outer .below {
+  z-index: 0;
+}
+.outer .top {
+  z-index: 1;
+}

@@ -2,9 +2,11 @@ import React from "react";
 import QR from "qrcode.react";
 import { message } from "antd";
 
-import { Blockie, Punk } from ".";
+import { Punk, PunkBlockie } from ".";
 
 import { copy } from "../helpers/EditorHelper";
+
+export const BLOCKIES_DEFAULT_SIZE = 8;
 
 export default function QRPunkBlockie({ address, showAddress, withQr, scale }) {
   const hardcodedSizeForNow = 380;
@@ -14,7 +16,7 @@ export default function QRPunkBlockie({ address, showAddress, withQr, scale }) {
     blockieScale = blockieScale * scale;
   }
 
-  const punkSize = blockieScale * 8; // Make punk image the same size as the blockie, from https://github.com/ethereum/blockies: width/height of the icon in blocks, default: 8
+  const punkSize = blockieScale * BLOCKIES_DEFAULT_SIZE; // Make punk image the same size as the blockie, from https://github.com/ethereum/blockies: width/height of the icon in blocks, default: 8
 
   return (
     <span
@@ -53,12 +55,8 @@ export default function QRPunkBlockie({ address, showAddress, withQr, scale }) {
           </div>
         )}
 
-        <div style={{ position: "absolute", opacity: "0.5", width: punkSize, height: punkSize }}>
-          <Blockie address={address} scale={blockieScale} />
-        </div>
-
         <div style={{ position: "absolute" }}>
-          <Punk address={address} size={punkSize} />
+          <PunkBlockie address={address} size={punkSize} />
         </div>
       </div>
 
