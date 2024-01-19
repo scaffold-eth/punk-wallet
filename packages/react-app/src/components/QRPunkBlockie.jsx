@@ -1,7 +1,10 @@
 import React from "react";
-import QR from 'qrcode.react';
-import { Blockie, Punk } from "."
-import { message } from 'antd';
+import QR from "qrcode.react";
+import { message } from "antd";
+
+import { Blockie, Punk } from ".";
+
+import { copy } from "../helpers/EditorHelper";
 
 export default function QRPunkBlockie({ address, showAddress, withQr, scale }) {
   const hardcodedSizeForNow = 380;
@@ -15,48 +18,57 @@ export default function QRPunkBlockie({ address, showAddress, withQr, scale }) {
 
   return (
     <span
-      onClick={() => {
-          // Todo: this part is duplicated in MoneriumIban
-          const el = document.createElement('textarea');
-          el.value = address;
-          document.body.appendChild(el);
-          el.select();
-          document.execCommand('copy');
-          document.body.removeChild(el);
-          const iconPunkSize = 40
+      onClick={() =>
+        copy(address, () =>
           message.success(
             <span style={{ position: "relative" }}>
               Copied Address
               <div style={{ position: "absolute", left: -60, top: -14, zIndex: 1 }}>
-                <Punk address={address} size={iconPunkSize}/>
+                <Punk address={address} size={40} />
               </div>
-            </span>
-          );
-        }}
+            </span>,
+          ),
+        )
+      }
     >
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: hardcodedSizeForNow, margin:"auto", position:"" }}>
-        {withQr &&
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }} >
-              <QR
-                level={"H"}
-                includeMargin={false}
-                value={address}
-                size={hardcodedSizeForNow}
-                imageSettings={{ width: 105, height: 105, excavate: true, src: "" }}
-              />
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          width: hardcodedSizeForNow,
+          margin: "auto",
+          position: "",
+        }}
+      >
+        {withQr && (
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <QR
+              level={"H"}
+              includeMargin={false}
+              value={address}
+              size={hardcodedSizeForNow}
+              imageSettings={{ width: 105, height: 105, excavate: true, src: "" }}
+            />
           </div>
-        }
+        )}
 
-        <div style={{ position: 'absolute', opacity:"0.5", width:punkSize, height:punkSize }}>
+        <div style={{ position: "absolute", opacity: "0.5", width: punkSize, height: punkSize }}>
           <Blockie address={address} scale={blockieScale} />
         </div>
 
-        <div style={{ position: 'absolute' }}>
-          <Punk address={address} size={punkSize}/>
+        <div style={{ position: "absolute" }}>
+          <Punk address={address} size={punkSize} />
         </div>
       </div>
 
-      {showAddress && <div style={{marginTop:"0.39em", fontWeight:"bolder", letterSpacing:-0.8,color:"#666666", fontSize:14.8}}>{address}</div>}
+      {showAddress && (
+        <div
+          style={{ marginTop: "0.39em", fontWeight: "bolder", letterSpacing: -0.8, color: "#666666", fontSize: 14.8 }}
+        >
+          {address}
+        </div>
+      )}
     </span>
   );
 }
