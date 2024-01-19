@@ -29,9 +29,10 @@ import { useBalance } from "../hooks";
 */
 
 export default function Balance(props) {
-  const [dollarMode, setDollarMode] = useState(true);
-
   // const [listening, setListening] = useState(false);
+
+  const dollarMode = props.dollarMode;
+  const setDollarMode = props.setDollarMode;
 
   const balance = useBalance(props.provider, props.address);
 
