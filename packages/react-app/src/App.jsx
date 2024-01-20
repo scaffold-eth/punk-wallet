@@ -1094,6 +1094,7 @@ function App(props) {
               address={address}
               dollarMode={dollarMode}
               setDollarMode={setDollarMode}
+              isTxSent={isTxSent}
             />
           ) : (
             <Balance
