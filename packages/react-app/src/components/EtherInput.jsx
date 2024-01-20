@@ -108,9 +108,17 @@ export default function EtherInput(props) {
   }
 
   useEffect(() => {
+    let isCancelled = false;
+
     if (!currentValue && !displayMax) {
-      setDisplay("");
+      if (isCancelled) {
+        setDisplay("");
+      }
     }
+
+    return () => {
+      isCancelled = true;
+    };
   }, [currentValue]);
 
   return (
