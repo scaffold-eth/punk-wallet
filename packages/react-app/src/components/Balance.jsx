@@ -1,5 +1,5 @@
 import { formatEther } from "@ethersproject/units";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useBalance } from "../hooks";
 
 /*
@@ -28,8 +28,9 @@ import { useBalance } from "../hooks";
   - Provide price={price} of ether and get your balance converted to dollars
 */
 
-export default function Balance(props) {
+export default function Balance(props, isTxSent) {
   // const [listening, setListening] = useState(false);
+  const [displayBalance, setDisplayBalance] = useState("");
 
   const dollarMode = props.dollarMode;
   const setDollarMode = props.setDollarMode;
@@ -53,13 +54,28 @@ export default function Balance(props) {
     floatBalance = parseFloat(etherBalance);
   }
 
-  let displayBalance = floatBalance.toFixed(4);
-
   const price = props.price || props.dollarMultiplier;
 
-  if (price && dollarMode) {
-    displayBalance = "$" + (floatBalance * price).toFixed(2);
-  }
+  useEffect(() => {
+    let newDisplayBalance = floatBalance.toFixed(4);
+
+    if (price && dollarMode) {
+      newDisplayBalance = "$" + (floatBalance * price).toFixed(2);
+    }
+
+    setDisplayBalance(newDisplayBalance);
+  }, [floatBalance, dollarMode, price]);
+
+  // Recalculate displayBalance when tx is sent
+  useEffect(() => {
+    let newDisplayBalance = floatBalance.toFixed(4);
+
+    if (price && dollarMode) {
+      newDisplayBalance = "$" + (floatBalance * price).toFixed(2);
+    }
+
+    setDisplayBalance(newDisplayBalance);
+  }, [isTxSent]);
 
   return (
     <span

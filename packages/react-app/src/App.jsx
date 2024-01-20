@@ -922,6 +922,9 @@ function App(props) {
   const [depositing, setDepositing] = useState();
   const [depositAmount, setDepositAmount] = useState();
 
+  // State to handle balance update after a tx is sent
+  const [isTxSent, setIsTxSent] = useState(false);
+
   /*
   const handleOk = async () => {
     setIsWalletModalVisible(false);
@@ -1099,6 +1102,7 @@ function App(props) {
               price={price}
               dollarMode={dollarMode}
               setDollarMode={setDollarMode}
+              isTxSent={isTxSent}
             />
           )}
         </div>
@@ -1292,6 +1296,9 @@ function App(props) {
 
               setShowHistory(true);
               setLoading(false);
+
+              // to trigger balance update
+              setIsTxSent(!isTxSent);
             }}
           >
             {loading ||
