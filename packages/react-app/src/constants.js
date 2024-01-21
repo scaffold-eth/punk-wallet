@@ -417,7 +417,7 @@ export const NETWORKS = {
         address: "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
         decimals: 6,
         imgSrc: "/USDC.png",
-      }
+      },
     ],
     nativeToken: {
       name: "ETH",
@@ -606,6 +606,18 @@ export const NETWORKS = {
     //rpcUrl: `https://rpc.sepolia.dev`,
     //rpcUrl: `https://rpc.sepolia.org/`,
     rpcUrl: `https://eth-sepolia.g.alchemy.com/v2/4vFnzFt4K0gFDvYodzTuH9ZjbGI-awSf`,
+    erc20Tokens: [
+      {
+        name: "tDAI",
+        address: "0x9ef870fDf44fAD7eF6DBcfaA68BeF95025721Bd7",
+        decimals: 18,
+        imgSrc: "/DAI.png",
+      },
+    ],
+    nativeToken: {
+      name: "SepETH",
+      imgSrc: "/ETH.png",
+    },
   },
   localhost: {
     name: "localhost",
