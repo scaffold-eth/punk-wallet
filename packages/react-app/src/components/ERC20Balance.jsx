@@ -14,7 +14,7 @@ export default function ERC20Balance({
   address,
   dollarMode,
   setDollarMode,
-  isTxsent,
+  isTxSent,
 }) {
   const [balance, setBalance] = useState(null);
   const [price, setPrice] = useState(0);
@@ -62,7 +62,7 @@ export default function ERC20Balance({
     return () => {
       isCancelled = true;
     };
-  }, [address, token, rpcURL, isTxsent]);
+  }, [address, token, rpcURL, isTxSent]);
 
   return (
     <div>
