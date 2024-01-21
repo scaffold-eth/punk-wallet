@@ -38,8 +38,6 @@ export default function ERC20Balance({
   }, [targetNetwork, token]);
 
   useEffect(() => {
-    let isCancelled = false;
-
     async function getBalance() {
       if (!address) {
         return;
@@ -48,7 +46,6 @@ export default function ERC20Balance({
       setLoading(true);
 
       try {
-        if (isCancelled) return;
         setBalance(await getTokenBalance(token, rpcURL, address));
       } catch (error) {
         console.error("Coudn't fetch balance", error);
@@ -60,7 +57,7 @@ export default function ERC20Balance({
     getBalance();
 
     return () => {
-      isCancelled = true;
+      setBalance();
     };
   }, [address, token, rpcURL, isTxSent]);
 
