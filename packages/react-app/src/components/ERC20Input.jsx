@@ -4,40 +4,17 @@ import { Input } from "antd";
 
 import { TokenDisplay } from "./";
 
+// ToDo: Prefix could be updated with token symbol instead of ticker
+
 export default function ERC20Input({ token, amount, setAmount }) {
   const [mode, setMode] = useState(token.name);
 
-  let addonAfter;
   let prefix;
-
-  const toggleUSDERC20 = () => {
-    if (mode === "USD") {
-      setMode(token.name);
-    } else {
-      setMode("USD");
-    }
-  };
-
-  const switchMode = title => {
-    return (
-      <div
-        onClick={() => {
-          toggleUSDERC20();
-        }}
-      >
-        {title}
-      </div>
-    );
-  };
-
-  // <TokenDisplay token={token} />
 
   if (mode === "USD") {
     prefix = "$";
-    addonAfter = switchMode("USD 🔀");
   } else {
-    prefix = "Ξ";
-    addonAfter = switchMode(token.name + " 🔀");
+    prefix = token.name;
   }
 
   return (
@@ -49,7 +26,6 @@ export default function ERC20Input({ token, amount, setAmount }) {
         addonAfter={<TokenDisplay token={token} setMode={setMode} mode={mode} toggle />}
         onChange={async e => {
           setAmount(e.target.value);
-          console.log("pressed");
         }}
       />
     </div>

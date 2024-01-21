@@ -1,5 +1,6 @@
 import React from "react";
 
+// toggle functionality for switching between ERC20 token and USD
 export default function TokenDisplay({ token, divStyle, spanStyle, setMode, mode, toggle }) {
   const toggleUSDERC20 = () => {
     console.log("pressed");
