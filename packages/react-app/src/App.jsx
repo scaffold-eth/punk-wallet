@@ -1190,7 +1190,15 @@ function App(props) {
           {walletConnectTx ? (
             <Input disabled={true} value={amount} />
           ) : selectedErc20Token ? (
-            <ERC20Input token={selectedErc20Token} amount={amount} setAmount={setAmount} />
+            <ERC20Input
+              token={selectedErc20Token}
+              value={amount}
+              setAmount={setAmount}
+              targetNetwork={targetNetwork}
+              onChange={value => {
+                setAmount(value);
+              }}
+            />
           ) : (
             <EtherInput
               price={price || targetNetwork.price}
