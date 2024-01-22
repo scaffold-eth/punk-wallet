@@ -21,7 +21,7 @@ export default function ERC20Balance({
 
   const [loading, setLoading] = useState(true);
 
-  // ToDo: Update balance after we hit Send - solved
+  // ToDo: Update balance after we hit Send -- solved
 
   // ToDo: Get rid of the error (when switching networks qickly): -- couldn't solve it from time to time the error appears
   // Can't perform a React state update on an unmounted component. This is a no-op, but it indicates a memory leak in your application. To fix, cancel all subscriptions and asynchronous tasks in a useEffect cleanup function.
