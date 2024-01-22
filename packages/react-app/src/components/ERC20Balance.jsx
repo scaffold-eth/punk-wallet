@@ -38,26 +38,33 @@ export default function ERC20Balance({
   }, [targetNetwork, token]);
 
   useEffect(() => {
-    async function getBalance() {
+    const abortController = new AbortController();
+    const signal = abortController.signal;
+
+    const getBalance = async () => {
       if (!address) {
+        return;
+      }
+      if (signal.aborted) {
         return;
       }
 
       setLoading(true);
 
       try {
-        setBalance(await getTokenBalance(token, rpcURL, address));
+        const response = await getTokenBalance(token, rpcURL, address);
+        setBalance(response);
       } catch (error) {
         console.error("Coudn't fetch balance", error);
       }
 
       setLoading(false);
-    }
+    };
 
     getBalance();
 
     return () => {
-      setBalance();
+      abortController.abort();
     };
   }, [address, token, rpcURL, isTxSent]);
 
