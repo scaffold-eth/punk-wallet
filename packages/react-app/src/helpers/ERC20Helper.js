@@ -104,20 +104,25 @@ const isTokenAddressMainnetWETH = tokenAddress => {
 export const getTokenBalance = async (token, rpcURL, address) => {
   const erc20Helper = new ERC20Helper(token.address, null, rpcURL);
 
-  const balance = await erc20Helper.balanceOf(address);
+  try {
+    const balance = await erc20Helper.balanceOf(address);
 
-  const inverseDecimalCorrectedAmountNumber = await erc20Helper.getInverseDecimalCorrectedAmountNumber(
-    balance,
-    token.decimals,
-  );
+    const inverseDecimalCorrectedAmountNumber = await erc20Helper.getInverseDecimalCorrectedAmountNumber(
+      balance,
+      token.decimals,
+    );
 
-  let digits = 2;
+    let digits = 2;
 
-  if (isTokenAddressMainnetWETH(token.address)) {
-    digits = 4;
+    if (isTokenAddressMainnetWETH(token.address)) {
+      digits = 4;
+    }
+
+    const roundedDown = Math.floor(inverseDecimalCorrectedAmountNumber * Math.pow(10, digits)) / Math.pow(10, digits);
+
+    return roundedDown.toFixed(digits);
+  } catch (error) {
+    console.error("Error fetching token balance:", error);
+    throw error;
   }
-
-  const roundedDown = Math.floor(inverseDecimalCorrectedAmountNumber * Math.pow(10, digits)) / Math.pow(10, digits);
-
-  return roundedDown.toFixed(digits);
 };
