@@ -40,6 +40,7 @@ export default function ERC20Input({ token, targetNetwork, onChange }) {
 
   useEffect(() => {
     getPrice();
+
     // Call price update just every 30sec instead of having price updates every second
     const interval = setInterval(getPrice, 30000);
 
@@ -53,7 +54,17 @@ export default function ERC20Input({ token, targetNetwork, onChange }) {
         value={display}
         placeholder={placeholder}
         prefix={prefix}
-        addonAfter={<TokenDisplay token={token} setMode={setMode} mode={mode} toggle />}
+        addonAfter={
+          <TokenDisplay
+            token={token}
+            setMode={setMode}
+            mode={mode}
+            toggle
+            price={price}
+            setDisplay={setDisplay}
+            display={display}
+          />
+        }
         onChange={async e => {
           amountCalculation(e.target.value);
           setDisplay(e.target.value);
