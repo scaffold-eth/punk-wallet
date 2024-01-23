@@ -47,14 +47,14 @@ export default function TokenDisplay({
         }
       }}
     >
-      {toggle
-        ? token.imgSrc && switchMode()
-        : token.imgSrc && (
-            <>
-              <img style={{ height: "1em", width: "1em" }} alt="Token symbol" src={token.imgSrc} />
-              <span style={{ ...spanStyle }}>{token.name}</span>
-            </>
-          )}
+      {toggle ? (
+        token.imgSrc && switchMode()
+      ) : (
+        <>
+          {token.imgSrc && <img style={{ height: "1em", width: "1em" }} src={token.imgSrc} alt="token" />}
+          <span style={{ ...spanStyle }}>{token.name}</span>
+        </>
+      )}
     </div>
   );
 }

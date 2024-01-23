@@ -1103,7 +1103,7 @@ function App(props) {
             />
           )}
         </div>
-        /***************** * SECTION: Choose network and tokens ***********************************************/
+        {/***************** * SECTION: Choose network and tokens ***********************************************/}
         <span style={{ verticalAlign: "middle" }}>
           <div
             style={{ display: "flex", justifyContent: erc20Tokens ? "space-evenly" : "center", alignItems: "center" }}
@@ -1138,7 +1138,7 @@ function App(props) {
           <QRPunkBlockie withQr address={address} showAddress={true} />
         </div>
       )}
-      /***************** * SECTION: Send tokens ***********************************************/
+      {/***************** * SECTION: Send tokens ***********************************************/}
       <div style={{ position: "relative", width: 320, margin: "auto", textAlign: "center", marginTop: 32 }}>
         <div style={{ padding: 10 }}>
           <AddressInput
