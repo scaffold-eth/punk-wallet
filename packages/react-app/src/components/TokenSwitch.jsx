@@ -1,21 +1,54 @@
-import React from "react";
+import React, { useState } from "react";
 
 // toggle functionality for switching between ERC20 token and USD
-export const TokenSwitch = ({ token, divStyle, spanStyle, setMode, mode, toggle, price, setDisplay, display }) => {
+export const TokenSwitch = ({
+  token,
+  divStyle,
+  spanStyle,
+  setMode,
+  mode,
+  price,
+  setDisplay,
+  display,
+  setPlaceholder,
+  setDisabledInput,
+}) => {
+  // serves a placeholder for the display value when price is 0
+  const [tempDisplay, setTempDisplay] = useState();
+
   const toggleUSDERC20 = () => {
     if (mode === "USD") {
-      if (display) setDisplay((display / price).toFixed(4));
+      if (display && price !== 0) {
+        setDisplay((display / price).toFixed(4));
+        setPlaceholder(`amount in ${mode}`);
+      }
+      if (price === 0) {
+        setDisabledInput(false);
+        setDisplay(tempDisplay);
+      }
       setMode(token.name);
     } else {
-      if (display) setDisplay((display * price).toFixed(2));
+      if (display) {
+        if (price !== 0) {
+          setDisplay((display * price).toFixed(2));
+          setPlaceholder(`amount in ${mode}`);
+        } else {
+          setTempDisplay(display);
+          setDisplay();
+          setDisabledInput(true);
+          setPlaceholder(`no price available`);
+        }
+      }
       setMode("USD");
     }
   };
 
-  const switchMode = () => {
+  const switching = () => {
     return mode === token.name ? (
       <>
-        <img style={{ height: "1em", width: "1em", marginRight: "0.5em" }} alt="Token symbol" src={token.imgSrc} />
+        {token.imgSrc && (
+          <img style={{ height: "1em", width: "1em", marginRight: "5px" }} src={token.imgSrc} alt="token" />
+        )}
         <span style={{ ...spanStyle }}>{token.name} 🔀</span>
       </>
     ) : (
@@ -32,19 +65,10 @@ export const TokenSwitch = ({ token, divStyle, spanStyle, setMode, mode, toggle,
         ...divStyle,
       }}
       onClick={() => {
-        if (toggle) {
-          toggleUSDERC20();
-        }
+        toggleUSDERC20();
       }}
     >
-      {toggle ? (
-        token.imgSrc && switchMode()
-      ) : (
-        <>
-          {token.imgSrc && <img style={{ height: "1em", width: "1em" }} src={token.imgSrc} alt="token" />}
-          <span style={{ ...spanStyle }}>{token.name}</span>
-        </>
-      )}
+      {switching()}
     </div>
   );
 };

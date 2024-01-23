@@ -15,9 +15,10 @@ export default function ERC20Input({ token, targetNetwork, onChange }) {
   const [mode, setMode] = useState(token.name);
   const [price, setPrice] = useState(0);
   const [display, setDisplay] = useState();
+  const [placeholder, setPlaceholder] = useState(`amount in ${mode}`);
+  const [disabledInput, setDisabledInput] = useState(false);
 
   const prefix = mode === "USD" ? "$" : token.name;
-  const placeholder = `amount in ${mode}`;
 
   async function getPrice() {
     try {
@@ -52,6 +53,7 @@ export default function ERC20Input({ token, targetNetwork, onChange }) {
     <div>
       <Input
         value={display}
+        disabled={disabledInput}
         placeholder={placeholder}
         prefix={prefix}
         addonAfter={
@@ -59,10 +61,11 @@ export default function ERC20Input({ token, targetNetwork, onChange }) {
             token={token}
             setMode={setMode}
             mode={mode}
-            toggle
             price={price}
             setDisplay={setDisplay}
             display={display}
+            setPlaceholder={setPlaceholder}
+            setDisabledInput={setDisabledInput}
           />
         }
         onChange={async e => {
