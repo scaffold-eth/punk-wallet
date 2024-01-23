@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react";
 import { Input } from "antd";
 import { getTokenPrice } from "../helpers/LiFiTokenPriceHelper";
 
-import { TokenDisplay } from "./";
+import { TokenSwitch } from "./TokenSwitch";
 
 // ToDo: Prefix could be updated with token symbol instead of ticker
 // ToDo: Link Balance on top with toggle in Input, so that when it is clicked both values are changed
@@ -55,7 +55,7 @@ export default function ERC20Input({ token, targetNetwork, onChange }) {
         placeholder={placeholder}
         prefix={prefix}
         addonAfter={
-          <TokenDisplay
+          <TokenSwitch
             token={token}
             setMode={setMode}
             mode={mode}
