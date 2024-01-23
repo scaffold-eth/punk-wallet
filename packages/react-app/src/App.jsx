@@ -992,7 +992,6 @@ function App(props) {
           setTargetNetwork={setTargetNetwork}
         />
       )}
-
       {tokenSettingsHelper && (
         <SettingsModal
           settingsHelper={tokenSettingsHelper}
@@ -1027,7 +1026,6 @@ function App(props) {
           network={targetNetwork}
         />
       )}
-
       <div className="site-page-header-ghost-wrapper">
         <Header
           extra={[
@@ -1078,9 +1076,7 @@ function App(props) {
           ]}
         />
       </div>
-
       {/* ✏️ Edit the header and change the title to your project name */}
-
       <div
         style={{ clear: "both", opacity: yourLocalBalance ? 1 : 0.2, width: 500, margin: "auto", position: "relative" }}
       >
@@ -1107,7 +1103,7 @@ function App(props) {
             />
           )}
         </div>
-
+        /***************** * SECTION: Choose network and tokens ***********************************************/
         <span style={{ verticalAlign: "middle" }}>
           <div
             style={{ display: "flex", justifyContent: erc20Tokens ? "space-evenly" : "center", alignItems: "center" }}
@@ -1137,13 +1133,12 @@ function App(props) {
           {faucetHint}
         </span>
       </div>
-
       {address && (
         <div style={{ padding: 16, cursor: "pointer", backgroundColor: "#FFFFFF", width: 420, margin: "auto" }}>
           <QRPunkBlockie withQr address={address} showAddress={true} />
         </div>
       )}
-
+      /***************** * SECTION: Send tokens ***********************************************/
       <div style={{ position: "relative", width: 320, margin: "auto", textAlign: "center", marginTop: 32 }}>
         <div style={{ padding: 10 }}>
           <AddressInput
@@ -1322,7 +1317,6 @@ function App(props) {
           </Button>
         </div>
       </div>
-
       {/* <BrowserRouter>
 
         <Menu style={{ textAlign:"center" }} selectedKeys={[route]} mode="horizontal">
@@ -1435,7 +1429,6 @@ function App(props) {
         </Switch>
       </BrowserRouter>
 */}
-
       <div style={{ padding: 16, backgroundColor: "#FFFFFF", width: 420, margin: "auto" }}>
         {
           <TransactionResponses
@@ -1451,7 +1444,6 @@ function App(props) {
           />
         }
       </div>
-
       <div style={{ zIndex: -1, paddingTop: 20, opacity: 0.5, fontSize: 12 }}>
         <Button
           style={{ margin: 8, marginTop: 16 }}
@@ -1471,7 +1463,6 @@ function App(props) {
           <span style={{ marginRight: 8 }}>👛</span> Inventory
         </Button>
       </div>
-
       <div style={{ clear: "both", maxWidth: "100%", width: 975, margin: "auto", marginTop: 32, position: "relative" }}>
         {wallectConnectConnector && !wallectConnectConnector.connected && (
           <div>
@@ -1525,7 +1516,6 @@ function App(props) {
 
         <div style={{ paddingTop: "2em" }}>{memoizedMonerium}</div>
       </div>
-
       {networkName == "ethereum" ? (
         <div style={{ zIndex: -1, padding: 64, opacity: 0.5, fontSize: 12 }}>
           {depositing ? (
@@ -1583,7 +1573,6 @@ function App(props) {
       ) : (
         ""
       )}
-
       <div style={{ zIndex: -1, padding: 64, opacity: 0.5, fontSize: 12 }}>
         created with <span style={{ marginRight: 4 }}>🏗</span>
         <a href="https://github.com/austintgriffith/scaffold-eth#-scaffold-eth" target="_blank">
@@ -1591,7 +1580,6 @@ function App(props) {
         </a>
       </div>
       <div style={{ padding: 32 }} />
-
       <div
         style={{
           transform: "scale(2.7)",
@@ -1615,7 +1603,6 @@ function App(props) {
           <ScanOutlined style={{ color: "#FFFFFF" }} />
         </Button>
       </div>
-
       {/*
 
       <Modal title={walletModalData && walletModalData.payload && walletModalData.payload.method} visible={isWalletModalVisible} onOk={handleOk} onCancel={handleCancel}>
@@ -1624,7 +1611,6 @@ function App(props) {
        </pre>
      </Modal>
   */}
-
       {/* 🗺 Extra UI like gas price, eth price, faucet, and support: */}
       <div style={{ position: "fixed", textAlign: "left", left: 0, bottom: 20, padding: 10 }}>
         <Row align="middle" gutter={[16, 16]}>
