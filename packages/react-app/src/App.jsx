@@ -195,28 +195,6 @@ function App(props) {
       )
     : undefined;
 
-  //const [isWalletModalVisible, setIsWalletModalVisible] = useState(false);
-  //const [walletModalData, setWalletModalData] = useState();
-
-  //
-  // TRYING SOMETHING HERE...
-  // the "noNetwork" error is really annoying because the network selection gets locked up
-  //   if you select a bad network, let's have it revert back to ethereum
-  //
-  /*useEffect(()=>{
-    const waitForNetwork = async ()=>{
-      localProvider._networkPromise.catch((e)=>{
-        if(e.event=="noNetwork"){
-          window.localStorage.setItem("network", "ethereum");
-          setTimeout(() => {
-            window.location.reload();
-          }, 1);
-        }
-      })
-    }
-    waitForNetwork()
-  },[ localProvider ])*/
-
   const [checkingBalances, setCheckingBalances] = useState();
   // a function to check your balance on every network and switch networks if found...
   const checkBalances = async address => {
@@ -264,17 +242,6 @@ function App(props) {
       window.location.reload();
     }, 1);
   };
-  /*
-  // track an extra eth price to display USD for Optimism?
-  const ethprice = useExchangePrice({
-    name: "ethereum",
-    color: "#ceb0fa",
-    chainId: 1,
-    price: "uniswap",
-    rpcUrl: `https://mainnet.infura.io/v3/${INFURA_ID}`,
-    blockExplorer: "https://etherscan.io/",
-  }, mainnetProvider);
-  console.log("ethprice",ethprice)*/
 
   /* 💵 This hook will get the price of ETH from 🦄 Uniswap: */
   const price = useExchangePrice(targetNetwork, mainnetProvider);
@@ -391,16 +358,6 @@ function App(props) {
     moneriumConnected && !moneriumClientData && selectedErc20Token && selectedErc20Token.name == "EURe";
   const isMoneriumTransferReady =
     moneriumConnected && punkConnectedToMonerium && selectedErc20Token && selectedErc20Token.name == "EURe";
-
-  // if you don't have any money, scan the other net;works for money
-  // lol this poller is a bad idea why does it keep
-  /*usePoller(() => {
-    if (!cachedNetwork) {
-      if (balance == 0) {
-        checkBalances(address);
-      }
-    }
-  }, 7777);*/
 
   const connectWallet = sessionDetails => {
     console.log(" 📡 Connecting to Wallet Connect....", sessionDetails);
@@ -723,23 +680,6 @@ function App(props) {
     }
   }, [injectedProvider, localProvider, address]);
 
-  /*
-  setTimeout(()=>{
-    if(!cachedNetwork){
-      if(balance==0){
-        checkBalances(address)
-      }
-    }
-  },1777)
-  setTimeout(()=>{
-    if(!cachedNetwork){
-      if(balance==0){
-        checkBalances(address)
-      }
-    }
-  },3777)
-*/
-
   // Just plug in different 🛰 providers to get your balance on different chains:
   const yourMainnetBalance = useBalance(mainnetProvider, address);
 
@@ -916,19 +856,6 @@ function App(props) {
       startingAddress = incoming;
       window.history.pushState({}, "", "/");
     }
-
-    /* let rawPK
-    if(incomingPK.length===64||incomingPK.length===66){
-      console.log("🔑 Incoming Private Key...");
-      rawPK=incomingPK
-      burnerConfig.privateKey = rawPK
-      window.history.pushState({},"", "/");
-      let currentPrivateKey = window.localStorage.getItem("metaPrivateKey");
-      if(currentPrivateKey && currentPrivateKey!==rawPK){
-        window.localStorage.setItem("metaPrivateKey_backup"+Date.now(),currentPrivateKey);
-      }
-      window.localStorage.setItem("metaPrivateKey",rawPK);
-    } */
   }
   // console.log("startingAddress",startingAddress)
   const [amount, setAmount] = useState();
@@ -943,39 +870,6 @@ function App(props) {
   const [depositing, setDepositing] = useState();
   const [depositAmount, setDepositAmount] = useState();
 
-  /*
-  const handleOk = async () => {
-    setIsWalletModalVisible(false);
-
-    let result = await userProvider.send(walletModalData.payload.method, walletModalData.payload.params)
-
-    //console.log("MSG:",ethers.utils.toUtf8Bytes(msg).toString())
-
-    //console.log("payload.params[0]:",payload.params[1])
-    //console.log("address:",address)
-
-    //let userSigner = userProvider.getSigner()
-    //let result = await userSigner.signMessage(msg)
-    console.log("RESULT:",result)
-
-
-    walletModalData.connector.approveRequest({
-      id: walletModalData.payload.id,
-      result: result
-    });
-
-    notification.info({
-      message: "Wallet Connect Transaction Sent",
-      description: result.hash,
-      placement: "bottomRight",
-    });
-  };
-
-  const handleCancel = () => {
-    setIsWalletModalVisible(false);
-  };
-
-*/
   const walletDisplay =
     web3Modal && web3Modal.cachedProvider ? (
       ""
@@ -1240,18 +1134,7 @@ function App(props) {
             />
           )}
         </div>
-        {/*
-          <div style={{ padding: 10 }}>
-          <Input
-          placeholder="data (0x0000)"
-          value={data}
-          disabled={walletConnectTx}
-          onChange={(e)=>{
-            setData(e.target.value)
-          }}
-          />
-          </div>
-          */}
+
         <div style={{ position: "relative", top: 10, left: 40 }}> {networkDisplay} </div>
 
         <div style={{ padding: 10 }}>
@@ -1358,119 +1241,6 @@ function App(props) {
           }
         </div>
       </div>
-
-      {/* <BrowserRouter>
-
-        <Menu style={{ textAlign:"center" }} selectedKeys={[route]} mode="horizontal">
-          <Menu.Item key="/">
-            <Link
-              onClick={() => {
-                setRoute("/");
-              }}
-              to="/"
-            >
-              YourContract
-            </Link>
-          </Menu.Item>
-          <Menu.Item key="/hints">
-            <Link
-              onClick={() => {
-                setRoute("/hints");
-              }}
-              to="/hints"
-            >
-              Hints
-            </Link>
-          </Menu.Item>
-          <Menu.Item key="/exampleui">
-            <Link
-              onClick={() => {
-                setRoute("/exampleui");
-              }}
-              to="/exampleui"
-            >
-              ExampleUI
-            </Link>
-          </Menu.Item>
-          <Menu.Item key="/mainnetdai">
-            <Link
-              onClick={() => {
-                setRoute("/mainnetdai");
-              }}
-              to="/mainnetdai"
-            >
-              Mainnet DAI
-            </Link>
-          </Menu.Item>
-          <Menu.Item key="/subgraph">
-            <Link
-              onClick={() => {
-                setRoute("/subgraph");
-              }}
-              to="/subgraph"
-            >
-              Subgraph
-            </Link>
-          </Menu.Item>
-        </Menu>
-        <Switch>
-          <Route exact path="/">
-            }
-            <Contract
-              name="YourContract"
-              signer={userProvider.getSigner()}
-              provider={localProvider}
-              address={address}
-              blockExplorer={blockExplorer}
-            />
-
-
-
-          </Route>
-          <Route path="/hints">
-            <Hints
-              address={address}
-              yourLocalBalance={yourLocalBalance}
-              mainnetProvider={mainnetProvider}
-              price={price}
-            />
-          </Route>
-          <Route path="/exampleui">
-            <ExampleUI
-              address={address}
-              userProvider={userProvider}
-              mainnetProvider={mainnetProvider}
-              localProvider={localProvider}
-              yourLocalBalance={yourLocalBalance}
-              price={price}
-              tx={tx}
-              writeContracts={writeContracts}
-              readContracts={readContracts}
-              purpose={purpose}
-              setPurposeEvents={setPurposeEvents}
-            />
-          </Route>
-          <Route path="/mainnetdai">
-            <Contract
-              name="DAI"
-              customContract={mainnetDAIContract}
-              signer={userProvider.getSigner()}
-              provider={mainnetProvider}
-              address={address}
-              blockExplorer="https://etherscan.io/"
-            />
-          </Route>
-          <Route path="/subgraph">
-            <Subgraph
-              subgraphUri={props.subgraphUri}
-              tx={tx}
-              writeContracts={writeContracts}
-              mainnetProvider={mainnetProvider}
-            />
-          </Route>
-        </Switch>
-      </BrowserRouter>
-*/}
 
       <div style={{ padding: 16, backgroundColor: "#FFFFFF", width: 420, margin: "auto" }}>
         {
@@ -1651,15 +1421,6 @@ function App(props) {
           <ScanOutlined style={{ color: "#FFFFFF" }} />
         </Button>
       </div>
-
-      {/*
-
-      <Modal title={walletModalData && walletModalData.payload && walletModalData.payload.method} visible={isWalletModalVisible} onOk={handleOk} onCancel={handleCancel}>
-       <pre>
-        {walletModalData && walletModalData.payload && JSON.stringify(walletModalData.payload.params, null, 2)}
-       </pre>
-     </Modal>
-  */}
 
       {/* 🗺 Extra UI like gas price, eth price, faucet, and support: */}
       <div style={{ position: "fixed", textAlign: "left", left: 0, bottom: 20, padding: 10 }}>
