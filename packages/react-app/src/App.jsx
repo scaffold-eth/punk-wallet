@@ -195,7 +195,7 @@ function App(props) {
         erc20Tokens.concat(tokenSettingsHelper.getCustomItems()),
       )
     : undefined;
-  
+
   const mainnetProvider = new StaticJsonRpcProvider(NETWORKS.ethereum.rpcUrl);
 
   const [injectedProvider, setInjectedProvider] = useState();
@@ -776,11 +776,6 @@ function App(props) {
     }
   }, [loadWeb3Modal]);
 
-  const [route, setRoute] = useState();
-  useEffect(() => {
-    setRoute(window.location.pathname);
-  }, [setRoute]);
-
   let faucetHint = "";
   const faucetAvailable = localProvider && localProvider.connection && networkName == "localhost";
 
@@ -811,19 +806,60 @@ function App(props) {
     );
   }
 
-  let startingAddress = "";
+  const [toAddress, setToAddress] = useLocalStorage("punkWalletToAddress", "", 120000);
+
+  const [amount, setAmount] = useState();
+  const [amountEthMode, setAmountEthMode] = useState(false);
+
   if (window.location.pathname) {
-    const incoming = window.location.pathname.replace("/", "");
-    if (incoming && ethers.utils.isAddress(incoming)) {
-      startingAddress = incoming;
-      window.history.pushState({}, "", "/");
+    try {
+      const incoming = window.location.pathname.replace("/", "");
+
+      if (incoming) {
+        const incomingParts = incoming.split(":");
+
+        const incomingAddress = incomingParts[0];
+
+        if (incomingAddress && ethers.utils.isAddress(incomingAddress)) {
+          console.log("incoming address:", incomingAddress);
+
+          window.history.pushState({}, "", "/");
+
+          setToAddress(incomingAddress);
+        }
+
+        if (incomingParts.length > 1) {
+          const incomingAmount = parseFloat(incomingParts[1]);
+          if (incomingAmount > 0) {
+            console.log("incoming amount:", incomingAmount);
+            setAmount(incomingAmount);
+            setAmountEthMode(true);
+
+            if (targetNetwork?.nativeToken) {
+              tokenSettingsHelper.updateSelectedName(targetNetwork.nativeToken.name);
+            }
+          }
+        }
+
+        if (incomingParts.length > 2) {
+          const incomingNetworkName = incomingParts[2];
+
+          const incomingNetwork = Object.values(NETWORKS).find(network => network.name.startsWith(incomingNetworkName));
+
+          if (incomingNetwork) {
+            console.log("incoming network:", incomingNetwork);
+
+            networkSettingsHelper.updateSelectedName(incomingNetwork.name);
+            setTargetNetwork(networkSettingsHelper.getSelectedItem(true));
+          }
+        }
+      }
+    } catch (error) {
+      console.error("Coudn't parse incoming address/amount/network", error);
     }
   }
 
-  const [amount, setAmount] = useState();
-
   const [data, setData] = useState();
-  const [toAddress, setToAddress] = useLocalStorage("punkWalletToAddress", startingAddress, 120000);
 
   const [walletConnectTx, setWalletConnectTx] = useState();
 
@@ -1087,6 +1123,7 @@ function App(props) {
               price={price || targetNetwork.price}
               value={amount}
               token={targetNetwork.token || "ETH"}
+              ethMode={amountEthMode}
               address={address}
               provider={localProvider}
               gasPrice={gasPrice}

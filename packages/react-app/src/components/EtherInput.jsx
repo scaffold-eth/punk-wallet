@@ -32,12 +32,13 @@ const { utils } = require("ethers");
 */
 
 export default function EtherInput(props) {
-  const [mode, setMode] = useState(props.price ? "USD" : props.token);
-  const [display, setDisplay] = useState();
+  const [mode, setMode] = useState(props.ethMode ? props.token : (props.price ? "USD" : props.token));
   const [value, setValue] = useState();
   const [displayMax, setDisplayMax] = useState();
 
   const currentValue = typeof props.value !== "undefined" ? props.value : value;
+
+  const [display, setDisplay] = useState(currentValue);
 
   const balance = useBalance(props.provider, props.address, 1000);
   let floatBalance = parseFloat("0.00");
