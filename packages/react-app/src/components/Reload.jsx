@@ -30,6 +30,8 @@ export default function Reload({ currentPunkAddress, localProvider, networkSetti
   );
 }
 
+// ToDo: It could be nice to run this automatically when someone first visits the page, so we would switch to the network with some balance
+
 // a function to check your balance on every network and switch networks if found...
 const checkBalances = async (address, checkingBalances, setCheckingBalances, localProvider, networkSettingsHelper, setTargetNetwork) => {
   if (!checkingBalances) {
