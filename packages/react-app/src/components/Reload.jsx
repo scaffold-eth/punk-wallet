@@ -8,12 +8,11 @@ import { formatEther } from "@ethersproject/units";
 
 import { NETWORKS } from "../constants";
 
-export default function Reload({ currentPunkAddress, localProvider }) {
+export default function Reload({ currentPunkAddress, localProvider, networkSettingsHelper, setTargetNetwork }) {
   const [checkingBalances, setCheckingBalances] = useState();
 
   return (
     <span
-      key="checkBalances"
       style={{
         color: "#1890ff",
         cursor: "pointer",
@@ -23,7 +22,7 @@ export default function Reload({ currentPunkAddress, localProvider }) {
         verticalAlign: "middle",
       }}
       onClick={() => {
-        checkBalances(currentPunkAddress, checkingBalances, setCheckingBalances, localProvider);
+        checkBalances(currentPunkAddress, checkingBalances, setCheckingBalances, localProvider, networkSettingsHelper, setTargetNetwork);
       }}
     >
       <ReloadOutlined />
@@ -32,7 +31,7 @@ export default function Reload({ currentPunkAddress, localProvider }) {
 }
 
 // a function to check your balance on every network and switch networks if found...
-const checkBalances = async (address, checkingBalances, setCheckingBalances, localProvider) => {
+const checkBalances = async (address, checkingBalances, setCheckingBalances, localProvider, networkSettingsHelper, setTargetNetwork) => {
   if (!checkingBalances) {
     setCheckingBalances(true);
     setTimeout(() => {
@@ -49,10 +48,9 @@ const checkBalances = async (address, checkingBalances, setCheckingBalances, loc
           const result = tempBalance && formatEther(tempBalance);
           if (result != 0) {
             console.log("Found a balance in ", n);
-            window.localStorage.setItem("network", n);
-            setTimeout(() => {
-              window.location.reload(true);
-            }, 500);
+            networkSettingsHelper.updateSelectedName(n);
+            setTargetNetwork(networkSettingsHelper.getSelectedItem(true));
+            break;
           }
         } catch (e) {
           console.log(e);

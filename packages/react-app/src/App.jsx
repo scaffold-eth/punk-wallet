@@ -925,6 +925,8 @@ function App(props) {
               key="checkBalances"
               currentPunkAddress={address}
               localProvider={localProvider}
+              networkSettingsHelper={networkSettingsHelper}
+              setTargetNetwork={setTargetNetwork}
             />,
             <Account
               key="account"
