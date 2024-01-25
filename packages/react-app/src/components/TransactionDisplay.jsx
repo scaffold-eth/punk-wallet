@@ -126,7 +126,7 @@ export default function TransactionDisplay({
                           currentPunkAddress,
                           incomingOrder ? smallImageSrcCrossChain : smallImageSrc,
                         )}
-                        <div>-></div>
+                        <div>{"->"}</div>
                         {PunkBlockieWithLogo(
                           crossChainTargetAddress,
                           incomingOrder ? smallImageSrc : smallImageSrcCrossChain,
