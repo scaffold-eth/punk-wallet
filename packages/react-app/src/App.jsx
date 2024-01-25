@@ -1,5 +1,5 @@
-import { CaretUpOutlined, ScanOutlined, SendOutlined, ReloadOutlined, HistoryOutlined } from "@ant-design/icons";
-import { JsonRpcProvider, StaticJsonRpcProvider, Web3Provider } from "@ethersproject/providers";
+import { CaretUpOutlined, ScanOutlined, SendOutlined, HistoryOutlined } from "@ant-design/icons";
+import { StaticJsonRpcProvider, Web3Provider } from "@ethersproject/providers";
 import { formatEther, parseEther } from "@ethersproject/units";
 import WalletConnectProvider from "@walletconnect/web3-provider";
 import { Alert, Button, Checkbox, Col, Row, Select, Spin, Input, Modal, notification } from "antd";
@@ -29,6 +29,7 @@ import {
   SettingsModal,
   QRPunkBlockie,
   Ramp,
+  Reload,
   TokenDetailedDisplay,
   TokenDisplay,
   TokenImportDisplay,
@@ -194,41 +195,7 @@ function App(props) {
         erc20Tokens.concat(tokenSettingsHelper.getCustomItems()),
       )
     : undefined;
-
-  const [checkingBalances, setCheckingBalances] = useState();
-  // a function to check your balance on every network and switch networks if found...
-  const checkBalances = async address => {
-    if (!checkingBalances) {
-      setCheckingBalances(true);
-      setTimeout(() => {
-        setCheckingBalances(false);
-      }, 5000);
-      //getting current balance
-      const currentBalance = await localProvider.getBalance(address);
-      if (currentBalance && ethers.utils.formatEther(currentBalance) == "0.0") {
-        console.log("No balance found... searching...");
-        for (const n in NETWORKS) {
-          try {
-            const tempProvider = new JsonRpcProvider(NETWORKS[n].rpcUrl);
-            const tempBalance = await tempProvider.getBalance(address);
-            const result = tempBalance && formatEther(tempBalance);
-            if (result != 0) {
-              console.log("Found a balance in ", n);
-              window.localStorage.setItem("network", n);
-              setTimeout(() => {
-                window.location.reload(true);
-              }, 500);
-            }
-          } catch (e) {
-            console.log(e);
-          }
-        }
-      } else {
-        window.location.reload(true);
-      }
-    }
-  };
-
+  
   const mainnetProvider = new StaticJsonRpcProvider(NETWORKS.ethereum.rpcUrl);
 
   const [injectedProvider, setInjectedProvider] = useState();
@@ -683,11 +650,6 @@ function App(props) {
   // Just plug in different 🛰 providers to get your balance on different chains:
   const yourMainnetBalance = useBalance(mainnetProvider, address);
 
-  /*
-  const addressFromENS = useResolveName(mainnetProvider, "austingriffith.eth");
-  console.log("🏷 Resolved austingriffith.eth as:",addressFromENS)
-  */
-
   //
   // 🧫 DEBUG 👨🏻‍🔬
   //
@@ -857,7 +819,7 @@ function App(props) {
       window.history.pushState({}, "", "/");
     }
   }
-  // console.log("startingAddress",startingAddress)
+
   const [amount, setAmount] = useState();
 
   const [data, setData] = useState();
@@ -959,22 +921,11 @@ function App(props) {
             </span>, */
             walletDisplay,
 
-            <span
+            <Reload
               key="checkBalances"
-              style={{
-                color: "#1890ff",
-                cursor: "pointer",
-                fontSize: 30,
-                opacity: checkingBalances ? 0.2 : 1,
-                paddingLeft: 16,
-                verticalAlign: "middle",
-              }}
-              onClick={() => {
-                checkBalances(address);
-              }}
-            >
-              <ReloadOutlined />
-            </span>,
+              currentPunkAddress={address}
+              localProvider={localProvider}
+            />,
             <Account
               key="account"
               address={address}
@@ -1054,7 +1005,16 @@ function App(props) {
         </div>
       )}
 
-      <div style={{ position: "relative", width: 320, margin: "auto", textAlign: "center", marginTop: 32, backgroundColor:"" }}>
+      <div
+        style={{
+          position: "relative",
+          width: 320,
+          margin: "auto",
+          textAlign: "center",
+          marginTop: 32,
+          backgroundColor: "",
+        }}
+      >
         <div style={{ padding: 10 }}>
           {isMoneriumDataLoading && (
             <div
