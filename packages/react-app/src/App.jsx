@@ -196,6 +196,18 @@ function App(props) {
       )
     : undefined;
 
+  if (selectedErc20Token) {
+    const switchToEth = localStorage.getItem("switchToEth");
+    if (switchToEth) {
+      localStorage.removeItem("switchToEth");
+
+      if (targetNetwork?.nativeToken?.name) {
+        tokenSettingsHelper.updateSelectedName(targetNetwork.nativeToken.name);
+        console.log("Switched to native token");
+      }
+    }
+  }
+
   const mainnetProvider = new StaticJsonRpcProvider(NETWORKS.ethereum.rpcUrl);
 
   const [injectedProvider, setInjectedProvider] = useState();
@@ -818,39 +830,67 @@ function App(props) {
       if (incoming) {
         const incomingParts = incoming.split(":");
 
-        const incomingAddress = incomingParts[0];
+        let index = 0;
+        let pushState = false;
 
-        if (incomingAddress && ethers.utils.isAddress(incomingAddress)) {
-          console.log("incoming address:", incomingAddress);
+        const incomingNetworkName = incomingParts[index];
+        let incomingNetwork;
 
-          window.history.pushState({}, "", "/");
-
-          setToAddress(incomingAddress);
-        }
-
-        if (incomingParts.length > 1) {
-          const incomingAmount = parseFloat(incomingParts[1]);
-          if (incomingAmount > 0) {
-            console.log("incoming amount:", incomingAmount);
-            setAmount(incomingAmount);
-            setAmountEthMode(true);
-
-            if (targetNetwork?.nativeToken) {
-              tokenSettingsHelper.updateSelectedName(targetNetwork.nativeToken.name);
-            }
-          }
-        }
-
-        if (incomingParts.length > 2) {
-          const incomingNetworkName = incomingParts[2];
-
-          const incomingNetwork = Object.values(NETWORKS).find(network => network.name.startsWith(incomingNetworkName));
+        if (incomingNetworkName) {
+          incomingNetwork = Object.values(NETWORKS).find(network => network.name.startsWith(incomingNetworkName));
 
           if (incomingNetwork) {
             console.log("incoming network:", incomingNetwork);
 
             networkSettingsHelper.updateSelectedName(incomingNetwork.name);
             setTargetNetwork(networkSettingsHelper.getSelectedItem(true));
+
+            window.history.pushState({}, "", "/");
+            pushState = true;
+
+            index++;
+          }
+        }
+
+        if (incomingParts.length > index) {
+          const incomingAddress = incomingParts[index];
+
+          if (incomingAddress && ethers.utils.isAddress(incomingAddress)) {
+            console.log("incoming address:", incomingAddress);
+
+            setToAddress(incomingAddress);
+          }
+
+          if (!pushState) {
+            window.history.pushState({}, "", "/");
+            pushState = true;
+          }
+
+          index++;
+        }
+
+        if (incomingParts.length > index) {
+          const incomingAmount = parseFloat(incomingParts[index]);
+
+          if (incomingAmount > 0) {
+            console.log("incoming amount:", incomingAmount);
+            setAmount(incomingAmount);
+            setAmountEthMode(true);
+
+            if (!incomingNetwork) {
+              if (targetNetwork?.nativeToken?.name) {
+                tokenSettingsHelper.updateSelectedName(targetNetwork.nativeToken.name);
+                console.log("Switched to native token");
+              }
+            }
+
+            if (incomingNetwork?.nativeToken) {
+              localStorage.setItem("switchToEth", true);
+            }
+          }
+
+          if (!pushState) {
+            window.history.pushState({}, "", "/");
           }
         }
       }
