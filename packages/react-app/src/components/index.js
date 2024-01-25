@@ -29,6 +29,7 @@ export { default as Punk } from "./Punk";
 export { default as PunkBlockie } from "./PunkBlockie";
 export { default as QRPunkBlockie } from "./QRPunkBlockie";
 export { default as Ramp } from "./Ramp";
+export { default as Reload } from "./Reload";
 export { default as SelectorWithSettings } from "./SelectorWithSettings";
 export { default as SettingsModal } from "./SettingsModal";
 export { default as Swap } from "./Swap";
