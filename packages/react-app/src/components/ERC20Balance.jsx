@@ -15,8 +15,10 @@ export default function ERC20Balance({
   dollarMode,
   setDollarMode,
   isTxSent,
+  balance,
+  setBalance,
 }) {
-  const [balance, setBalance] = useState(null);
+  // const [balance, setBalance] = useState(null);
   const [price, setPrice] = useState(0);
 
   const [loading, setLoading] = useState(true);

@@ -925,6 +925,9 @@ function App(props) {
   // State to handle balance update after a tx is sent
   const [isTxSent, setIsTxSent] = useState(false);
 
+  // ERC20 Token balance to use in balance and in tokenswitch
+  const [balanceERC20, setBalanceERC20] = useState(null);
+
   /*
   const handleOk = async () => {
     setIsWalletModalVisible(false);
@@ -1091,6 +1094,8 @@ function App(props) {
               dollarMode={dollarMode}
               setDollarMode={setDollarMode}
               isTxSent={isTxSent}
+              balance={balanceERC20}
+              setBalance={setBalanceERC20}
             />
           ) : (
             <Balance
