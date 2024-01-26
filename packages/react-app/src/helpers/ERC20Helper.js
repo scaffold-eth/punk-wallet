@@ -112,7 +112,7 @@ export const getTokenBalance = async (token, rpcURL, address) => {
       token.decimals,
     );
 
-    let digits = 2;
+    let digits = 4;
 
     if (isTokenAddressMainnetWETH(token.address)) {
       digits = 4;
