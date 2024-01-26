@@ -852,24 +852,28 @@ function App(props) {
           }
         }
 
+        let validAddress = false;
+
         if (incomingParts.length > index) {
           const incomingAddress = incomingParts[index];
 
           if (incomingAddress && ethers.utils.isAddress(incomingAddress)) {
             console.log("incoming address:", incomingAddress);
 
-            setToAddress(incomingAddress);
-          }
+            validAddress=true;
 
-          if (!pushState) {
-            window.history.pushState({}, "", "/");
-            pushState = true;
+            setToAddress(incomingAddress);
+
+            if (!pushState) {
+              window.history.pushState({}, "", "/");
+              pushState = true;
+            }
           }
 
           index++;
         }
 
-        if (incomingParts.length > index) {
+        if (validAddress && (incomingParts.length > index)) {
           const incomingAmount = parseFloat(incomingParts[index]);
 
           if (incomingAmount > 0) {
