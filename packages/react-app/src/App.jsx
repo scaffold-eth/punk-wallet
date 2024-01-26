@@ -195,7 +195,19 @@ function App(props) {
         erc20Tokens.concat(tokenSettingsHelper.getCustomItems()),
       )
     : undefined;
-  
+
+  if (selectedErc20Token) {
+    const switchToEth = localStorage.getItem("switchToEth");
+    if (switchToEth) {
+      localStorage.removeItem("switchToEth");
+
+      if (targetNetwork?.nativeToken?.name) {
+        tokenSettingsHelper.updateSelectedName(targetNetwork.nativeToken.name);
+        console.log("Switched to native token");
+      }
+    }
+  }
+
   const mainnetProvider = new StaticJsonRpcProvider(NETWORKS.ethereum.rpcUrl);
 
   const [injectedProvider, setInjectedProvider] = useState();
@@ -776,11 +788,6 @@ function App(props) {
     }
   }, [loadWeb3Modal]);
 
-  const [route, setRoute] = useState();
-  useEffect(() => {
-    setRoute(window.location.pathname);
-  }, [setRoute]);
-
   let faucetHint = "";
   const faucetAvailable = localProvider && localProvider.connection && networkName == "localhost";
 
@@ -811,19 +818,88 @@ function App(props) {
     );
   }
 
-  let startingAddress = "";
+  const [toAddress, setToAddress] = useLocalStorage("punkWalletToAddress", "", 120000);
+
+  const [amount, setAmount] = useState();
+  const [amountEthMode, setAmountEthMode] = useState(false);
+
   if (window.location.pathname) {
-    const incoming = window.location.pathname.replace("/", "");
-    if (incoming && ethers.utils.isAddress(incoming)) {
-      startingAddress = incoming;
-      window.history.pushState({}, "", "/");
+    try {
+      const incoming = window.location.pathname.replace("/", "");
+
+      if (incoming) {
+        const incomingParts = incoming.split(":");
+
+        let index = 0;
+        let pushState = false;
+
+        const incomingNetworkName = incomingParts[index];
+        let incomingNetwork;
+
+        if (incomingNetworkName) {
+          incomingNetwork = Object.values(NETWORKS).find(network => network.name.startsWith(incomingNetworkName));
+
+          if (incomingNetwork) {
+            console.log("incoming network:", incomingNetwork);
+
+            networkSettingsHelper.updateSelectedName(incomingNetwork.name);
+            setTargetNetwork(networkSettingsHelper.getSelectedItem(true));
+
+            window.history.pushState({}, "", "/");
+            pushState = true;
+
+            index++;
+          }
+        }
+
+        if (incomingParts.length > index) {
+          const incomingAddress = incomingParts[index];
+
+          if (incomingAddress && ethers.utils.isAddress(incomingAddress)) {
+            console.log("incoming address:", incomingAddress);
+
+            setToAddress(incomingAddress);
+          }
+
+          if (!pushState) {
+            window.history.pushState({}, "", "/");
+            pushState = true;
+          }
+
+          index++;
+        }
+
+        if (incomingParts.length > index) {
+          const incomingAmount = parseFloat(incomingParts[index]);
+
+          if (incomingAmount > 0) {
+            console.log("incoming amount:", incomingAmount);
+            setAmount(incomingAmount);
+            setAmountEthMode(true);
+
+            if (!incomingNetwork) {
+              if (targetNetwork?.nativeToken?.name) {
+                tokenSettingsHelper.updateSelectedName(targetNetwork.nativeToken.name);
+                console.log("Switched to native token");
+              }
+            }
+
+            if (incomingNetwork?.nativeToken) {
+              localStorage.setItem("switchToEth", true);
+            }
+          }
+
+          if (!pushState) {
+            window.history.pushState({}, "", "/");
+          }
+        }
+      }
+    } catch (error) {
+      console.error("Coudn't parse incoming address/amount/network", error);
     }
   }
 
-  const [amount, setAmount] = useState();
-
   const [data, setData] = useState();
-  const [toAddress, setToAddress] = useLocalStorage("punkWalletToAddress", startingAddress, 120000);
 
   const [walletConnectTx, setWalletConnectTx] = useState();
 
@@ -1087,6 +1163,7 @@ function App(props) {
               price={price || targetNetwork.price}
               value={amount}
               token={targetNetwork.token || "ETH"}
+              ethMode={amountEthMode}
               address={address}
               provider={localProvider}
               gasPrice={gasPrice}
