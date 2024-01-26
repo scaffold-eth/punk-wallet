@@ -11,15 +11,12 @@ import { TokenSwitch } from "./TokenSwitch";
 // ToDo: add check if enough balance is available, otherwise don't allow user to send
 // ToDo: address check if valid
 
-export default function ERC20Input({ token, targetNetwork, onChange, balance }) {
-  const [mode, setMode] = useState(token.name);
+export default function ERC20Input({ token, targetNetwork, onChange, balance, dollarMode, setDollarMode }) {
   const [price, setPrice] = useState(0);
   const [display, setDisplay] = useState();
-  const [placeholder, setPlaceholder] = useState(`amount in ${mode}`);
-  const [disabledInput, setDisabledInput] = useState(false);
   const [displayMax, setDisplayMax] = useState();
 
-  const prefix = mode === "USD" ? "$" : token.name;
+  const prefix = dollarMode ? "$" : token.name;
 
   async function getPrice() {
     try {
@@ -31,7 +28,7 @@ export default function ERC20Input({ token, targetNetwork, onChange, balance }) 
   }
 
   const amountCalculation = _value => {
-    if (mode === "USD") {
+    if (dollarMode) {
       const numericValue = parseFloat(_value);
       const amountToken = numericValue / price;
       onChange(amountToken);
@@ -51,6 +48,10 @@ export default function ERC20Input({ token, targetNetwork, onChange, balance }) 
     if (displayMax) {
       amountCalculation(balance);
     }
+    // for tokenswitch so that switch to usd can be disabled
+    if (price === 0) {
+      setDollarMode(false);
+    }
 
     // Call price update just every 30sec instead of having price updates every second
     const interval = setInterval(getPrice, 30000);
@@ -66,25 +67,23 @@ export default function ERC20Input({ token, targetNetwork, onChange, balance }) 
         onClick={() => {
           setDisplayMax(true);
           amountCalculation(balance);
+          console.log("dollarMode", dollarMode);
         }}
       >
         max
       </span>
       <Input
         value={display}
-        disabled={disabledInput}
-        placeholder={placeholder}
+        placeholder="...insert amout"
         prefix={prefix}
         addonAfter={
           <TokenSwitch
             token={token}
-            setMode={setMode}
-            mode={mode}
             price={price}
             setDisplay={setDisplay}
             display={display}
-            setPlaceholder={setPlaceholder}
-            setDisabledInput={setDisabledInput}
+            dollarMode={dollarMode}
+            setDollarMode={setDollarMode}
           />
         }
         onChange={async e => {

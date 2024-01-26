@@ -1,58 +1,31 @@
-import React, { useState } from "react";
+import React from "react";
 
 // toggle functionality for switching between ERC20 token and USD
-export const TokenSwitch = ({
-  token,
-  divStyle,
-  spanStyle,
-  setMode,
-  mode,
-  price,
-  setDisplay,
-  display,
-  setPlaceholder,
-  setDisabledInput,
-}) => {
-  // serves a placeholder for the display value when price is 0
-  const [tempDisplay, setTempDisplay] = useState();
-
+export const TokenSwitch = ({ token, divStyle, spanStyle, price, setDisplay, display, dollarMode, setDollarMode }) => {
   const toggleUSDERC20 = () => {
-    if (mode === "USD") {
-      if (display && price !== 0) {
+    if (dollarMode) {
+      if (display) {
         setDisplay((display / price).toFixed(4));
-        setPlaceholder(`amount in ${mode}`);
       }
-      if (price === 0) {
-        setDisabledInput(false);
-        setDisplay(tempDisplay);
-      }
-      setMode(token.name);
+      setDollarMode(false);
     } else {
       if (display) {
-        if (price !== 0) {
-          setDisplay((display * price).toFixed(2));
-          setPlaceholder(`amount in ${mode}`);
-        } else {
-          setTempDisplay(display);
-          setDisplay();
-          setDisabledInput(true);
-          setPlaceholder(`no price available`);
-        }
+        setDisplay((display * price).toFixed(2));
       }
-      setMode("USD");
+      setDollarMode(true);
     }
   };
 
   const switching = () => {
-    return mode === token.name ? (
+    return dollarMode ? (
+      <>💵 USD 🔀</>
+    ) : (
       <>
         {token.imgSrc && (
           <img style={{ height: "1em", width: "1em", marginRight: "5px" }} src={token.imgSrc} alt="token" />
         )}
         <span style={{ ...spanStyle }}>{token.name} 🔀</span>
       </>
-    ) : (
-      <>💵 USD 🔀</>
     );
   };
 
@@ -65,7 +38,11 @@ export const TokenSwitch = ({
         ...divStyle,
       }}
       onClick={() => {
-        toggleUSDERC20();
+        if (price !== 0) {
+          toggleUSDERC20();
+        } else {
+          console.log("price not available");
+        }
       }}
     >
       {switching()}

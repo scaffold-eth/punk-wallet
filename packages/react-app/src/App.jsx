@@ -1196,6 +1196,8 @@ function App(props) {
               setAmount={setAmount}
               targetNetwork={targetNetwork}
               balance={balanceERC20}
+              dollarMode={dollarMode}
+              setDollarMode={setDollarMode}
               onChange={value => {
                 setAmount(value);
               }}
