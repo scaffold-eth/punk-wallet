@@ -11,12 +11,13 @@ import { TokenSwitch } from "./TokenSwitch";
 // ToDo: add check if enough balance is available, otherwise don't allow user to send
 // ToDo: address check if valid
 
-export default function ERC20Input({ token, targetNetwork, onChange }) {
+export default function ERC20Input({ token, targetNetwork, onChange, balance }) {
   const [mode, setMode] = useState(token.name);
   const [price, setPrice] = useState(0);
   const [display, setDisplay] = useState();
   const [placeholder, setPlaceholder] = useState(`amount in ${mode}`);
   const [disabledInput, setDisabledInput] = useState(false);
+  const [displayMax, setDisplayMax] = useState();
 
   const prefix = mode === "USD" ? "$" : token.name;
 
@@ -34,23 +35,41 @@ export default function ERC20Input({ token, targetNetwork, onChange }) {
       const numericValue = parseFloat(_value);
       const amountToken = numericValue / price;
       onChange(amountToken);
+      if (displayMax) {
+        setDisplay((numericValue * price).toFixed(2));
+      }
     } else {
       onChange(_value);
+      if (displayMax) {
+        setDisplay(_value);
+      }
     }
   };
 
   useEffect(() => {
     getPrice();
+    if (displayMax) {
+      amountCalculation(balance);
+    }
 
     // Call price update just every 30sec instead of having price updates every second
     const interval = setInterval(getPrice, 30000);
 
     // Clear interval on component unmount to prevent memory overflow
     return () => clearInterval(interval);
-  }, [targetNetwork, token]);
+  }, [targetNetwork, token, displayMax]);
 
   return (
     <div>
+      <span
+        style={{ cursor: "pointer", color: "red", float: "right", marginTop: "-5px" }}
+        onClick={() => {
+          setDisplayMax(true);
+          amountCalculation(balance);
+        }}
+      >
+        max
+      </span>
       <Input
         value={display}
         disabled={disabledInput}
@@ -71,6 +90,7 @@ export default function ERC20Input({ token, targetNetwork, onChange }) {
         onChange={async e => {
           amountCalculation(e.target.value);
           setDisplay(e.target.value);
+          setDisplayMax(false);
         }}
       />
     </div>

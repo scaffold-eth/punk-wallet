@@ -1195,6 +1195,7 @@ function App(props) {
               value={amount}
               setAmount={setAmount}
               targetNetwork={targetNetwork}
+              balance={balanceERC20}
               onChange={value => {
                 setAmount(value);
               }}
