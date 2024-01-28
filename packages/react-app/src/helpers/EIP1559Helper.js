@@ -8,89 +8,90 @@ const POLYGON_GAS_API_URL = "https://gasstation.polygon.technology/v2";
 
 // Create an ethers wallet from the localStorage private key, for EIP-1559 type-2 transactions
 // Mainnet and polygon only
-export const getEthersWallet = (txParams) => {
-	const chainId = getChainIdNumber(txParams);
-	if (!chainId) {
-		return;
-	}
+export const getEthersWallet = txParams => {
+  const chainId = getChainIdNumber(txParams);
+  if (!chainId) {
+    return;
+  }
 
-	let rpcUrl;
-	if (chainId == NETWORKS.ethereum.chainId) {
-		rpcUrl = NETWORKS.ethereum.rpcUrl;
-	}
-	else if (chainId == NETWORKS.polygon.chainId) {
-		rpcUrl = NETWORKS.polygon.rpcUrl;
-	}
-	else {
-		console.error("Only mainnet and polygon support EIP-1559")
-		return;
-	}
+  let rpcUrl;
+  if (chainId == NETWORKS.ethereum.chainId) {
+    rpcUrl = NETWORKS.ethereum.rpcUrl;
+  } else if (chainId == NETWORKS.polygon.chainId) {
+    rpcUrl = NETWORKS.polygon.rpcUrl;
+  } else {
+    console.error("Only mainnet and polygon support EIP-1559");
+    return;
+  }
 
-	const ethersProvider = new ethers.providers.StaticJsonRpcProvider(rpcUrl);
+  const ethersProvider = new ethers.providers.StaticJsonRpcProvider(rpcUrl);
 
-	return createEthersWallet(ethersProvider);
-}
+  return createEthersWallet(ethersProvider);
+};
 
-export const createEthersWallet = (ethersProvider) => {
-	const privakeKey = localStorage.getItem('metaPrivateKey');
+export const createEthersWallet = ethersProvider => {
+  const privakeKey = localStorage.getItem("metaPrivateKey");
 
-	if (ethersProvider) {
-		return new ethers.Wallet(privakeKey, ethersProvider);
-	}
+  if (ethersProvider) {
+    return new ethers.Wallet(privakeKey, ethersProvider);
+  }
 
-	return new ethers.Wallet(privakeKey);
-}
+  return new ethers.Wallet(privakeKey);
+};
 
 // Create EIP-1559 type-2 transactions on mainnet and polygon
 // Other networks use legacy transactions with gasPrice
-export const sendTransaction =  (txParams, signer, injectedProvider) => {
-	const chainId = getChainIdNumber(txParams);
+export const sendTransaction = (txParams, signer, injectedProvider) => {
+  const chainId = getChainIdNumber(txParams);
 
-	let result;
+  let result;
 
-	if ((injectedProvider !== undefined) ||	// In case of an injected provider like metamask, let them handle the transaction
-		(!chainId) || ((chainId != NETWORKS.ethereum.chainId) && (chainId != NETWORKS.polygon.chainId))) { // Legacy transaction if we're not on mainnet/polygon
+  if (
+    injectedProvider !== undefined || // In case of an injected provider like metamask, let them handle the transaction
+    !chainId ||
+    (chainId != NETWORKS.ethereum.chainId && chainId != NETWORKS.polygon.chainId)
+  ) {
+    // Legacy transaction if we're not on mainnet/polygon
 
-		return signer.sendTransaction(txParams);	
-	}
+    return signer.sendTransaction(txParams);
+  }
 
-	cleanGasParams(txParams);
-	txParams.chainId = chainId; // Ethers is quite strict, chainId should be a numbner like 137, not "0x89" which is sent by paraswap via WalletConnect
+  cleanGasParams(txParams);
+  txParams.chainId = chainId; // Ethers is quite strict, chainId should be a numbner like 137, not "0x89" which is sent by paraswap via WalletConnect
 
-	if (chainId == NETWORKS.ethereum.chainId) {
-		return sendTransactionMainnet(txParams);
-	}
-	else if (chainId == NETWORKS.polygon.chainId) {
-		return sendTransactionPolygon(txParams, signer);
-	}
-}
+  if (chainId == NETWORKS.ethereum.chainId) {
+    return sendTransactionMainnet(txParams);
+  } else if (chainId == NETWORKS.polygon.chainId) {
+    return sendTransactionPolygon(txParams, signer);
+  }
+};
 
 // This should work for strings, hexa and decimal numbers: "1", 1, "0x01", 0x01
-export const getChainIdNumber = (txParams) => {
-	let chainId = txParams?.chainId;
-	if (!chainId) {
-		console.error("Missing chainId")
-		return undefined;
-	}
+export const getChainIdNumber = txParams => {
+  let chainId = txParams?.chainId;
+  if (!chainId) {
+    console.error("Missing chainId");
+    return undefined;
+  }
 
-	return BigNumber.from(chainId.toString()).toNumber();
-}
+  return BigNumber.from(chainId.toString()).toNumber();
+};
 
 // Ethers can figure out maxFeePerGas and maxPriorityFeePerGas properly
 // maxFeePerGas is set to the baseFee * 2
 // maxPriorityFeePerGas is set to 1.5 gwei
 // See https://github.com/ethers-io/ethers.js/blob/0bfa7f497dc5793b66df7adfb42c6b846c51d794/packages/abstract-provider/src.ts/index.ts#L252-L253
-const sendTransactionMainnet = (txParams) => {
-	const ethersWallet = getEthersWallet(txParams);
-	return ethersWallet.sendTransaction(txParams);
-}
+const sendTransactionMainnet = txParams => {
+  const ethersWallet = getEthersWallet(txParams);
+  return ethersWallet.sendTransaction(txParams);
+};
 
 // Ethers cannot figure out maxFeePerGas and maxPriorityFeePerGas properly
 // https://github.com/ethers-io/ethers.js/issues/2828#issuecomment-1283014250
 const sendTransactionPolygon = async (txParams, signer) => {
-	let gasData = (await axios.get(POLYGON_GAS_API_URL)).data;
+  let gasData = (await axios.get(POLYGON_GAS_API_URL)).data;
 
-		/* Example response
+  /* Example response
 			{
 			   "safeLow":{
 			      "maxPriorityFee":34.48322525326667,
@@ -109,29 +110,39 @@ const sendTransactionPolygon = async (txParams, signer) => {
 			   "blockNumber":41986526
 		*/
 
-	const baseFee = gasData.estimatedBaseFee * 2; // Double baseFee the same way as ethers calculate it
-	const maxPriorityFee = gasData.standard.maxPriorityFee * 1.2 // speed up standard by 20%, it should be enough
+  // https://support.polygon.technology/support/solutions/articles/82000902417-what-is-the-difference-between-eth-estimategas-eth-gasprice-how-does-polygon-gas-station-compare-t
 
-	txParams.maxFeePerGas = getHexStringFromGasNumber(baseFee);
-	txParams.maxPriorityFeePerGas = getHexStringFromGasNumber(maxPriorityFee);
-	console.log("updated txParams", txParams);
+  const gas = gasData["fast"];
 
-	const ethersWallet = signer ? signer : getEthersWallet(txParams);
-	return ethersWallet.sendTransaction(txParams);
-}
+  const priority = Math.trunc(gas.maxPriorityFee * 10 ** 9);
+  const max = Math.trunc(gas.maxFee * 10 ** 9);
+  console.log("using gasData", priority.toString(), max.toString());
+  const maxFeePerGas = max.toString();
+  const maxPriorityFeePerGas = priority.toString();
+  console.log("maxFeePerGas: ", maxFeePerGas);
+  console.log("maxPriorityFeePerGas: ", maxPriorityFeePerGas);
 
-const getHexStringFromGasNumber = (gasNumber) => {
-	const gasString = Math.floor(gasNumber).toString();
+  txParams.maxFeePerGas = maxFeePerGas;
+  txParams.maxPriorityFeePerGas = maxPriorityFeePerGas;
 
-	const gasBigNumber = utils.parseUnits(gasString, "gwei");
-	return gasBigNumber.toHexString();
-}
+  console.log("updated txParams", txParams);
+
+  const ethersWallet = signer ? signer : getEthersWallet(txParams);
+  return ethersWallet.sendTransaction(txParams);
+};
+
+const getHexStringFromGasNumber = gasNumber => {
+  const gasString = Math.floor(gasNumber).toString();
+
+  const gasBigNumber = utils.parseUnits(gasString, "gwei");
+  return gasBigNumber.toHexString();
+};
 
 // Clean gas params
 // Simply sending a tx with PunkWallet won't need this,
 // however WalletConnect transactions migh have wrong gas data set already
-const cleanGasParams = (txParams) => {
-	delete txParams.gasPrice;				// for legacy transacitons
-	delete txParams.maxPriorityFeePerGas;	// for EIP-1559 type-2 transacitons
-	delete txParams.maxFeePerGas;			// for EIP-1559 type-2 transacitons
-}
+const cleanGasParams = txParams => {
+  delete txParams.gasPrice; // for legacy transacitons
+  delete txParams.maxPriorityFeePerGas; // for EIP-1559 type-2 transacitons
+  delete txParams.maxFeePerGas; // for EIP-1559 type-2 transacitons
+};
