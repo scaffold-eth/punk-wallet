@@ -1,4 +1,6 @@
-const ALCHEMY_API_KEY_MAINNET = process.env.REACT_APP_ALCHEMY_API_KEY_MAINNET;
+const TAMS_FREE_ALCHEMY_API_KEY = "7OQ7KlD3Ldrw_Zhvh8_RhkJRf1lm9s90";
+
+const ALCHEMY_API_KEY_MAINNET = process.env.REACT_APP_ALCHEMY_API_KEY_MAINNET ?? TAMS_FREE_ALCHEMY_API_KEY;
 
 // MY INFURA_ID, SWAP IN YOURS FROM https://infura.io/dashboard/ethereum
 export const INFURA_ID = "5b3aa68d82264f59bb6a1874cb3c23ea"; // trying the  emoji.support key
