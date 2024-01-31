@@ -23,9 +23,7 @@ export default function TokenImportDisplay({ tokenSettingsHelper, tokenCoreDispl
 
                 setLoading(true);
 
-                // ToDo: Use Promise.all to make this faster
-                const decimals = await tokenHelper.decimals();
-                const symbol = await tokenHelper.symbol();
+                const [decimals, symbol] = await Promise.all([tokenHelper.decimals(),tokenHelper.symbol()])
 
                 setLoading(false);
 
