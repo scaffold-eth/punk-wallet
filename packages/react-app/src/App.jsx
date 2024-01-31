@@ -858,7 +858,7 @@ function App(props) {
           if (incomingAddress && ethers.utils.isAddress(incomingAddress)) {
             console.log("incoming address:", incomingAddress);
 
-            validAddress=true;
+            validAddress = true;
 
             setToAddress(incomingAddress);
 
@@ -871,7 +871,7 @@ function App(props) {
           index++;
         }
 
-        if (validAddress && (incomingParts.length > index)) {
+        if (validAddress && incomingParts.length > index) {
           const incomingAmount = parseFloat(incomingParts[index]);
 
           if (incomingAmount > 0) {
@@ -909,6 +909,9 @@ function App(props) {
 
   const [depositing, setDepositing] = useState();
   const [depositAmount, setDepositAmount] = useState();
+
+  // ERC20 Token balance to use in balance and in tokenswitch
+  const [balanceERC20, setBalanceERC20] = useState(null);
 
   const walletDisplay =
     web3Modal && web3Modal.cachedProvider ? (
@@ -1037,6 +1040,8 @@ function App(props) {
               address={address}
               dollarMode={dollarMode}
               setDollarMode={setDollarMode}
+              balance={balanceERC20}
+              setBalance={setBalanceERC20}
             />
           ) : (
             <Balance
@@ -1159,7 +1164,18 @@ function App(props) {
           {walletConnectTx ? (
             <Input disabled={true} value={amount} />
           ) : selectedErc20Token ? (
-            <ERC20Input token={selectedErc20Token} amount={amount} setAmount={setAmount} />
+            <ERC20Input
+              token={selectedErc20Token}
+              value={amount}
+              setAmount={setAmount}
+              targetNetwork={targetNetwork}
+              balance={balanceERC20}
+              dollarMode={dollarMode}
+              setDollarMode={setDollarMode}
+              onChange={value => {
+                setAmount(value);
+              }}
+            />
           ) : (
             <EtherInput
               price={price || targetNetwork.price}

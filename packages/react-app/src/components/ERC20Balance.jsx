@@ -6,8 +6,17 @@ import { getTokenBalance } from "../helpers/ERC20Helper";
 
 import { getTokenPrice } from "../helpers/LiFiTokenPriceHelper";
 
-export default function ERC20Balance({ targetNetwork, token, rpcURL, size, address, dollarMode, setDollarMode }) {
-  const [balance, setBalance] = useState(null);
+export default function ERC20Balance({
+  targetNetwork,
+  token,
+  rpcURL,
+  size,
+  address,
+  dollarMode,
+  setDollarMode,
+  balance,
+  setBalance,
+}) {
   const [price, setPrice] = useState(0);
 
   const [loading, setLoading] = useState(true);
