@@ -53,8 +53,6 @@ import {
   onSessionProposal,
 } from "./helpers/WalletConnectV2Helper";
 
-import { sendTransaction } from "./helpers/EIP1559Helper";
-
 import {
   ON_CHAIN_IBAN_VALUE,
   getAvailableTargetChainNames,

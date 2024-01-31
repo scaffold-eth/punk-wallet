@@ -41,7 +41,7 @@ export const createEthersWallet = ethersProvider => {
 
 // Create EIP-1559 type-2 transactions on mainnet and polygon
 // Other networks use legacy transactions with gasPrice
-export const sendTransaction = (txParams, signer, injectedProvider) => {
+export const sendTransaction = (txParams, signer, injectedProvider, relayerWallet) => {
   const chainId = getChainIdNumber(txParams);
 
   let result;
@@ -62,7 +62,7 @@ export const sendTransaction = (txParams, signer, injectedProvider) => {
   if (chainId == NETWORKS.ethereum.chainId) {
     return sendTransactionMainnet(txParams);
   } else if (chainId == NETWORKS.polygon.chainId) {
-    return sendTransactionPolygon(txParams, signer);
+    return sendTransactionPolygon(txParams, relayerWallet);
   }
 };
 
