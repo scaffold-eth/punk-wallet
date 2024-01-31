@@ -27,8 +27,6 @@ export default function ERC20Balance({
   // Can't perform a React state update on an unmounted component. This is a no-op, but it indicates a memory leak in your application. To fix, cancel all subscriptions and asynchronous tasks in a useEffect cleanup function.
   // https://medium.com/doctolib/react-stop-checking-if-your-component-is-mounted-3bb2568a4934
 
-  // ToDo: Switch between token amount and token price, same as how we can switch between ETH and USD
-
   useEffect(() => {
     async function getPrice() {
       setPrice(await getTokenPrice(targetNetwork.chainId, token.address));
