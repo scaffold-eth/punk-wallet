@@ -1,4 +1,5 @@
 import React from "react";
+import TokenDisplay from "./TokenDisplay";
 
 // toggle functionality for switching between ERC20 token and USD
 export const TokenSwitch = ({ token, divStyle, spanStyle, price, setDisplay, display, dollarMode, setDollarMode }) => {
@@ -21,10 +22,12 @@ export const TokenSwitch = ({ token, divStyle, spanStyle, price, setDisplay, dis
       <>💵 USD 🔀</>
     ) : (
       <>
-        {token.imgSrc && (
-          <img style={{ height: "1em", width: "1em", marginRight: "5px" }} src={token.imgSrc} alt="token" />
-        )}
-        <span style={{ ...spanStyle }}>{token.name} 🔀</span>
+        <TokenDisplay
+          token={token}
+          divStyle={{ display: "flex", alignItems: "center", justifyContent: "center" }}
+          spanStyle={{ paddingLeft: "0.2em" }}
+          optionalEnding="🔀"
+        />
       </>
     );
   };
