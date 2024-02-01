@@ -2,7 +2,7 @@ import React from "react";
 import TokenDisplay from "./TokenDisplay";
 
 // toggle functionality for switching between ERC20 token and USD
-export const TokenSwitch = ({ token, divStyle, spanStyle, price, setDisplay, display, dollarMode, setDollarMode }) => {
+export const TokenSwitch = ({ token, divStyle, price, setDisplay, display, dollarMode, setDollarMode }) => {
   const toggleUSDERC20 = () => {
     if (dollarMode) {
       if (display) {

@@ -31,14 +31,14 @@ export default function ERC20Input({ token, balance, dollarMode, setDollarMode, 
       }
     }
   };
+  // for tokenswitch so that switch to usd can be disabled
+  if (price === 0 && !dollarMode) {
+    setDollarMode(false);
+  }
 
   useEffect(() => {
     if (displayMax) {
       amountCalculation(balance);
-    }
-    // for tokenswitch so that switch to usd can be disabled
-    if (price === 0) {
-      setDollarMode(false);
     }
   }, [token, displayMax]);
 
