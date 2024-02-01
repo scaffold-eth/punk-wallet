@@ -16,9 +16,9 @@ export default function ERC20Balance({
   setDollarMode,
   balance,
   setBalance,
+  price,
+  setPrice,
 }) {
-  const [price, setPrice] = useState(0);
-
   const [loading, setLoading] = useState(true);
 
   // ToDo: Update balance after we hit Send

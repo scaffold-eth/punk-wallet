@@ -912,6 +912,7 @@ function App(props) {
 
   // ERC20 Token balance to use in balance and in tokenswitch
   const [balanceERC20, setBalanceERC20] = useState(null);
+  const [priceERC20, setPriceERC20] = useState(0);
 
   const walletDisplay =
     web3Modal && web3Modal.cachedProvider ? (
@@ -1042,6 +1043,8 @@ function App(props) {
               setDollarMode={setDollarMode}
               balance={balanceERC20}
               setBalance={setBalanceERC20}
+              setPrice={setPriceERC20}
+              price={priceERC20}
             />
           ) : (
             <Balance
@@ -1168,8 +1171,9 @@ function App(props) {
               token={selectedErc20Token}
               value={amount}
               setAmount={setAmount}
-              targetNetwork={targetNetwork}
               balance={balanceERC20}
+              price={priceERC20}
+              setPrice={setPriceERC20}
               dollarMode={dollarMode}
               setDollarMode={setDollarMode}
               onChange={value => {
