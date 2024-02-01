@@ -44,7 +44,7 @@ export default function ERC20Balance({
       setLoading(true);
 
       try {
-        setBalance(await getTokenBalance(token, rpcURL, address));
+        setBalance(await getTokenBalance(token, rpcURL, address, price));
       } catch (error) {
         console.error("Coudn't fetch balance", error);
       }
@@ -53,7 +53,7 @@ export default function ERC20Balance({
     }
 
     getBalance();
-  }, [address, token, rpcURL]);
+  }, [address, token, rpcURL, price]);
 
   return (
     <div>
