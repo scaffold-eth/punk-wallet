@@ -10,7 +10,7 @@ import { TokenSwitch } from "./TokenSwitch";
 // ToDo: add check if enough balance is available, otherwise don't allow user to send
 // ToDo: address check if valid
 
-export default function ERC20Input({ token, onChange, balance, dollarMode, setDollarMode, price }) {
+export default function ERC20Input({ token, balance, dollarMode, setDollarMode, price, setAmount }) {
   const [display, setDisplay] = useState();
   const [displayMax, setDisplayMax] = useState();
 
@@ -20,12 +20,12 @@ export default function ERC20Input({ token, onChange, balance, dollarMode, setDo
     if (dollarMode) {
       const numericValue = parseFloat(_value);
       const amountToken = numericValue / price;
-      onChange(amountToken);
+      setAmount(amountToken);
       if (displayMax) {
         setDisplay((numericValue * price).toFixed(2));
       }
     } else {
-      onChange(_value);
+      setAmount(_value);
       if (displayMax) {
         setDisplay(_value);
       }

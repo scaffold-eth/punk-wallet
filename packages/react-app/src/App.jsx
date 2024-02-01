@@ -1176,9 +1176,6 @@ function App(props) {
               setPrice={setPriceERC20}
               dollarMode={dollarMode}
               setDollarMode={setDollarMode}
-              onChange={value => {
-                setAmount(value);
-              }}
             />
           ) : (
             <EtherInput
