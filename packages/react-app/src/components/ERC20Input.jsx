@@ -11,6 +11,7 @@ import TokenDisplay from "./TokenDisplay";
 export default function ERC20Input({ token, balance, dollarMode, setDollarMode, price, setAmount }) {
   const [display, setDisplay] = useState();
   const [displayMax, setDisplayMax] = useState();
+  const [value, setValue] = useState();
 
   const amountCalculation = _value => {
     if (dollarMode) {
@@ -62,10 +63,13 @@ export default function ERC20Input({ token, balance, dollarMode, setDollarMode, 
             display={display}
             dollarMode={dollarMode}
             setDollarMode={setDollarMode}
+            value={value}
+            setValue={setValue}
           />
         }
         onChange={async e => {
           amountCalculation(e.target.value);
+          setValue(e.target.value);
           setDisplay(e.target.value);
           setDisplayMax(false);
         }}
