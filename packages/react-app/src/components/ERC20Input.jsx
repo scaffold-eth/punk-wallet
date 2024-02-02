@@ -5,17 +5,12 @@ import { Input } from "antd";
 import { TokenSwitch } from "./TokenSwitch";
 import TokenDisplay from "./TokenDisplay";
 
-// ToDo: Prefix could be updated with token symbol instead of ticker
-// ToDo: Link Balance on top with toggle in Input, so that when it is clicked both values are changed
-// ToDo: add max Button
 // ToDo: add check if enough balance is available, otherwise don't allow user to send
 // ToDo: address check if valid
 
 export default function ERC20Input({ token, balance, dollarMode, setDollarMode, price, setAmount }) {
   const [display, setDisplay] = useState();
   const [displayMax, setDisplayMax] = useState();
-
-  const prefix = dollarMode ? "$" : token.name;
 
   const amountCalculation = _value => {
     if (dollarMode) {
@@ -58,7 +53,7 @@ export default function ERC20Input({ token, balance, dollarMode, setDollarMode, 
       <Input
         value={display}
         placeholder={"amount in " + (dollarMode ? "USD" : token.name)}
-        prefix={<Prefix dollarMode={dollarMode} token={token}/>}
+        prefix={<Prefix dollarMode={dollarMode} token={token} />}
         addonAfter={
           <TokenSwitch
             token={token}
@@ -79,15 +74,10 @@ export default function ERC20Input({ token, balance, dollarMode, setDollarMode, 
   );
 }
 
-const Prefix = ({dollarMode, token}) => {
-    if (dollarMode) {
-      return "$"
-    }
+const Prefix = ({ dollarMode, token }) => {
+  if (dollarMode) {
+    return "$";
+  }
 
-    return (
-      <TokenDisplay
-          token={token}
-          showName={false}
-        />
-    );
-  };
+  return <TokenDisplay token={token} showName={false} />;
+};
