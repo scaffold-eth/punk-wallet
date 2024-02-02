@@ -56,7 +56,7 @@ export default function ERC20Input({ token, balance, dollarMode, setDollarMode, 
       </span>
       <Input
         value={display}
-        placeholder="...insert amout"
+        placeholder={"amount in " + (dollarMode ? "USD" : token.name)}
         prefix={prefix}
         addonAfter={
           <TokenSwitch
