@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 import { Input } from "antd";
 
 import { TokenSwitch } from "./TokenSwitch";
+import TokenDisplay from "./TokenDisplay";
 
 // ToDo: Prefix could be updated with token symbol instead of ticker
 // ToDo: Link Balance on top with toggle in Input, so that when it is clicked both values are changed
@@ -57,7 +58,7 @@ export default function ERC20Input({ token, balance, dollarMode, setDollarMode, 
       <Input
         value={display}
         placeholder={"amount in " + (dollarMode ? "USD" : token.name)}
-        prefix={prefix}
+        prefix={<Prefix dollarMode={dollarMode} token={token}/>}
         addonAfter={
           <TokenSwitch
             token={token}
@@ -77,3 +78,16 @@ export default function ERC20Input({ token, balance, dollarMode, setDollarMode, 
     </div>
   );
 }
+
+const Prefix = ({dollarMode, token}) => {
+    if (dollarMode) {
+      return "$"
+    }
+
+    return (
+      <TokenDisplay
+          token={token}
+          showName={false}
+        />
+    );
+  };
