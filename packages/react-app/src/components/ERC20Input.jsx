@@ -2,76 +2,78 @@ import React, { useState, useEffect } from "react";
 
 import { Input } from "antd";
 
-import { TokenSwitch } from "./TokenSwitch";
+import AmountDollarSwitch from "./AmountDollarSwitch";
 import TokenDisplay from "./TokenDisplay";
+
+import { getDisplayNumberWithDecimals, getInverseDecimalCorrectedAmountNumber } from "../helpers/ERC20Helper";
+
+const { ethers } = require("ethers");
 
 // ToDo: add check if enough balance is available, otherwise don't allow user to send
 // ToDo: address check if valid
 
-export default function ERC20Input({ token, balance, dollarMode, setDollarMode, price, setAmount }) {
-  const [display, setDisplay] = useState();
-  const [displayMax, setDisplayMax] = useState();
-  const [value, setValue] = useState();
-
-  const amountCalculation = _value => {
-    if (dollarMode) {
-      const numericValue = parseFloat(_value);
-      const amountToken = numericValue / price;
-      setAmount(amountToken);
-      if (displayMax) {
-        setDisplay((numericValue * price).toFixed(2));
-      }
-    } else {
-      setAmount(_value);
-      if (displayMax) {
-        setDisplay(_value);
-      }
-    }
-  };
-  // for tokenswitch so that switch to usd can be disabled
-  if (price === 0 && !dollarMode) {
-    setDollarMode(false);
-  }
+export default function ERC20Input({ token, balance, dollarMode, setDollarMode, price, amount, setAmount }) {
+  const [userValue, setUserValue] = useState();
+  const [displayValue, setDisplayValue] = useState();
 
   useEffect(() => {
-    if (displayMax) {
-      amountCalculation(balance);
+    if (userValue === 0 || userValue === undefined) {
+      return;
     }
-  }, [token, displayMax]);
+
+    setDisplayValue(userValue);
+
+    const userValueNumber = parseFloat(userValue);
+
+    if (Number.isNaN(userValueNumber) || !(userValueNumber > 0)) {
+      console.log("Not a valid amount", userValueNumber);
+
+      setAmount(undefined);
+
+      return;
+    }
+
+    setAmount(calcAmount(userValueNumber, dollarMode, price));
+  }, [userValue]);
+
+  useEffect(() => {
+    if ((!userValue && !displayValue) || userValue === "0") {
+      return;
+    }
+
+    setDisplayValue(calcDisplayValue(token, amount, dollarMode, price));
+    setUserValue(0);
+  }, [dollarMode]);
+
+  useEffect(() => {
+    resetValues(setUserValue, setDisplayValue, setAmount);
+  }, [token]);
+
+  useEffect(() => {
+    // After we hit send, amount is set to the empty string
+    // setAmount("");
+    if (typeof amount === "string" && amount.length === 0) {
+      resetValues(setUserValue, setDisplayValue, setAmount);
+    }
+  }, [amount]);
 
   return (
     <div>
       <span
         style={{ cursor: "pointer", color: "red", float: "right", marginTop: "-5px" }}
         onClick={() => {
-          setDisplayMax(true);
-          amountCalculation(balance);
-          console.log("dollarMode", dollarMode);
+          handleMax(token, setAmount, balance, setDisplayValue, dollarMode, price, setUserValue);
         }}
       >
         max
       </span>
       <Input
-        value={display}
+        value={displayValue}
         placeholder={"amount in " + (dollarMode ? "USD" : token.name)}
         prefix={<Prefix dollarMode={dollarMode} token={token} />}
-        addonAfter={
-          <TokenSwitch
-            token={token}
-            price={price}
-            setDisplay={setDisplay}
-            display={display}
-            dollarMode={dollarMode}
-            setDollarMode={setDollarMode}
-            value={value}
-            setValue={setValue}
-          />
-        }
+        addonAfter={<AmountDollarSwitch token={token} dollarMode={dollarMode} setDollarMode={setDollarMode} />}
         onChange={async e => {
-          amountCalculation(e.target.value);
-          setValue(e.target.value);
-          setDisplay(e.target.value);
-          setDisplayMax(false);
+          setUserValue(e.target.value);
         }}
       />
     </div>
@@ -84,4 +86,45 @@ const Prefix = ({ dollarMode, token }) => {
   }
 
   return <TokenDisplay token={token} showName={false} />;
+};
+
+const calcAmount = (userValueNumber, dollarMode, price) => {
+  if (!dollarMode) {
+    return userValueNumber;
+  }
+
+  return userValueNumber / price;
+};
+
+const calcDisplayValue = (token, amount, dollarMode, price) => {
+  if (ethers.utils.isHexString(amount)) {
+    amount = getInverseDecimalCorrectedAmountNumber(amount, token.decimals);
+  }
+
+  let displayValue;
+
+  if (!dollarMode) {
+    displayValue = amount;
+  } else {
+    displayValue = amount * price;
+  }
+
+  if (Math.floor(displayValue) === displayValue) {
+    return displayValue;
+  }
+
+  return getDisplayNumberWithDecimals(displayValue, dollarMode);
+};
+
+const handleMax = (token, setAmount, balance, setDisplayValue, dollarMode, price, setUserValue) => {
+  setAmount(balance);
+
+  setDisplayValue(calcDisplayValue(token, balance, dollarMode, price));
+  setUserValue(0);
+};
+
+const resetValues = (setUserValue, setDisplayValue, setAmount) => {
+  setUserValue(undefined);
+  setDisplayValue(undefined);
+  setAmount(undefined);
 };

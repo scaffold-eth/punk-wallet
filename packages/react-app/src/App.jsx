@@ -819,6 +819,8 @@ function App(props) {
   const [toAddress, setToAddress] = useLocalStorage("punkWalletToAddress", "", 120000);
 
   const [amount, setAmount] = useState();
+  console.log("xx amount", amount);
+
   const [amountEthMode, setAmountEthMode] = useState(false);
 
   if (window.location.pathname) {
@@ -912,7 +914,8 @@ function App(props) {
 
   // ERC20 Token balance to use in balance and in tokenswitch
   const [balanceERC20, setBalanceERC20] = useState(null);
-  const [priceERC20, setPriceERC20] = useState(0);
+
+  const [priceERC20, setPriceERC20] = useState();
 
   const walletDisplay =
     web3Modal && web3Modal.cachedProvider ? (
@@ -1170,6 +1173,7 @@ function App(props) {
             <ERC20Input
               token={selectedErc20Token}
               value={amount}
+              amount={amount}
               setAmount={setAmount}
               balance={balanceERC20}
               price={priceERC20}

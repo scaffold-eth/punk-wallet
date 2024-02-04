@@ -2,9 +2,15 @@ import React, { useEffect, useState } from "react";
 
 import { Spin } from "antd";
 
-import { getTokenBalance } from "../helpers/ERC20Helper";
+import {
+  getDisplayNumberWithDecimals,
+  getTokenBalance,
+  getInverseDecimalCorrectedAmountNumber,
+} from "../helpers/ERC20Helper";
 
 import { getTokenPrice } from "../helpers/LiFiTokenPriceHelper";
+
+const { BigNumber } = require("ethers");
 
 export default function ERC20Balance({
   targetNetwork,
@@ -20,6 +26,36 @@ export default function ERC20Balance({
   setPrice,
 }) {
   const [loading, setLoading] = useState(true);
+
+  const [displayedNumber, setDisplayedNumber] = useState();
+
+  useEffect(() => {
+    // Price 0 means that there was an error when fetching token price
+    if (price === 0) {
+      setDollarMode(false);
+    }
+
+    if (!balance || (!price && price !== 0)) {
+      return;
+    }
+
+    let displayNumber;
+
+    const balanceNumber = getInverseDecimalCorrectedAmountNumber(BigNumber.from(balance), token.decimals);
+
+    if (!dollarMode) {
+      displayNumber = balanceNumber;
+    } else {
+      displayNumber = balanceNumber * price;
+    }
+
+    if (Math.floor(displayNumber) === displayNumber && displayNumber !== 0) {
+      setDisplayedNumber(displayNumber);
+      return;
+    }
+
+    setDisplayedNumber(getDisplayNumberWithDecimals(displayNumber, dollarMode));
+  }, [balance, price, dollarMode]);
 
   // ToDo: Update balance after we hit Send
 
@@ -44,7 +80,9 @@ export default function ERC20Balance({
       setLoading(true);
 
       try {
-        setBalance(await getTokenBalance(token, rpcURL, address, price));
+        const balanceBigNumber = await getTokenBalance(token, rpcURL, address, price);
+
+        setBalance(balanceBigNumber.toHexString());
       } catch (error) {
         console.error("Coudn't fetch balance", error);
       }
@@ -58,13 +96,23 @@ export default function ERC20Balance({
   return (
     <div>
       <span
-        style={{ verticalAlign: "middle", fontSize: size ? size : 24, padding: 8, cursor: "pointer" }}
+        style={{ verticalAlign: "middle", fontSize: size ? size : 24, padding: 8, cursor: price ? "pointer" : "" }}
         onClick={() => {
-          setDollarMode(!dollarMode);
+          if (price) {
+            setDollarMode(!dollarMode);
+          }
         }}
       >
-        {loading ? <Spin /> : balance && (dollarMode && price != 0 ? "$" + (balance * price).toFixed(2) : balance)}
+        {!displayedNumber || loading ? <Spin /> : <Display displayedNumber={displayedNumber} dollarMode={dollarMode} />}
       </span>
     </div>
   );
 }
+
+const Display = ({ displayedNumber, dollarMode }) => {
+  if (dollarMode) {
+    return "$" + displayedNumber;
+  } else {
+    return displayedNumber;
+  }
+};
