@@ -69,6 +69,8 @@ import {
 
 import { SettingsHelper } from "./helpers/SettingsHelper";
 
+import { monitorBalance } from "./helpers/ERC20Helper";
+
 import {
   NETWORK_SETTINGS_STORAGE_KEY,
   SELECTED_BLOCK_EXPORER_NAME_KEY,
@@ -819,6 +821,7 @@ function App(props) {
   const [toAddress, setToAddress] = useLocalStorage("punkWalletToAddress", "", 120000);
 
   const [amount, setAmount] = useState();
+
   const [amountEthMode, setAmountEthMode] = useState(false);
 
   if (window.location.pathname) {
@@ -858,7 +861,7 @@ function App(props) {
           if (incomingAddress && ethers.utils.isAddress(incomingAddress)) {
             console.log("incoming address:", incomingAddress);
 
-            validAddress=true;
+            validAddress = true;
 
             setToAddress(incomingAddress);
 
@@ -871,7 +874,7 @@ function App(props) {
           index++;
         }
 
-        if (validAddress && (incomingParts.length > index)) {
+        if (validAddress && incomingParts.length > index) {
           const incomingAmount = parseFloat(incomingParts[index]);
 
           if (incomingAmount > 0) {
@@ -909,6 +912,11 @@ function App(props) {
 
   const [depositing, setDepositing] = useState();
   const [depositAmount, setDepositAmount] = useState();
+
+  // ERC20 Token balance to use in ERC20Balance and in ERC20Input
+  const [balanceERC20, setBalanceERC20] = useState(null);
+
+  const [priceERC20, setPriceERC20] = useState();
 
   const walletDisplay =
     web3Modal && web3Modal.cachedProvider ? (
@@ -1037,6 +1045,10 @@ function App(props) {
               address={address}
               dollarMode={dollarMode}
               setDollarMode={setDollarMode}
+              balance={balanceERC20}
+              setBalance={setBalanceERC20}
+              setPrice={setPriceERC20}
+              price={priceERC20}
             />
           ) : (
             <Balance
@@ -1159,7 +1171,17 @@ function App(props) {
           {walletConnectTx ? (
             <Input disabled={true} value={amount} />
           ) : selectedErc20Token ? (
-            <ERC20Input token={selectedErc20Token} amount={amount} setAmount={setAmount} />
+            <ERC20Input
+              token={selectedErc20Token}
+              value={amount}
+              amount={amount}
+              setAmount={setAmount}
+              balance={balanceERC20}
+              price={priceERC20}
+              setPrice={setPriceERC20}
+              dollarMode={dollarMode}
+              setDollarMode={setDollarMode}
+            />
           ) : (
             <EtherInput
               price={price || targetNetwork.price}
@@ -1267,6 +1289,8 @@ function App(props) {
 
                 setShowHistory(true);
                 setLoading(false);
+
+                monitorBalance(selectedErc20Token, targetNetwork.rpcUrl, address, balanceERC20, setBalanceERC20);
               }}
             >
               {loading ||

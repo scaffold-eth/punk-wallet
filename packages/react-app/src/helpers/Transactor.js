@@ -5,11 +5,13 @@ import Notify from "bnc-notify";
 import { BLOCKNATIVE_DAPPID } from "../constants";
 import { TransactionManager } from "./TransactionManager";
 import { sendTransaction } from "./EIP1559Helper";
-import { getTransferTxParams } from "./ERC20Helper";
+import { getDisplayValue, getInverseDecimalCorrectedAmountNumber, getTransferTxParams } from "./ERC20Helper";
 import { transferWithAuthorization } from "./PolygonTransferWithAuthorizationHelper";
 import { transferNativeMetaTransaction } from "./PolygonNativeMetaTransaction";
 import { transferViaPaymaster } from "./zkSyncTestnetHelper";
 import { ZK_TESTNET_USDC_ADDRESS, POLYGON_USDC_ADDRESS } from "../constants";
+
+const { ethers } = require("ethers");
 
 // this should probably just be renamed to "notifier"
 // it is basically just a wrapper around BlockNative's wonderful Notify.js
@@ -53,17 +55,14 @@ export default function Transactor(provider, gasPrice, etherscan, injectedProvid
 
           if (erc20) {
             if (erc20?.token?.address == ZK_TESTNET_USDC_ADDRESS) {
-              const zkResult = await transferViaPaymaster(erc20.to, erc20.amount * 1000000);
+              const zkResult = await transferViaPaymaster(erc20.token, erc20.to, erc20.amount);
               console.log("zkResult", zkResult);
               result = await provider.getTransaction(zkResult.transactionHash);
-            }
-            else if (erc20?.token?.address == POLYGON_USDC_ADDRESS) {
-              result = await transferWithAuthorization(erc20.to, erc20.amount * 1000000)
-            }
-            else if (erc20?.token?.NativeMetaTransaction) {
+            } else if (erc20?.token?.address == POLYGON_USDC_ADDRESS) {
+              result = await transferWithAuthorization(erc20.token, erc20.to, erc20.amount);
+            } else if (erc20?.token?.NativeMetaTransaction) {
               result = await transferNativeMetaTransaction(erc20.token, erc20.to, erc20.amount);
-            }
-            else {
+            } else {
               const transferTxParams = await getTransferTxParams(erc20.token, erc20.to, erc20.amount);
 
               tx.to = transferTxParams.to;
@@ -75,21 +74,27 @@ export default function Transactor(provider, gasPrice, etherscan, injectedProvid
 
           if (!result) {
             console.log("RUNNING TX", tx);
-            result = await sendTransaction(tx, signer, injectedProvider)
+            result = await sendTransaction(tx, signer, injectedProvider);
           }
 
           // Store transactionResponse in localStorage, so we can speed up the transaction if needed
           // Injected providers like MetaMask can manage their transactions on their own
           if (injectedProvider === undefined) {
             if (erc20) {
-                result.erc20 = erc20;
+              result.erc20 = erc20;
+
+              if (ethers.utils.isHexString(result?.erc20?.amount)) {
+                result.erc20.amount = getInverseDecimalCorrectedAmountNumber(
+                  ethers.BigNumber.from(result.erc20.amount),
+                  result.erc20.token.decimals,
+                );
+              }
             }
 
             const transactionManager = new TransactionManager(provider, provider.getSigner());
 
-            transactionManager.setTransactionResponse(result);  
-          } 
-          
+            transactionManager.setTransactionResponse(result);
+          }
         }
         console.log("RESULT:", result);
         // console.log("Notify", notify);
