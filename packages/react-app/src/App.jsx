@@ -912,7 +912,7 @@ function App(props) {
   const [depositing, setDepositing] = useState();
   const [depositAmount, setDepositAmount] = useState();
 
-  // ERC20 Token balance to use in balance and in tokenswitch
+  // ERC20 Token balance to use in ERC20Balance and in ERC20Input
   const [balanceERC20, setBalanceERC20] = useState(null);
 
   const [priceERC20, setPriceERC20] = useState();
