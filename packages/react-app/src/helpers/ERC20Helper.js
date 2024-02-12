@@ -28,44 +28,30 @@ export class ERC20Helper {
     this.contract = new ethers.Contract(tokenAddress, abi, signerOrProvider);
   }
 
-  balanceOf = address => {
-    return this.contract.balanceOf(address);
-  };
+  balanceOf = address => this.contract.balanceOf(address);
 
-  symbol = () => {
-    return this.contract.symbol();
-  };
+  symbol = () => this.contract.symbol();
 
-  decimals = () => {
-    return this.contract.decimals();
-  };
+  decimals = () => this.contract.decimals();
 
-  transfer = (toAddress, amount, decimals) => {
-    return this.contract.transfer(toAddress, this.getDecimalCorrectedAmountBigNumber(amount, decimals));
-  };
+  transfer = (toAddress, amount) => this.contract.transfer(toAddress, amount);
 
-  transferPopulateTransaction = (toAddress, amount, decimals) => {
-    let transferAmount;
-
-    if (utils.isHexString(amount)) {
-      transferAmount = amount;
-    } else {
-      transferAmount = this.getDecimalCorrectedAmountBigNumber(amount, decimals);
-    }
-
-    return this.contract.populateTransaction.transfer(toAddress, transferAmount);
-  };
-
-  getDecimalCorrectedAmountBigNumber = (amount, decimals) => {
-    const decimalCorrectedAmountBigNumber = utils.parseUnits(amount.toString(), decimals);
-
-    return decimalCorrectedAmountBigNumber;
-  };
+  transferPopulateTransaction = (toAddress, amount) => this.contract.populateTransaction.transfer(toAddress, amount);
 }
 
-export const getDisplayNumber = (number, dollarMode) => {
-  return number;
+export const getAmount = (amount, decimals) => {
+  if (utils.isHexString(amount)) {
+    return amount;
+  }
+
+  return getDecimalCorrectedAmountBigNumber(amount, decimals).toHexString();
 };
+
+export const getDecimalCorrectedAmountBigNumber = (amountNumber, decimals) =>
+  utils.parseUnits(amountNumber.toString(), decimals);
+
+export const getInverseDecimalCorrectedAmountNumber = (amountBigNumber, decimals) =>
+  Number(utils.formatUnits(amountBigNumber.toString(), decimals));
 
 export const getDisplayNumberWithDecimals = (number, dollarMode) => {
   let decimals = 2;
@@ -77,16 +63,10 @@ export const getDisplayNumberWithDecimals = (number, dollarMode) => {
   return number.toFixed(decimals);
 };
 
-export const getInverseDecimalCorrectedAmountNumber = (amountBigNumber, decimals) => {
-  const decimalCorrectedAmountString = utils.formatUnits(amountBigNumber.toString(), decimals);
-
-  return Number(decimalCorrectedAmountString);
-};
-
 export const getTransferTxParams = (token, to, amount) => {
   const erc20Helper = new ERC20Helper(token.address);
 
-  return erc20Helper.transferPopulateTransaction(to, amount, token.decimals);
+  return erc20Helper.transferPopulateTransaction(to, getAmount(amount, token.decimals));
 };
 
 const isTokenAddressMainnetWETH = tokenAddress => {
