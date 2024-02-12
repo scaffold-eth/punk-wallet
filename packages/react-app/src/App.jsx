@@ -916,6 +916,7 @@ function App(props) {
   const [balanceERC20, setBalanceERC20] = useState(null);
 
   const [priceERC20, setPriceERC20] = useState();
+  console.log("priceERC20", priceERC20);
 
   const walletDisplay =
     web3Modal && web3Modal.cachedProvider ? (
