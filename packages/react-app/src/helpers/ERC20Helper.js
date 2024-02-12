@@ -49,7 +49,7 @@ export const getAmount = (amount, decimals) => {
 
 export const getDecimalCorrectedAmountBigNumber = (amountNumber, decimals) =>
   utils.parseUnits(amountNumber.toString(), decimals);
-
+  
 export const getInverseDecimalCorrectedAmountNumber = (amountBigNumber, decimals) =>
   Number(utils.formatUnits(amountBigNumber.toString(), decimals));
 

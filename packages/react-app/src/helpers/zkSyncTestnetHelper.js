@@ -1,5 +1,8 @@
 import { createEthersWallet } from "./EIP1559Helper";
+import { getAmount } from "./ERC20Helper";
 import { ZK_TESTNET_USDC_ADDRESS } from "../constants";
+
+const { ethers, BigNumber } = require("ethers");
 
 const { Provider, Contract, Wallet, utils } =  require("zksync-web3");
 
@@ -7,7 +10,16 @@ const ERC20ABI = '[ { "anonymous": false, "inputs": [ { "indexed": true, "intern
 
 const PAYMASTER_ADDRESS = "0xDB4FB4fC0378448f98Ae9967F2081EE899159c20";
 
-export const transferViaPaymaster = async (to, amount) => {
+const PAYMASTER_FEE = 100000;
+
+export const transferViaPaymaster = async (token, to, amount) => {
+    if (ethers.utils.isHexString(amount)) {
+        amount = calcMaxAmount(amount, token.decimals);
+    }
+    else {
+        amount = getAmount(amount, token.decimals);
+    }
+
 	let zkWallet = new Wallet(createEthersWallet());
 	const zkProvider = new Provider("https://testnet.era.zksync.dev");
 	zkWallet = zkWallet.connect(zkProvider);
@@ -17,7 +29,7 @@ export const transferViaPaymaster = async (to, amount) => {
 	const paymasterParams = utils.getPaymasterParams(PAYMASTER_ADDRESS, {
         type: "ApprovalBased",
         token: ZK_TESTNET_USDC_ADDRESS,
-        minimalAllowance: 100000,
+        minimalAllowance: PAYMASTER_FEE,
         innerInput: new Uint8Array(),
     });
 
@@ -33,4 +45,14 @@ export const transferViaPaymaster = async (to, amount) => {
 
 
 	return result;
+}
+
+const calcMaxAmount = (amountHexString, decimals) => {
+    const balanceBigNumber = BigNumber.from(amountHexString);
+
+    const payMasterFeeBigNumber = BigNumber.from(PAYMASTER_FEE);
+
+    const maxAmountBigNumber = balanceBigNumber.sub(payMasterFeeBigNumber);
+
+    return maxAmountBigNumber;
 }

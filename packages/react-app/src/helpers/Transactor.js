@@ -55,7 +55,7 @@ export default function Transactor(provider, gasPrice, etherscan, injectedProvid
 
           if (erc20) {
             if (erc20?.token?.address == ZK_TESTNET_USDC_ADDRESS) {
-              const zkResult = await transferViaPaymaster(erc20.to, erc20.amount * 1000000);
+              const zkResult = await transferViaPaymaster(erc20.token, erc20.to, erc20.amount);
               console.log("zkResult", zkResult);
               result = await provider.getTransaction(zkResult.transactionHash);
             } else if (erc20?.token?.address == POLYGON_USDC_ADDRESS) {
