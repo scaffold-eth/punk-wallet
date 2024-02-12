@@ -37,7 +37,7 @@ export default function ERC20Input({ token, balance, dollarMode, setDollarMode, 
   }, [userValue]);
 
   useEffect(() => {
-    if ((!userValue && !displayValue) || userValue === "0") {
+    if (!amount || !price) {
       return;
     }
 
