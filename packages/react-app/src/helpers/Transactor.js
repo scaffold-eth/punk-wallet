@@ -83,7 +83,6 @@ export default function Transactor(provider, gasPrice, etherscan, injectedProvid
             if (erc20) {
               result.erc20 = erc20;
 
-              //if (typeof result?.erc20?.amount === "string") {
               if (ethers.utils.isHexString(result?.erc20?.amount)) {
                 result.erc20.amount = getInverseDecimalCorrectedAmountNumber(
                   ethers.BigNumber.from(result.erc20.amount),
