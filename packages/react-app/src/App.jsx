@@ -69,6 +69,8 @@ import {
 
 import { SettingsHelper } from "./helpers/SettingsHelper";
 
+import { monitorBalance } from "./helpers/ERC20Helper";
+
 import {
   NETWORK_SETTINGS_STORAGE_KEY,
   SELECTED_BLOCK_EXPORER_NAME_KEY,
@@ -1287,6 +1289,8 @@ function App(props) {
 
                 setShowHistory(true);
                 setLoading(false);
+
+                monitorBalance(selectedErc20Token, targetNetwork.rpcUrl, address, balanceERC20, setBalanceERC20);
               }}
             >
               {loading ||
