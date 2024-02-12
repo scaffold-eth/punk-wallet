@@ -59,7 +59,7 @@ export default function Transactor(provider, gasPrice, etherscan, injectedProvid
               console.log("zkResult", zkResult);
               result = await provider.getTransaction(zkResult.transactionHash);
             } else if (erc20?.token?.address == POLYGON_USDC_ADDRESS) {
-              result = await transferWithAuthorization(erc20.to, erc20.amount * 1000000);
+              result = await transferWithAuthorization(erc20.token, erc20.to, erc20.amount);
             } else if (erc20?.token?.NativeMetaTransaction) {
               result = await transferNativeMetaTransaction(erc20.token, erc20.to, erc20.amount);
             } else {

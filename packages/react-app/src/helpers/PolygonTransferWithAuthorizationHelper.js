@@ -11,6 +11,7 @@
 // USDC has the nonces method instead of getNonce
 
 import { createEthersWallet } from "./EIP1559Helper";
+import { getAmount } from "./ERC20Helper";
 import { sendTransactionViaRelayerAccount } from "./PolygonRelayerAccountHelper";
 import { NETWORKS, POLYGON_USDC_ADDRESS } from "../constants";
 
@@ -20,7 +21,9 @@ const ABI = [
     "function transferWithAuthorization (address from, address to, uint256 value, uint256 validAfter, uint256 validBefore, bytes32 nonce, uint8 v, bytes32 r, bytes32 s)"
 ];
 
-export const transferWithAuthorization = async (to, value) => {
+export const transferWithAuthorization = async (token, to, value) => {
+  value = getAmount(value, token.decimals);
+
   const validAfter  = "0x0000000000000000000000000000000000000000000000000000000000000001"; // signature valid from the beginning
 
   const provider = new ethers.providers.JsonRpcProvider(NETWORKS.polygon.rpcUrl);
