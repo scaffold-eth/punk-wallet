@@ -80,7 +80,7 @@ export default function ERC20Balance({
       setLoading(true);
 
       try {
-        const balanceBigNumber = await getTokenBalance(token, rpcURL, address, price);
+        const balanceBigNumber = await getTokenBalance(token, rpcURL, address);
 
         setBalance(balanceBigNumber.toHexString());
       } catch (error) {
@@ -91,7 +91,7 @@ export default function ERC20Balance({
     }
 
     getBalance();
-  }, [address, token, rpcURL, price]);
+  }, [address, token, rpcURL]);
 
   return (
     <div>

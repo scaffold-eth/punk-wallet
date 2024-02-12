@@ -92,7 +92,7 @@ const isTokenAddressMainnetWETH = tokenAddress => {
   return false;
 };
 
-export const getTokenBalance = async (token, rpcURL, address, price) => {
+export const getTokenBalance = async (token, rpcURL, address) => {
   const erc20Helper = new ERC20Helper(token.address, null, rpcURL);
 
   const balanceBigNumber = await erc20Helper.balanceOf(address);
