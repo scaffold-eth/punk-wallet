@@ -1,18 +1,49 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
-import { Button, Select, Tooltip } from "antd";
-import { DeleteOutlined } from "@ant-design/icons";
+import { Select, Tooltip } from "antd";
+
+import { CustomRPC } from ".";
 
 import { getBLockExplorer, getBLockExplorers, getChain } from "../helpers/ChainHelper";
-import { SELECTED_BLOCK_EXPORER_NAME_KEY } from "../helpers/NetworkSettingsHelper";
+import { validateRPC, CUSTOM_RPC_KEY, SELECTED_BLOCK_EXPORER_NAME_KEY } from "../helpers/NetworkSettingsHelper";
 
 export default function NetworkDetailedDisplay({
   networkSettingsHelper,
   network,
   networkCoreDisplay,
   setTargetNetwork,
+  currentPunkAddress,
 }) {
   const chain = getChain(network.chainId);
+
+  const networkSettings = networkSettingsHelper.getItemSettings(network);
+  const storedRPC = networkSettings[CUSTOM_RPC_KEY];
+
+  const [userValue, setUserValue] = useState(storedRPC ?? undefined);
+  const [validRPC, setValidRPC] = useState();
+  const [loading, setLoading] = useState();
+
+  useEffect(() => {
+    if (userValue === undefined) {
+      return;
+    }
+
+    if (userValue === "") {
+      setValidRPC(undefined);
+
+      return;
+    }
+
+    validateRPC(
+      setLoading,
+      network,
+      userValue,
+      currentPunkAddress,
+      networkSettingsHelper,
+      setTargetNetwork,
+      setValidRPC,
+    );
+  }, [userValue]);
 
   return (
     <>
@@ -31,6 +62,20 @@ export default function NetworkDetailedDisplay({
               networkSettingsHelper={networkSettingsHelper}
               network={network}
               chain={chain}
+              setTargetNetwork={setTargetNetwork}
+            />
+          </div>
+
+          <div style={{ paddingBottom: "2em" }}>
+            <CustomRPC
+              network={network}
+              userValue={userValue}
+              setUserValue={setUserValue}
+              validRPC={validRPC}
+              setValidRPC={setValidRPC}
+              loading={loading}
+              storedRPC={storedRPC}
+              networkSettingsHelper={networkSettingsHelper}
               setTargetNetwork={setTargetNetwork}
             />
           </div>

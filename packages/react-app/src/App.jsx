@@ -944,6 +944,7 @@ function App(props) {
               network={networkDetailed}
               networkCoreDisplay={networkCoreDisplay}
               setTargetNetwork={setTargetNetwork}
+              currentPunkAddress={address}
             />
           )}
           modalOpen={networkSettingsModalOpen}
