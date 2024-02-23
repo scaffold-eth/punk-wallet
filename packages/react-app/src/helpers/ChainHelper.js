@@ -14,11 +14,18 @@ const getChains = async () => {
   }
 
   const json = await response.json();
+
+  localStorage.setItem("chains", JSON.stringify(json));
   return json;
 };
 
 const getLocalChains = () => {
   // eslint-disable-next-line global-require
+  if (localStorage.getItem("chains")) {
+    console.log(localStorage.getItem("chains"));
+    return JSON.parse(localStorage.getItem("chains"));
+  }
+
   const response = require("../constants/chains.json");
   return response;
 };
@@ -27,7 +34,7 @@ export async function initChains(useLocal) {
   if (useLocal) {
     return getLocalChains();
   }
-  const chains = await getChains();
+  const chains = (await getChains()) || getLocalChains();
 
   return chains;
 }
