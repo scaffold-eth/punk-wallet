@@ -14,7 +14,15 @@ export default function NetworkDetailedDisplay({
   setTargetNetwork,
   currentPunkAddress,
 }) {
-  const chain = getChain(network.chainId);
+  const [chain, setChain] = useState(null);
+
+  useEffect(() => {
+    const getCurrentChain = async () => {
+      return await getChain(network.chainId);
+    };
+
+    getCurrentChain().then(data => setChain(data));
+  }, []);
 
   const networkSettings = networkSettingsHelper.getItemSettings(network);
   const storedRPC = networkSettings[CUSTOM_RPC_KEY];
@@ -46,44 +54,46 @@ export default function NetworkDetailedDisplay({
   }, [userValue]);
 
   return (
-    <>
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "center", fontSize: "1em" }}>
-        {networkCoreDisplay && networkCoreDisplay(network)}
-      </div>
-
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "center", fontSize: "0.75em" }}>
-        <div style={{ display: "flex", flexDirection: "column", paddingTop: "1em" }}>
-          <DataDisplay description={"Name"} data={chain.name} />
-          <DataDisplay description={"Chain ID"} data={chain.chainId} />
-          <DataDisplay description={"Native Currency"} data={chain.nativeCurrency.symbol} />
-
-          <div style={{ paddingTop: "1em", paddingBottom: "1em" }}>
-            <BlockExplorerSelector
-              networkSettingsHelper={networkSettingsHelper}
-              network={network}
-              chain={chain}
-              setTargetNetwork={setTargetNetwork}
-            />
-          </div>
-
-          <div style={{ paddingBottom: "2em" }}>
-            <CustomRPC
-              network={network}
-              userValue={userValue}
-              setUserValue={setUserValue}
-              validRPC={validRPC}
-              setValidRPC={setValidRPC}
-              loading={loading}
-              storedRPC={storedRPC}
-              networkSettingsHelper={networkSettingsHelper}
-              setTargetNetwork={setTargetNetwork}
-            />
-          </div>
-
-          <DataDisplay description={"Info"} data={chain.infoURL} isLink={true} />
+    chain && (
+      <>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "center", fontSize: "1em" }}>
+          {networkCoreDisplay && networkCoreDisplay(network)}
         </div>
-      </div>
-    </>
+
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "center", fontSize: "0.75em" }}>
+          <div style={{ display: "flex", flexDirection: "column", paddingTop: "1em" }}>
+            <DataDisplay description={"Name"} data={chain.name} />
+            <DataDisplay description={"Chain ID"} data={chain.chainId} />
+            <DataDisplay description={"Native Currency"} data={chain.nativeCurrency.symbol} />
+
+            <div style={{ paddingTop: "1em", paddingBottom: "1em" }}>
+              <BlockExplorerSelector
+                networkSettingsHelper={networkSettingsHelper}
+                network={network}
+                chain={chain}
+                setTargetNetwork={setTargetNetwork}
+              />
+            </div>
+
+            <div style={{ paddingBottom: "2em" }}>
+              <CustomRPC
+                network={network}
+                userValue={userValue}
+                setUserValue={setUserValue}
+                validRPC={validRPC}
+                setValidRPC={setValidRPC}
+                loading={loading}
+                storedRPC={storedRPC}
+                networkSettingsHelper={networkSettingsHelper}
+                setTargetNetwork={setTargetNetwork}
+              />
+            </div>
+
+            <DataDisplay description={"Info"} data={chain.infoURL} isLink={true} />
+          </div>
+        </div>
+      </>
+    )
   );
 }
 

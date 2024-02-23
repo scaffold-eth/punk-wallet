@@ -13,6 +13,7 @@ export const getNetworkWithSettings = (network, networkSettings) => {
   const selectedBlockExplorerName = networkSettings[SELECTED_BLOCK_EXPORER_NAME_KEY];
 
   if (selectedBlockExplorerName) {
+    // add true as second parameter to getChain if it fails: getChain(network.chainId, true)
     const blockExplorer = getBLockExplorer(getChain(network.chainId), selectedBlockExplorerName);
 
     networkWithSettings.blockExplorer = blockExplorer.url + "/";

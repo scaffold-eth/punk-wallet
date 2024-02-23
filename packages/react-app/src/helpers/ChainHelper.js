@@ -17,20 +17,23 @@ const getChains = async () => {
   return json;
 };
 
-const getLocalChains = async () => {
+const getLocalChains = () => {
   // eslint-disable-next-line global-require
   const response = require("../constants/chains.json");
   return response;
 };
 
-export async function initChains() {
-  const chains = (await getChains()) || (await getLocalChains());
+export async function initChains(useLocal) {
+  if (useLocal) {
+    return getLocalChains();
+  }
+  const chains = await getChains();
 
   return chains;
 }
 
-export const getChain = async chainId => {
-  const chains = await initChains();
+export const getChain = async (chainId, useLocal) => {
+  const chains = await initChains(useLocal);
 
   return chains.find(chain => chain.chainId === chainId);
 };
