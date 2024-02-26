@@ -846,7 +846,13 @@ function App(props) {
             networkSettingsHelper.updateSelectedName(incomingNetwork.name);
             setTargetNetwork(networkSettingsHelper.getSelectedItem(true));
 
-            window.history.pushState({}, "", "/");
+            let pushStateURL = "/"
+
+            if ((incomingParts.length > 1) && incomingParts[1] == "pk") {
+              pushStateURL = "pk" + window.location.hash;
+            }
+
+            window.history.pushState({}, "", pushStateURL);
             pushState = true;
 
             index++;
