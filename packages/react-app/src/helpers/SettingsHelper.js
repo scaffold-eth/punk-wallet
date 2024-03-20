@@ -4,7 +4,7 @@ const INDEX_MAP_KEY = "indexMap";
 const REMOVED_NAMES_KEY = "removedNames";
 const SELECTED_NAME_KEY = "selectedName";
 
-// These settings were added later, so it is possible 
+// These settings were added later, so it is possible
 // that they don't exist yet for someone
 const CUSTOM_ITEMS_KEY = "customItems";
 const CUSTOM_ITEMS_DEFAULT_VALUE = [];
@@ -16,213 +16,236 @@ const ITEM_SETTINGS_DEFAULT_VALUE = {};
 const modalSettingsKeys = [INDEX_MAP_KEY, ITEMS_SETTINGS_KEY, REMOVED_NAMES_KEY];
 
 export class SettingsHelper {
-    constructor(storageKey, items, settings, setSettings, getItemWithSettings) {
-        this.storageKey = storageKey;
-        this.items = items;
-        this.storedSettings = settings;
-        this.settings = {...getInitialSettings(this.storageKey, this.items), ...this.storedSettings};
-        this.setSettings = setSettings;
-        this.getItemWithSettings = getItemWithSettings;
+  constructor(storageKey, items, settings, setSettings, getItemWithSettings) {
+    this.storageKey = storageKey;
+    this.items = items;
+    this.storedSettings = settings;
+    this.settings = { ...getInitialSettings(this.storageKey, this.items), ...this.storedSettings };
+    this.setSettings = setSettings;
+    this.getItemWithSettings = getItemWithSettings;
 
-        const {sortedItems, removedItems, selectedItem} = splitItems(getAllItems(this.items, this.settings), this.settings);
-
-        this.sortedItems = sortedItems;
-        this.removedItems = removedItems;
-        this.selectedItem = selectedItem;
-    }
-
-    addCustomItem = (item) => {
-        setCustomItems(getCustomItems(this.settings).concat(item), this.settings);
-
-        return updateSettings(this.settings, this.setSettings);
-    }
-
-    addItem = (item) => {
-        // Remove item name from deleted names 
-        setRemovedNames(getRemovedNames(this.settings).filter(removedName => removedName != item.name), this.settings);
-
-        // Extend index map with item
-        setIndexMap(createIndexMap([...this.sortedItems, item]), this.settings);
-
-        // Update state and storage
-        return updateSettings(this.settings, this.setSettings);
-    }
-
-    getCustomItems = () => {
-        return getCustomItems(this.settings);
-    }
-
-    getExistingItem = (item, keyProperty) => {
-        let existingItem;
-
-        getAllItems(this.items, this.settings).some(
-            (otherItem) => {
-                if (this.isItemsTheSame(otherItem, item, keyProperty)) {
-                    existingItem = otherItem;
-
-                    return true;
-                }
-            }
-        )
-
-        return existingItem;
-    }
-
-    getSelectedItem = (getItemSettings) => {
-        const selectedName = getSelectedName(this.settings);
-
-        const selectedItem = getAllItems(this.items, this.settings).find(item => item.name === selectedName);
-
-        if (getItemSettings && this.getItemWithSettings) {
-            return this.getItemWithSettings(selectedItem, this.getItemSettings(selectedItem));
-        }
-
-        return selectedItem;
-    }
-
-    isCustomItem = (item, keyProperty) => {
-        return this.getCustomItems().some(customItem => this.isItemsTheSame(customItem, item, keyProperty));
-    }
-
-    isItemsTheSame = (item1, item2, keyProperty) => {
-        if (!keyProperty) {
-            keyProperty = "name";
-        }
-
-        return item1[keyProperty] && item2[keyProperty] && (item1[keyProperty].toLowerCase() == item2[keyProperty].toLowerCase());
-    }
-
-    isModalSettingsModified = () => {
-        return modalSettingsKeys.some(key => this.storedSettings.hasOwnProperty(key));
-    }
-
-    removeCustomItem = (item) => {
-        setCustomItems(this.getCustomItems().filter(customItem => customItem.name != item.name), this.settings);
-
-        return updateSettings(this.settings, this.setSettings);
-    }
-
-    removeItem = (item) => {
-
-        // Extend deleted names with item name
-        setRemovedNames([...getRemovedNames(this.settings), item.name], this.settings);
-
-        // Update index map by removing the item from sorted items
-        setIndexMap(createIndexMap(this.sortedItems.filter(sortedItem => sortedItem.name != item.name)), this.settings);
-
-        // Update state and storage
-        return updateSettings(this.settings, this.setSettings);
-    }
-
-    resetModalSettings = () => {
-        modalSettingsKeys.forEach(
-            (key) => delete this.settings[key]
-        );
-
-        return updateSettings(this.settings, this.setSettings);
-    }
-
-    getItemSettings = (item) => getItemsSettings(this.settings)[item.name] ?? ITEM_SETTINGS_DEFAULT_VALUE;
-
-    updateIndexMap = (item, direction) => {
-        const itemIndex = this.sortedItems.indexOf(item);
-
-        const otherItemIndex = itemIndex + (direction ? 1 : -1)
-
-        this.sortedItems[itemIndex] = this.sortedItems[otherItemIndex];
-        this.sortedItems[otherItemIndex] = item;
-
-        return updateSettings(setIndexMap(createIndexMap(this.sortedItems), this.settings), this.setSettings);
-    }
-
-    updateItemSettings = (item, setting) => {
-        const itemsSettings = getItemsSettings(this.settings);
-
-        const currentItemSettings = this.getItemSettings(item);
-
-        itemsSettings[item.name] = {...currentItemSettings, ...setting};
-
-        return updateSettings(setItemsSettings(itemsSettings, this.settings), this.setSettings)
-    }
-
-    updateSelectedName = (name) => updateSettings(setSelectedName(name, this.settings), this.setSettings);
-}
-
-const createIndexMap = (sortedItems) => {
-    const orderSetting = {};
-
-    sortedItems.forEach(
-        (item, index) => {
-            orderSetting[item.name] = index;
-        }
+    const { sortedItems, removedItems, selectedItem } = splitItems(
+      getAllItems(this.items, this.settings),
+      this.settings,
     );
 
-    return orderSetting;
+    this.sortedItems = sortedItems;
+    this.removedItems = removedItems;
+    this.selectedItem = selectedItem;
+  }
+
+  addCustomItem = item => {
+    setCustomItems(getCustomItems(this.settings).concat(item), this.settings);
+
+    return updateSettings(this.settings, this.setSettings);
+  };
+
+  addItem = item => {
+    // Remove item name from deleted names
+    setRemovedNames(
+      getRemovedNames(this.settings).filter(removedName => removedName != item.name),
+      this.settings,
+    );
+
+    // Extend index map with item
+    setIndexMap(createIndexMap([...this.sortedItems, item]), this.settings);
+
+    // Update state and storage
+    return updateSettings(this.settings, this.setSettings);
+  };
+
+  getCustomItems = () => {
+    return getCustomItems(this.settings);
+  };
+
+  getExistingItem = (item, keyProperty) => {
+    let existingItem;
+
+    getAllItems(this.items, this.settings).some(otherItem => {
+      if (this.isItemsTheSame(otherItem, item, keyProperty)) {
+        existingItem = otherItem;
+
+        return true;
+      }
+    });
+
+    return existingItem;
+  };
+
+  getSelectedItem = getItemSettings => {
+    const selectedName = getSelectedName(this.settings);
+
+    const selectedItem = getAllItems(this.items, this.settings).find(item => item.name === selectedName);
+
+    if (getItemSettings && this.getItemWithSettings) {
+      return this.getItemWithSettings(selectedItem, this.getItemSettings(selectedItem));
+    }
+
+    return selectedItem;
+  };
+
+  isCustomItem = (item, keyProperty) => {
+    return this.getCustomItems().some(customItem => this.isItemsTheSame(customItem, item, keyProperty));
+  };
+
+  isItemsTheSame = (item1, item2, keyProperty) => {
+    if (!keyProperty) {
+      keyProperty = "name";
+    }
+
+    return (
+      item1[keyProperty] && item2[keyProperty] && item1[keyProperty].toLowerCase() == item2[keyProperty].toLowerCase()
+    );
+  };
+
+  isModalSettingsModified = () => {
+    return modalSettingsKeys.some(key => this.storedSettings.hasOwnProperty(key));
+  };
+
+  removeCustomItem = item => {
+    setCustomItems(
+      this.getCustomItems().filter(customItem => customItem.name != item.name),
+      this.settings,
+    );
+
+    return updateSettings(this.settings, this.setSettings);
+  };
+
+  removeItem = item => {
+    // Extend deleted names with item name
+    setRemovedNames([...getRemovedNames(this.settings), item.name], this.settings);
+
+    // Update index map by removing the item from sorted items
+    setIndexMap(createIndexMap(this.sortedItems.filter(sortedItem => sortedItem.name != item.name)), this.settings);
+
+    // Update state and storage
+    return updateSettings(this.settings, this.setSettings);
+  };
+
+  resetModalSettings = () => {
+    modalSettingsKeys.forEach(key => delete this.settings[key]);
+
+    return updateSettings(this.settings, this.setSettings);
+  };
+
+  getItemSettings = item => getItemsSettings(this.settings)[item.name] ?? ITEM_SETTINGS_DEFAULT_VALUE;
+
+  updateIndexMap = (item, direction) => {
+    const itemIndex = this.sortedItems.indexOf(item);
+
+    const otherItemIndex = itemIndex + (direction ? 1 : -1);
+
+    this.sortedItems[itemIndex] = this.sortedItems[otherItemIndex];
+    this.sortedItems[otherItemIndex] = item;
+
+    return updateSettings(setIndexMap(createIndexMap(this.sortedItems), this.settings), this.setSettings);
+  };
+
+  updateItemSettings = (item, setting) => {
+    const itemsSettings = getItemsSettings(this.settings);
+
+    const currentItemSettings = this.getItemSettings(item);
+
+    itemsSettings[item.name] = { ...currentItemSettings, ...setting };
+
+    return updateSettings(setItemsSettings(itemsSettings, this.settings), this.setSettings);
+  };
+
+  removeItemSetting = (item, settingKey) => {
+    const currentItemSettings = this.getItemSettings(item);
+
+    if (currentItemSettings === ITEM_SETTINGS_DEFAULT_VALUE) {
+      return;
+    }
+
+    const itemsSettings = getItemsSettings(this.settings);
+
+    delete currentItemSettings[settingKey];
+
+    if (Object.keys(currentItemSettings).length === 0) {
+      delete itemsSettings[item.name];
+    } else {
+      itemsSettings[item.name] = { ...currentItemSettings };
+    }
+
+    return updateSettings(setItemsSettings(itemsSettings, this.settings), this.setSettings);
+  };
+
+  updateSelectedName = name => updateSettings(setSelectedName(name, this.settings), this.setSettings);
 }
+
+const createIndexMap = sortedItems => {
+  const orderSetting = {};
+
+  sortedItems.forEach((item, index) => {
+    orderSetting[item.name] = index;
+  });
+
+  return orderSetting;
+};
 
 const getAllItems = (items, settings) => items.concat(getCustomItems(settings));
 
-const getCustomItems = (settings) => settings[CUSTOM_ITEMS_KEY] ?? CUSTOM_ITEMS_DEFAULT_VALUE;
+const getCustomItems = settings => settings[CUSTOM_ITEMS_KEY] ?? CUSTOM_ITEMS_DEFAULT_VALUE;
 
-const getItemsSettings = (settings) => settings[ITEMS_SETTINGS_KEY] ?? ITEMS_SETTINGS_DEFAULT_VALUE;
+const getItemsSettings = settings => settings[ITEMS_SETTINGS_KEY] ?? ITEMS_SETTINGS_DEFAULT_VALUE;
 
-const getIndexMap = (settings) => settings[INDEX_MAP_KEY];
+const getIndexMap = settings => settings[INDEX_MAP_KEY];
 
 const getInitialSettings = (storageKey, items) => {
-    if (!items) {
-        return undefined;
-    }
+  if (!items) {
+    return undefined;
+  }
 
-    return {
-        [STORAGE_KEY_KEY]: storageKey,
-        [INDEX_MAP_KEY]: createIndexMap(items),
-        [REMOVED_NAMES_KEY]: [],
-        [SELECTED_NAME_KEY]: items[0].name,
-        [CUSTOM_ITEMS_KEY]: CUSTOM_ITEMS_DEFAULT_VALUE,
-        [ITEMS_SETTINGS_KEY]: ITEMS_SETTINGS_DEFAULT_VALUE,
-    }
-}
+  return {
+    [STORAGE_KEY_KEY]: storageKey,
+    [INDEX_MAP_KEY]: createIndexMap(items),
+    [REMOVED_NAMES_KEY]: [],
+    [SELECTED_NAME_KEY]: items[0].name,
+    [CUSTOM_ITEMS_KEY]: CUSTOM_ITEMS_DEFAULT_VALUE,
+    [ITEMS_SETTINGS_KEY]: ITEMS_SETTINGS_DEFAULT_VALUE,
+  };
+};
 
-const getRemovedNames = (settings) => settings[REMOVED_NAMES_KEY];
+const getRemovedNames = settings => settings[REMOVED_NAMES_KEY];
 
-const getSelectedName = (settings) => settings[SELECTED_NAME_KEY];
+const getSelectedName = settings => settings[SELECTED_NAME_KEY];
 
-const getStorageKey = (settings) => settings[STORAGE_KEY_KEY];
+const getStorageKey = settings => settings[STORAGE_KEY_KEY];
 
 // Split items into displayed items (sorted), removed items and currently selected item according to the settings
 const splitItems = (items, settings) => {
-    const removedNames = getRemovedNames(settings);
-    const filterMethod = removedNames.length ? (item) => removedNames.includes(item.name) : undefined;
+  const removedNames = getRemovedNames(settings);
+  const filterMethod = removedNames.length ? item => removedNames.includes(item.name) : undefined;
 
-    const selectedName = getSelectedName(settings);
+  const selectedName = getSelectedName(settings);
 
-    const result = items.reduce(
-        (accumulator, item) => {
-            if (filterMethod && filterMethod(item)) {
-                accumulator.removedItems.push(item);
-            }
-            else {
-                accumulator.sortedItems.push(item)
-            }
+  const result = items.reduce(
+    (accumulator, item) => {
+      if (filterMethod && filterMethod(item)) {
+        accumulator.removedItems.push(item);
+      } else {
+        accumulator.sortedItems.push(item);
+      }
 
-            if (item.name == selectedName) {
-                accumulator.selectedItem = item;
-            }
+      if (item.name == selectedName) {
+        accumulator.selectedItem = item;
+      }
 
-            return accumulator;
-        },
-        {
-            sortedItems:[],
-            removedItems:[],
-            selectedItem: items[0]
-        }
-    );
+      return accumulator;
+    },
+    {
+      sortedItems: [],
+      removedItems: [],
+      selectedItem: items[0],
+    },
+  );
 
-    return {
-        ...result,
-        sortedItems : sortItems(result.sortedItems, settings)
-    }
-}
+  return {
+    ...result,
+    sortedItems: sortItems(result.sortedItems, settings),
+  };
+};
 
 const setCustomItems = (customItems, settings) => setSetting(CUSTOM_ITEMS_KEY, customItems, settings);
 const setItemsSettings = (itemsSettings, settings) => setSetting(ITEMS_SETTINGS_KEY, itemsSettings, settings);
@@ -232,33 +255,29 @@ const setSelectedName = (selectedName, settings) => setSetting(SELECTED_NAME_KEY
 
 // Updates the settings without changing the state and storage
 const setSetting = (key, value, settings) => {
-    settings[key] = value;
+  settings[key] = value;
 
-    return settings;
-}
+  return settings;
+};
 
 const sortItems = (items, settings) => {
-    const order = getIndexMap(settings);
+  const order = getIndexMap(settings);
 
-    // I'm not sure if toSorted is widely enough supported
-    //return items.toSorted(
-    //    (a, b) => order[a.name] - order[b.name]
-    //);
+  // I'm not sure if toSorted is widely enough supported
+  //return items.toSorted(
+  //    (a, b) => order[a.name] - order[b.name]
+  //);
 
-    return items.slice().sort(
-        (a, b) => order[a.name] - order[b.name]
-    );
-}
+  return items.slice().sort((a, b) => order[a.name] - order[b.name]);
+};
 
 const updateSettings = (settings, setSettings) => {
-    setSettings(
-        settings ? {...settings} : settings
-    );
+  setSettings(settings ? { ...settings } : settings);
 
-    return settings;
-}
+  return settings;
+};
 
-// Settings example 
+// Settings example
 /*
 
 {
