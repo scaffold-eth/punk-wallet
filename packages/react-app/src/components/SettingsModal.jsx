@@ -114,6 +114,8 @@ const ItemWithButtons = ({item, itemCoreDisplay, itemDetailedDisplay, setItemDet
 
     const isCurrentlySelected = selectedItem ? (selectedItem.name == item.name) : (itemIndex == 0);
 
+    const isItemDetailedDisplay = itemDetailedDisplay && ((item?.name !== "localhost") && (item?.name !== "buidlguidl"));
+
     return (
         <div style={{ display: "flex", alignItems: "center"}}>
             <div style={{ flexGrow:3, display: "flex", justifyContent: "space-around", alignItems:"center", padding:"0.25em"}}>
@@ -127,7 +129,7 @@ const ItemWithButtons = ({item, itemCoreDisplay, itemDetailedDisplay, setItemDet
                 <ItemDisplay
                     item={item}
                     itemCoreDisplay={itemCoreDisplay}
-                    onClick={itemDetailedDisplay ? () => setItemDetailed(item) : undefined}
+                    onClick={isItemDetailedDisplay ? () => setItemDetailed(item) : undefined}
                     isCurrentlySelected={isCurrentlySelected}
                     width={"7em"} // ToDo: There should be a better way to align the buttons
                 />
