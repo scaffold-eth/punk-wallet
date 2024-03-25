@@ -1,4 +1,4 @@
-const isEIP3091Explorer = explorer => explorer.standard === "EIP3091";
+const isEIP3091Explorer = explorer => explorer.standard === "EIP3091" || explorer.name === "basescan";
 
 export const getBLockExplorers = chain => chain.explorers.filter(explorer => isEIP3091Explorer(explorer));
 
