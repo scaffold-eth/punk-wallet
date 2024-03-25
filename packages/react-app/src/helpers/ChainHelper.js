@@ -6,14 +6,17 @@ export const getBLockExplorer = (chain, name) =>
   getBLockExplorers(chain).find(blockExplorer => blockExplorer.name === name);
 
 const getChains = async () => {
-  const response = await fetch("https://chainid.network/chains.json");
-  if (!response.ok) {
-    // In case of error use currentChains
-    // throw new Error('Couldn\'t fetch chains');
-    return null;
+  try {
+    const response = await fetch("https://chainid.network/chains.json");
+
+    if (response.ok) {
+      return response.json();
+    }
+  } catch (error) {
+    console.error("Couldn't fetch chains.json", error);
   }
 
-  return response.json();
+  return null;
 };
 
 const getLocalChains = () => {
