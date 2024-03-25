@@ -5,7 +5,12 @@ import { Select, Tooltip } from "antd";
 import { CustomRPC } from ".";
 
 import { getBLockExplorer, getBLockExplorers, getChain } from "../helpers/ChainHelper";
-import { validateRPC, CUSTOM_RPC_KEY, SELECTED_BLOCK_EXPORER_NAME_KEY } from "../helpers/NetworkSettingsHelper";
+import {
+  validateRPC,
+  CUSTOM_RPC_KEY,
+  SELECTED_BLOCK_EXPORER_NAME_KEY,
+  SELECTED_BLOCK_EXPORER_URL_KEY,
+} from "../helpers/NetworkSettingsHelper";
 
 export default function NetworkDetailedDisplay({
   networkSettingsHelper,
@@ -122,6 +127,9 @@ const BlockExplorerSelector = ({ networkSettingsHelper, network, chain, setTarge
               setCurrentBLockExplorerName(blockExplorerName);
               networkSettingsHelper.updateItemSettings(network, {
                 [SELECTED_BLOCK_EXPORER_NAME_KEY]: blockExplorerName,
+              });
+              networkSettingsHelper.updateItemSettings(network, {
+                [SELECTED_BLOCK_EXPORER_URL_KEY]: getBLockExplorer(chain, blockExplorerName).url + "/",
               });
               setTargetNetwork(networkSettingsHelper.getSelectedItem(true));
             }}

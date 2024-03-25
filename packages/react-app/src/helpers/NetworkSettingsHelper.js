@@ -5,18 +5,16 @@ import { getBLockExplorer, getChain } from "./ChainHelper";
 export const NETWORK_SETTINGS_STORAGE_KEY = "networkSettings";
 
 export const SELECTED_BLOCK_EXPORER_NAME_KEY = "selectedBlockExplorerName";
+export const SELECTED_BLOCK_EXPORER_URL_KEY = "selectedBlockExplorerURL";
 export const CUSTOM_RPC_KEY = "customRPC";
 
 export const getNetworkWithSettings = (network, networkSettings) => {
   const networkWithSettings = {};
 
-  const selectedBlockExplorerName = networkSettings[SELECTED_BLOCK_EXPORER_NAME_KEY];
+  const selectedBlockExplorerURL = networkSettings[SELECTED_BLOCK_EXPORER_URL_KEY];
 
-  if (selectedBlockExplorerName) {
-    // add true as second parameter to getChain if it fails: getChain(network.chainId, true)
-    const blockExplorer = getBLockExplorer(getChain(network.chainId), selectedBlockExplorerName);
-
-    networkWithSettings.blockExplorer = blockExplorer.url + "/";
+  if (selectedBlockExplorerURL) {
+    networkWithSettings.blockExplorer = selectedBlockExplorerURL;
   }
 
   const customRPC = networkSettings[CUSTOM_RPC_KEY];
