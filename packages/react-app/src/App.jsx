@@ -846,9 +846,9 @@ function App(props) {
             networkSettingsHelper.updateSelectedName(incomingNetwork.name);
             setTargetNetwork(networkSettingsHelper.getSelectedItem(true));
 
-            let pushStateURL = "/"
+            let pushStateURL = "/";
 
-            if ((incomingParts.length > 1) && incomingParts[1] == "pk") {
+            if (incomingParts.length > 1 && incomingParts[1] == "pk") {
               pushStateURL = "pk" + window.location.hash;
             }
 
@@ -1276,6 +1276,8 @@ function App(props) {
                   } else if (networkName == "polygon") {
                     //ask rpc for gas price
                   } else if (networkName == "goerli") {
+                    //ask rpc for gas price
+                  } else if (networkName == "base") {
                     //ask rpc for gas price
                   } else if (networkName == "sepolia") {
                     //ask rpc for gas price
