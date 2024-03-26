@@ -419,7 +419,13 @@ export const NETWORKS = {
         address: "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
         decimals: 6,
         imgSrc: "/USDC.png",
-      }
+      },
+      {
+        name: "DEGEN",
+        address: "0x4ed4e862860bed51a9570b96d89af5e1b0efefed",
+        decimals: 18,
+        imgSrc: "/degen.png",
+      },
     ],
     nativeToken: {
       name: "ETH",
