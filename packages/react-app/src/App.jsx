@@ -73,7 +73,6 @@ import { monitorBalance } from "./helpers/ERC20Helper";
 
 import {
   NETWORK_SETTINGS_STORAGE_KEY,
-  SELECTED_BLOCK_EXPORER_NAME_KEY,
   migrateSelectedNetworkStorageSetting,
   getNetworkWithSettings,
 } from "./helpers/NetworkSettingsHelper";
