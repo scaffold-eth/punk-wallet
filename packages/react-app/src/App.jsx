@@ -1150,6 +1150,7 @@ function App(props) {
               value={toAddress}
               setAmount={setAmount}
               setToAddress={setToAddress}
+              setDollarMode={setDollarMode}
               hoistScanner={toggle => {
                 scanner = toggle;
               }}

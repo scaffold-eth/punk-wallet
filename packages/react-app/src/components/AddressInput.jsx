@@ -64,6 +64,7 @@ export default function AddressInput(props) {
     ibanAddressObject,
     setIbanAddressObject,
     isMoneriumTransferReady,
+    setDollarMode,
   } = props;
 
   const [value, setValue] = useState(props.address);
@@ -281,6 +282,7 @@ export default function AddressInput(props) {
                 amount = formatEther(amount);
                 amount = Math.round(amount);
 
+                setDollarMode(false);
                 console.log("eth amount: ", amount);
               }
 
