@@ -822,6 +822,11 @@ function App(props) {
 
   const [amount, setAmount] = useState();
 
+  useEffect(() => {
+    console.log(amount)
+  }, [amount])
+  
+
   const [amountEthMode, setAmountEthMode] = useState(false);
 
   if (window.location.pathname) {
@@ -1150,7 +1155,7 @@ function App(props) {
               value={toAddress}
               setAmount={setAmount}
               setToAddress={setToAddress}
-              setDollarMode={setDollarMode}
+              setAmountEthMode={setAmountEthMode}
               hoistScanner={toggle => {
                 scanner = toggle;
               }}
@@ -1185,6 +1190,7 @@ function App(props) {
             />
           ) : (
             <EtherInput
+              key={amount}
               price={price || targetNetwork.price}
               value={amount}
               token={targetNetwork.token || "ETH"}

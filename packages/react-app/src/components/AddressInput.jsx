@@ -3,9 +3,8 @@ import { Badge, Input, message, Spin } from "antd";
 import { useLookupAddress } from "eth-hooks";
 import React, { useCallback, useState, useEffect } from "react";
 import QrReader from "react-qr-reader-es6";
-import { isBigIntLiteral } from "typescript";
 import { BigNumber } from "ethers";
-import { formatEther, parseEther } from "ethers/lib/utils";
+import { formatEther } from "ethers/lib/utils";
 import { QRPunkBlockie } from ".";
 
 import { isValidIban } from "../helpers/MoneriumHelper";
@@ -64,7 +63,7 @@ export default function AddressInput(props) {
     ibanAddressObject,
     setIbanAddressObject,
     isMoneriumTransferReady,
-    setDollarMode,
+    setAmountEthMode,
   } = props;
 
   const [value, setValue] = useState(props.address);
@@ -281,8 +280,8 @@ export default function AddressInput(props) {
                 amount = BigNumber.from(parseFloat(amount).toString());
                 amount = formatEther(amount);
                 amount = Math.round(amount);
+                setAmountEthMode(true);
 
-                setDollarMode(false);
                 console.log("eth amount: ", amount);
               }
 
