@@ -822,11 +822,6 @@ function App(props) {
 
   const [amount, setAmount] = useState();
 
-  useEffect(() => {
-    console.log(amount)
-  }, [amount])
-  
-
   const [amountEthMode, setAmountEthMode] = useState(false);
 
   if (window.location.pathname) {
