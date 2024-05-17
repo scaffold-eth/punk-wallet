@@ -7,6 +7,7 @@ import "antd/dist/antd.css";
 import { useUserAddress } from "eth-hooks";
 import React, { useCallback, useEffect, useState, useMemo } from "react";
 import Web3Modal from "web3modal";
+import { parse } from "eth-url-parser";
 import "./App.css";
 import {
   Account,
@@ -203,6 +204,31 @@ function App(props) {
       if (targetNetwork?.nativeToken?.name) {
         tokenSettingsHelper.updateSelectedName(targetNetwork.nativeToken.name);
         console.log("Switched to native token");
+      }
+    }
+  }
+
+  const switchToTokenAddress = localStorage.getItem("switchToTokenAddress");
+
+  if (switchToTokenAddress) {
+    localStorage.removeItem("switchToTokenAddress");
+
+    let tokens = targetNetwork?.erc20Tokens;
+
+    if (tokens) {
+      const customTokens = tokenSettingsHelper.getCustomItems();
+
+      if (customTokens.length > 0) {
+        tokens = tokens.concat(customTokens);
+      }
+
+      const token = tokens.find(token => token.address == switchToTokenAddress);
+
+      if (token) {
+        tokenSettingsHelper.updateSelectedName(token.name);
+      }
+      else {
+        // error screen that token is not supported
       }
     }
   }
@@ -835,7 +861,58 @@ function App(props) {
 
   const [receiveMode, setReceiveMode] = useState(false);
 
-  if (window.location.pathname) {
+  if (window.location.pathname !== "/") {
+    try {
+      const path = window.location.pathname.replace("/", "");
+
+      if (path.startsWith("ethereum:")) {
+        const eip681URL = window.location.href.substring(window.location.href.indexOf("ethereum:"));
+
+        const eip681Object = parse(eip681URL);
+        console.log("eip681Object", eip681Object);
+
+        let incomingNetwork;
+
+        const chainId = eip681Object.chain_id;
+
+        if (chainId) {
+          incomingNetwork = Object.values(NETWORKS).find(network => network.chainId == chainId);
+
+          if (incomingNetwork) {
+            console.log("incoming network:", incomingNetwork);
+            if (incomingNetwork.name != targetNetwork.name) {
+              networkSettingsHelper.updateSelectedName(incomingNetwork.name);
+              setTargetNetwork(networkSettingsHelper.getSelectedItem(true));
+            }
+          } else {
+            // error screen that chainId is not supported
+          }
+        } else {
+          // warning screen that chainId is not provided
+        }
+
+        const functionName = eip681Object.function_name;
+        const tokenAddress = eip681Object?.target_address;
+
+        let toAddress;
+
+        if (functionName == "transfer" && tokenAddress) {
+          localStorage.setItem("switchToTokenAddress", tokenAddress);
+          toAddress = eip681Object?.params?.address;
+        }
+        else {
+          localStorage.setItem("switchToEth", true);
+          toAddress = eip681Object?.target_address
+        }
+      }
+
+      window.history.pushState({}, "", "/");
+    } catch (error) {
+      console.log("Coudn't parse EIP681", error);
+    }
+  }
+
+  if (window.location.pathname !== "/") {
     try {
       const incoming = window.location.pathname.replace("/", "");
 
