@@ -22,6 +22,7 @@ export default function QRPunkBlockie({
   selectedErc20Token,
 }) {
   let displayValue = address;
+  let paymentLink;
 
   if (receiveMode) {
     try {
@@ -64,6 +65,8 @@ export default function QRPunkBlockie({
       console.log("eip681", eip681);
 
       displayValue = eip681;
+
+      paymentLink = "http://localhost:3000/" + displayValue;
     } catch (error) {
       console.error("Couldn't create EIP-681 QR value", error);
     }
@@ -78,13 +81,14 @@ export default function QRPunkBlockie({
 
   const punkSize = blockieScale * BLOCKIES_DEFAULT_SIZE; // Make punk image the same size as the blockie, from https://github.com/ethereum/blockies: width/height of the icon in blocks, default: 8
 
+  
   return (
     <span
       onClick={() =>
-        copy(address, () =>
+        copy(paymentLink ? paymentLink : displayValue, () =>
           message.success(
             <span style={{ position: "relative" }}>
-              Copied Address
+              {!receiveMode ? "Copied Address" : "Copied Payment Link" }
               <div style={{ position: "absolute", left: -60, top: -14, zIndex: 1 }}>
                 <Punk address={address} size={40} />
               </div>
