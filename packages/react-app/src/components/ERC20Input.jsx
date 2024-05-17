@@ -12,7 +12,7 @@ const { ethers } = require("ethers");
 // ToDo: add check if enough balance is available, otherwise don't allow user to send
 // ToDo: address check if valid
 
-export default function ERC20Input({ token, balance, dollarMode, setDollarMode, price, amount, setAmount }) {
+export default function ERC20Input({ token, balance, dollarMode, setDollarMode, price, amount, setAmount, receiveMode }) {
   const [userValue, setUserValue] = useState();
   const [displayValue, setDisplayValue] = useState();
 
@@ -59,6 +59,7 @@ export default function ERC20Input({ token, balance, dollarMode, setDollarMode, 
 
   return (
     <div>
+      {!receiveMode && (
       <span
         style={{ cursor: "pointer", color: "red", float: "right", marginTop: "-5px" }}
         onClick={() => {
@@ -67,6 +68,7 @@ export default function ERC20Input({ token, balance, dollarMode, setDollarMode, 
       >
         max
       </span>
+      )}
       <Input
         value={displayValue}
         placeholder={"amount in " + (dollarMode ? "USD" : token.name)}
