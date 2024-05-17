@@ -2,7 +2,7 @@ import { CaretUpOutlined, ScanOutlined, SendOutlined, HistoryOutlined } from "@a
 import { StaticJsonRpcProvider, Web3Provider } from "@ethersproject/providers";
 import { formatEther, parseEther } from "@ethersproject/units";
 import WalletConnectProvider from "@walletconnect/web3-provider";
-import { Alert, Button, Checkbox, Col, Row, Select, Spin, Input, Modal, notification } from "antd";
+import { Alert, Button, Checkbox, Col, Row, Select, Spin, Switch, Input, Modal, notification } from "antd";
 import "antd/dist/antd.css";
 import { useUserAddress } from "eth-hooks";
 import React, { useCallback, useEffect, useState, useMemo } from "react";
@@ -823,6 +823,8 @@ function App(props) {
 
   const [amountEthMode, setAmountEthMode] = useState(false);
 
+  const [receiveMode, setReceiveMode] = useState(false);
+
   if (window.location.pathname) {
     try {
       const incoming = window.location.pathname.replace("/", "");
@@ -1099,7 +1101,15 @@ function App(props) {
 
       {address && (
         <div style={{ padding: 16, cursor: "pointer", backgroundColor: "#FFFFFF", width: 420, margin: "auto" }}>
-          <QRPunkBlockie withQr address={address} showAddress={true} />
+          <QRPunkBlockie
+            address={address}
+            showAddress={true}
+            withQr
+            receiveMode={receiveMode}
+            chainId={targetNetwork.chainId}
+            amount={amount}
+            selectedErc20Token={selectedErc20Token}
+          />
         </div>
       )}
 
@@ -1135,45 +1145,49 @@ function App(props) {
               <Spin />
             </div>
           )}
-          {isMoneriumTransferReady && (
-            <MoneriumOnChainCrossChainRadio moneriumRadio={moneriumRadio} setMoneriumRadio={setMoneriumRadio} />
-          )}
-          {isMoneriumTransferReady && isCrossChain(moneriumRadio) ? (
-            <MoneriumCrossChainAddressSelector
-              clientData={moneriumClientData}
-              currentPunkAddress={address}
-              targetChain={moneriumTargetChain}
-              setTargetChain={setMoneriumTargetChain}
-              targetAddress={moneriumTargetAddress}
-              setTargetAddress={setMoneriumTargetAddress}
-              networkName={targetNetwork.name}
-            />
-          ) : (
-            <AddressInput
-              ensProvider={mainnetProvider}
-              placeholder={isMoneriumTransferReady ? "to address / IBAN" : "to address"}
-              disabled={walletConnectTx}
-              value={toAddress}
-              setAmount={setAmount}
-              setToAddress={setToAddress}
-              hoistScanner={toggle => {
-                scanner = toggle;
-              }}
-              isMoneriumTransferReady={isMoneriumTransferReady}
-              ibanAddressObject={ibanAddressObject}
-              setIbanAddressObject={setIbanAddressObject}
-              walletConnect={async wcLink => {
-                if (walletConnectConnected) {
-                  await disconnectFromWalletConnect(wallectConnectConnector, web3wallet);
-                }
+          {!receiveMode && (
+            <>
+              {isMoneriumTransferReady && (
+                <MoneriumOnChainCrossChainRadio moneriumRadio={moneriumRadio} setMoneriumRadio={setMoneriumRadio} />
+              )}
+              {isMoneriumTransferReady && isCrossChain(moneriumRadio) ? (
+                <MoneriumCrossChainAddressSelector
+                  clientData={moneriumClientData}
+                  currentPunkAddress={address}
+                  targetChain={moneriumTargetChain}
+                  setTargetChain={setMoneriumTargetChain}
+                  targetAddress={moneriumTargetAddress}
+                  setTargetAddress={setMoneriumTargetAddress}
+                  networkName={targetNetwork.name}
+                />
+              ) : (
+                <AddressInput
+                  ensProvider={mainnetProvider}
+                  placeholder={isMoneriumTransferReady ? "to address / IBAN" : "to address"}
+                  disabled={walletConnectTx}
+                  value={toAddress}
+                  setAmount={setAmount}
+                  setToAddress={setToAddress}
+                  hoistScanner={toggle => {
+                    scanner = toggle;
+                  }}
+                  isMoneriumTransferReady={isMoneriumTransferReady}
+                  ibanAddressObject={ibanAddressObject}
+                  setIbanAddressObject={setIbanAddressObject}
+                  walletConnect={async wcLink => {
+                    if (walletConnectConnected) {
+                      await disconnectFromWalletConnect(wallectConnectConnector, web3wallet);
+                    }
 
-                setWalletConnectUrl(wcLink);
-              }}
-            />
+                    setWalletConnectUrl(wcLink);
+                  }}
+                />
+              )}
+            </>
           )}
         </div>
 
-        <div style={{ padding: 10 }}>
+        <div style={{ padding: !receiveMode ? 10 : 0 }}>
           {walletConnectTx ? (
             <Input disabled={true} value={amount} />
           ) : selectedErc20Token ? (
@@ -1187,6 +1201,7 @@ function App(props) {
               setPrice={setPriceERC20}
               dollarMode={dollarMode}
               setDollarMode={setDollarMode}
+              receiveMode={receiveMode}
             />
           ) : (
             <EtherInput
@@ -1200,6 +1215,7 @@ function App(props) {
               onChange={value => {
                 setAmount(value);
               }}
+              receiveMode={receiveMode}
             />
           )}
         </div>
@@ -1207,7 +1223,7 @@ function App(props) {
         <div style={{ position: "relative", top: 10, left: 40 }}> {networkDisplay} </div>
 
         <div style={{ padding: 10 }}>
-          {
+          {!receiveMode && (
             <Button
               key="submit"
               type="primary"
@@ -1311,7 +1327,7 @@ function App(props) {
               )}{" "}
               Send
             </Button>
-          }
+          )}
         </div>
       </div>
 
@@ -1329,6 +1345,15 @@ function App(props) {
             setShowHistory={setShowHistory}
           />
         }
+      </div>
+
+      <div style={{ padding: "1em" }}>
+        <Switch
+          checkedChildren="Send"
+          unCheckedChildren="Receive"
+          defaultChecked
+          onChange={() => setReceiveMode(!receiveMode)}
+        />
       </div>
 
       <div style={{ zIndex: -1, paddingTop: 20, opacity: 0.5, fontSize: 12 }}>

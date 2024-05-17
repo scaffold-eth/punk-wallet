@@ -32,7 +32,7 @@ const { utils } = require("ethers");
 */
 
 export default function EtherInput(props) {
-  const [mode, setMode] = useState(props.ethMode ? props.token : (props.price ? "USD" : props.token));
+  const [mode, setMode] = useState(props.ethMode ? props.token : props.price ? "USD" : props.token);
   const [value, setValue] = useState();
   const [displayMax, setDisplayMax] = useState();
 
@@ -116,18 +116,20 @@ export default function EtherInput(props) {
 
   return (
     <div>
-      <span
-        style={{ cursor: "pointer", color: "red", float: "right", marginTop: "-5px" }}
-        onClick={() => {
-          setDisplay(getBalance(mode));
-          setDisplayMax(true);
-          if (typeof props.onChange === "function") {
-            props.onChange(floatBalance);
-          }
-        }}
-      >
-        max
-      </span>
+      {!props.receiveMode && (
+        <span
+          style={{ cursor: "pointer", color: "red", float: "right", marginTop: "-5px" }}
+          onClick={() => {
+            setDisplay(getBalance(mode));
+            setDisplayMax(true);
+            if (typeof props.onChange === "function") {
+              props.onChange(floatBalance);
+            }
+          }}
+        >
+          max
+        </span>
+      )}
       <Input
         placeholder={props.placeholder ? props.placeholder : "amount in " + mode}
         autoFocus={props.autoFocus}
@@ -137,6 +139,13 @@ export default function EtherInput(props) {
         onChange={async e => {
           const newValue = e.target.value;
           setDisplayMax(false);
+
+          if (e.target.value === "") {
+            if (typeof props.onChange === "function") {
+              props.onChange(undefined);
+            }
+          }
+
           if (mode === "USD") {
             const possibleNewValue = parseFloat(newValue);
             if (possibleNewValue) {
