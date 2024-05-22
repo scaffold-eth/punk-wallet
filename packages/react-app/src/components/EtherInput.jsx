@@ -42,7 +42,7 @@ export default function EtherInput(props) {
 
   const balance = useBalance(props.provider, props.address, 1000);
   let floatBalance = parseFloat("0.00");
-  let usingBalance = balance;
+  const usingBalance = balance;
 
   let gasCost = 0;
 
@@ -118,7 +118,13 @@ export default function EtherInput(props) {
     <div>
       {!props.receiveMode && (
         <span
-          style={{ cursor: "pointer", color: "red", float: "right", marginTop: "-5px" }}
+          style={{
+            cursor: "pointer",
+            color: "red",
+            float: "right",
+            marginTop: "-5px",
+            visibility: !props.receiveMode ? "visible" : "hidden",
+          }}
           onClick={() => {
             setDisplay(getBalance(mode));
             setDisplayMax(true);

@@ -1222,8 +1222,7 @@ function App(props) {
               <Spin />
             </div>
           )}
-          {!receiveMode && (
-            <>
+            <div style={{ visibility: !receiveMode ? 'visible' : 'hidden' }}>
               {isMoneriumTransferReady && (
                 <MoneriumOnChainCrossChainRadio moneriumRadio={moneriumRadio} setMoneriumRadio={setMoneriumRadio} />
               )}
@@ -1263,11 +1262,10 @@ function App(props) {
                   }}
                 />
               )}
-            </>
-          )}
+            </div>
         </div>
 
-        <div style={{ padding: !receiveMode ? 10 : 0 }}>
+        <div style={{ padding: 10 }}>
           {walletConnectTx ? (
             <Input disabled={true} value={amount} />
           ) : selectedErc20Token ? (
@@ -1304,8 +1302,7 @@ function App(props) {
 
         <div style={{ position: "relative", top: 10, left: 40 }}> {networkDisplay} </div>
 
-        <div style={{ padding: 10 }}>
-          {!receiveMode && (
+        <div style={{ padding: 10, visibility: !receiveMode ? "visible" : "hidden", }}>
             <Button
               key="submit"
               type="primary"
@@ -1409,7 +1406,6 @@ function App(props) {
               )}{" "}
               Send
             </Button>
-          )}
         </div>
       </div>
 
