@@ -866,7 +866,7 @@ function App(props) {
         const chainId = eip681Object.chain_id;
 
         if (chainId) {
-          incomingNetwork = Object.values(NETWORKS).find(network => network.chainId == chainId);
+          incomingNetwork = Object.values(NETWORKS).find(network => network.chainId === parseInt(chainId));
 
           if (incomingNetwork) {
             console.log("incoming network:", incomingNetwork);
@@ -1251,6 +1251,9 @@ function App(props) {
                   isMoneriumTransferReady={isMoneriumTransferReady}
                   ibanAddressObject={ibanAddressObject}
                   setIbanAddressObject={setIbanAddressObject}
+                  setAmountEthMode={setAmountEthMode}
+                  networkSettingsHelper={networkSettingsHelper}
+                  setTargetNetwork={setTargetNetwork}
                   walletConnect={async wcLink => {
                     if (walletConnectConnected) {
                       await disconnectFromWalletConnect(wallectConnectConnector, web3wallet);
@@ -1269,6 +1272,7 @@ function App(props) {
             <Input disabled={true} value={amount} />
           ) : selectedErc20Token ? (
             <ERC20Input
+              key={amount}
               token={selectedErc20Token}
               value={amount}
               amount={amount}
@@ -1282,6 +1286,7 @@ function App(props) {
             />
           ) : (
             <EtherInput
+              key={amount}
               price={price || targetNetwork.price}
               value={amount}
               token={targetNetwork.token || "ETH"}
