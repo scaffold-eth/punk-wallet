@@ -5,9 +5,11 @@ import React, { useCallback, useState, useEffect } from "react";
 import QrReader from "react-qr-reader-es6";
 import { BigNumber } from "ethers";
 import { formatEther } from "ethers/lib/utils";
+import { parse } from "eth-url-parser";
 import { QRPunkBlockie } from ".";
 
 import { isValidIban } from "../helpers/MoneriumHelper";
+import { NETWORKS } from "../constants";
 
 // probably we need to change value={toAddress} to address={toAddress}
 
@@ -64,6 +66,8 @@ export default function AddressInput(props) {
     setIbanAddressObject,
     isMoneriumTransferReady,
     setAmountEthMode,
+    setTargetNetwork,
+    networkSettingsHelper,
   } = props;
 
   const [value, setValue] = useState(props.address);
@@ -238,7 +242,7 @@ export default function AddressInput(props) {
           if (newValue) {
             console.log("SCAN VALUE", newValue);
 
-            if (newValue && newValue.length == 66 && newValue.indexOf("0x") === 0) {
+            if (newValue && newValue.length === 66 && newValue.indexOf("0x") === 0) {
               console.log("This might be a PK...", newValue);
               setTimeout(() => {
                 console.log("opening...");
@@ -267,16 +271,30 @@ export default function AddressInput(props) {
               updateAddress();
             } else {
               let possibleNewValue = newValue;
-              let address;
-              let amount;
-              possibleNewValue = possibleNewValue.replace("ethereum:", "");
-              possibleNewValue = possibleNewValue.replace("eth:", "");
-              console.log("possibleNewValue", possibleNewValue);
+              const eip681Object = parse(possibleNewValue);
 
-              if (possibleNewValue.includes("?")) {
-                const newValuesArray = possibleNewValue.split("?");
-                address = newValuesArray[0];
-                amount = newValuesArray[1].replaceAll("value=", "");
+              // token transfer
+              if (possibleNewValue.includes("transfer") || possibleNewValue.includes("uint256")) {
+                console.log("TOKEN TRANSFER");
+                const chainId = eip681Object.chain_id;
+
+                if (chainId) {
+                  const incomingNetwork = Object.values(NETWORKS).find(
+                    network => network.chainId === parseInt(chainId),
+                  );
+                  if (incomingNetwork) {
+                    console.log("incoming network:", incomingNetwork);
+                    networkSettingsHelper.updateSelectedName(incomingNetwork.name);
+                    setTargetNetwork(networkSettingsHelper.getSelectedItem(true));
+                  } else {
+                    // error screen that chainId is not supported
+                  }
+                } else {
+                  // warning screen that chainId is not provided
+                }
+              } else if (possibleNewValue.includes("?")) {
+                let amount = eip681Object.parameters.value;
+
                 amount = BigNumber.from(parseFloat(amount).toString());
                 amount = formatEther(amount);
                 amount = Math.round(amount);
@@ -290,8 +308,8 @@ export default function AddressInput(props) {
                 console.log("CLEANED VALUE", possibleNewValue);
               }
               setScan(false);
+              updateAddress(eip681Object.target_address);
               setAmount(amount);
-              updateAddress(address);
             }
           }
         }}
@@ -301,13 +319,6 @@ export default function AddressInput(props) {
   ) : (
     ""
   );
-
-  const punkSize = 45;
-
-  const part1 = currentValue && currentValue.substr && currentValue.substr(2, 20);
-  const part2 = currentValue && currentValue.substr && currentValue.substr(22);
-  const x = parseInt(part1, 16) % 100;
-  const y = parseInt(part2, 16) % 100;
 
   props.hoistScanner(() => {
     setScan(!scan);
