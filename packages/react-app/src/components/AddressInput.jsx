@@ -10,6 +10,7 @@ import { QRPunkBlockie } from ".";
 
 import { isValidIban } from "../helpers/MoneriumHelper";
 import { NETWORKS } from "../constants";
+import { handleNetworkByQR } from "../helpers/handleNetworkByQR";
 
 // probably we need to change value={toAddress} to address={toAddress}
 
@@ -279,22 +280,9 @@ export default function AddressInput(props) {
                 console.log("TOKEN TRANSFER");
                 const chainId = eip681Object.chain_id;
 
-                if (chainId) {
-                  const incomingNetwork = Object.values(NETWORKS).find(
-                    network => network.chainId === parseInt(chainId),
-                  );
-                  if (incomingNetwork) {
-                    console.log("incoming network:", incomingNetwork);
-                    networkSettingsHelper.updateSelectedName(incomingNetwork.name);
-                    setTargetNetwork(networkSettingsHelper.getSelectedItem(true));
-                  } else {
-                    // error screen that chainId is not supported
-                  }
-                } else {
-                  // warning screen that chainId is not provided
-                }
+                handleNetworkByQR(chainId, networkSettingsHelper, setTargetNetwork);
               } else if (possibleNewValue.includes("?")) {
-                let amount = eip681Object.parameters.value;
+                amount = eip681Object.parameters.value;
 
                 amount = BigNumber.from(parseFloat(amount).toString());
                 amount = formatEther(amount);

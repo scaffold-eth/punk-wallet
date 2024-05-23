@@ -41,6 +41,7 @@ import {
 } from "./components";
 import { INFURA_ID, NETWORK, NETWORKS } from "./constants";
 import { Transactor } from "./helpers";
+import { handleNetworkByQR } from "./helpers/handleNetworkByQR";
 import { useBalance, useExchangePrice, useGasPrice, useLocalStorage, usePoller, useUserProvider } from "./hooks";
 
 import WalletConnect from "@walletconnect/client";
@@ -84,8 +85,6 @@ import {
   getTokens,
   migrateSelectedTokenStorageSetting,
 } from "./helpers/TokenSettingsHelper";
-
-import { getChain } from "./helpers/ChainHelper";
 
 const { confirm } = Modal;
 
@@ -861,25 +860,9 @@ function App(props) {
         const eip681Object = parse(eip681URL);
         console.log("eip681Object", eip681Object);
 
-        let incomingNetwork;
-
         const chainId = eip681Object.chain_id;
 
-        if (chainId) {
-          incomingNetwork = Object.values(NETWORKS).find(network => network.chainId === parseInt(chainId));
-
-          if (incomingNetwork) {
-            console.log("incoming network:", incomingNetwork);
-            if (incomingNetwork.name != targetNetwork.name) {
-              networkSettingsHelper.updateSelectedName(incomingNetwork.name);
-              setTargetNetwork(networkSettingsHelper.getSelectedItem(true));
-            }
-          } else {
-            // error screen that chainId is not supported
-          }
-        } else {
-          // warning screen that chainId is not provided
-        }
+        handleNetworkByQR(chainId, networkSettingsHelper, setTargetNetwork)
 
         const functionName = eip681Object.function_name;
         const tokenAddress = eip681Object?.target_address;
