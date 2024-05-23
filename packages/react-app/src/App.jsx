@@ -1238,6 +1238,7 @@ function App(props) {
                 />
               ) : (
                 <AddressInput
+                  key={receiveMode}
                   ensProvider={mainnetProvider}
                   placeholder={isMoneriumTransferReady ? "to address / IBAN" : "to address"}
                   disabled={walletConnectTx}
@@ -1304,7 +1305,7 @@ function App(props) {
 
         <div style={{ padding: 10, visibility: !receiveMode ? "visible" : "hidden", }}>
             <Button
-              key="submit"
+              key={receiveMode}
               type="primary"
               disabled={
                 loading ||
