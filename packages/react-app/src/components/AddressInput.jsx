@@ -271,6 +271,7 @@ export default function AddressInput(props) {
               updateAddress();
             } else {
               let possibleNewValue = newValue;
+              let amount;
               const eip681Object = parse(possibleNewValue);
 
               // token transfer
