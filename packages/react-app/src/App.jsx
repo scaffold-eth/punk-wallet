@@ -671,6 +671,16 @@ function App(props) {
     pairWalletConnectV2();
   }, [walletConnectUrl, web3wallet]);
 
+  // Forcing white background for the QR code - Dark Reader issue
+  useEffect(() => {
+    setTimeout(() => {
+      const element = document.getElementById('QRPunkBlockieDiv');
+      if (element) {
+        element.removeAttribute('data-darkreader-inline-bgcolor');
+      }
+    }, 50);
+  }, []);
+
   useMemo(() => {
     if (address && window.location.pathname) {
       if (window.location.pathname.indexOf("/wc") >= 0) {
@@ -1160,7 +1170,7 @@ function App(props) {
       </div>
 
       {address && (
-        <div style={{ padding: 16, cursor: "pointer", backgroundColor: "#FFFFFF", width: 420, margin: "auto" }}>
+        <div id="QRPunkBlockieDiv" style={{ padding: 16, cursor: "pointer", backgroundColor: "#FFFFFF", width: 420, margin: "auto" }}>
           <QRPunkBlockie
             address={address}
             showAddress={true}
