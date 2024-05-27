@@ -12,6 +12,55 @@ const { ethers } = require("ethers");
 // ToDo: add check if enough balance is available, otherwise don't allow user to send
 // ToDo: address check if valid
 
+const calcAmount = (userValueNumber, dollarMode, price) => {
+  if (!dollarMode) {
+    return userValueNumber;
+  }
+
+  return userValueNumber / price;
+};
+
+const Prefix = ({ dollarMode, token }) => {
+  if (dollarMode) {
+    return "$";
+  }
+
+  return <TokenDisplay token={token} showName={false} />;
+};
+
+const calcDisplayValue = (token, amount, dollarMode, price) => {
+  if (ethers.utils.isHexString(amount)) {
+    amount = getInverseDecimalCorrectedAmountNumber(amount, token.decimals);
+  }
+
+  let displayValue;
+
+  if (!dollarMode) {
+    displayValue = amount;
+  } else {
+    displayValue = amount * price;
+  }
+
+  if (Math.floor(displayValue) === displayValue) {
+    return displayValue;
+  }
+
+  return getDisplayNumberWithDecimals(displayValue, dollarMode);
+};
+
+const handleMax = (token, setAmount, balance, setDisplayValue, dollarMode, price, setUserValue) => {
+  setAmount(balance);
+
+  setDisplayValue(calcDisplayValue(token, balance, dollarMode, price));
+  setUserValue(0);
+};
+
+const resetValues = (setUserValue, setDisplayValue, setAmount) => {
+  setUserValue(undefined);
+  setDisplayValue(undefined);
+  setAmount(undefined);
+};
+
 export default function ERC20Input({
   token,
   balance,
@@ -68,20 +117,22 @@ export default function ERC20Input({
 
   return (
     <div>
-      <span
-        style={{
-          cursor: "pointer",
-          color: "red",
-          float: "right",
-          marginTop: "-5px",
-          visibility: !receiveMode ? "visible" : "hidden",
-        }}
-        onClick={() => {
-          handleMax(token, setAmount, balance, setDisplayValue, dollarMode, price, setUserValue);
-        }}
-      >
-        max
-      </span>
+      {!receiveMode && (
+        <span
+          style={{
+            cursor: "pointer",
+            color: "red",
+            float: "right",
+            marginTop: "-5px",
+            visibility: !receiveMode ? "visible" : "hidden",
+          }}
+          onClick={() => {
+            handleMax(token, setAmount, balance, setDisplayValue, dollarMode, price, setUserValue);
+          }}
+        >
+          max
+        </span>
+      )}
       <Input
         value={displayValue}
         placeholder={"amount in " + (dollarMode ? "USD" : token.name)}
@@ -94,52 +145,3 @@ export default function ERC20Input({
     </div>
   );
 }
-
-const Prefix = ({ dollarMode, token }) => {
-  if (dollarMode) {
-    return "$";
-  }
-
-  return <TokenDisplay token={token} showName={false} />;
-};
-
-const calcAmount = (userValueNumber, dollarMode, price) => {
-  if (!dollarMode) {
-    return userValueNumber;
-  }
-
-  return userValueNumber / price;
-};
-
-const calcDisplayValue = (token, amount, dollarMode, price) => {
-  if (ethers.utils.isHexString(amount)) {
-    amount = getInverseDecimalCorrectedAmountNumber(amount, token.decimals);
-  }
-
-  let displayValue;
-
-  if (!dollarMode) {
-    displayValue = amount;
-  } else {
-    displayValue = amount * price;
-  }
-
-  if (Math.floor(displayValue) === displayValue) {
-    return displayValue;
-  }
-
-  return getDisplayNumberWithDecimals(displayValue, dollarMode);
-};
-
-const handleMax = (token, setAmount, balance, setDisplayValue, dollarMode, price, setUserValue) => {
-  setAmount(balance);
-
-  setDisplayValue(calcDisplayValue(token, balance, dollarMode, price));
-  setUserValue(0);
-};
-
-const resetValues = (setUserValue, setDisplayValue, setAmount) => {
-  setUserValue(undefined);
-  setDisplayValue(undefined);
-  setAmount(undefined);
-};
