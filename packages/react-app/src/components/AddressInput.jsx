@@ -3,9 +3,14 @@ import { Badge, Input, message, Spin } from "antd";
 import { useLookupAddress } from "eth-hooks";
 import React, { useCallback, useState, useEffect } from "react";
 import QrReader from "react-qr-reader-es6";
+import { BigNumber } from "ethers";
+import { formatEther } from "ethers/lib/utils";
+import { parse } from "eth-url-parser";
 import { QRPunkBlockie } from ".";
 
 import { isValidIban } from "../helpers/MoneriumHelper";
+import { NETWORKS } from "../constants";
+import { handleNetworkByQR } from "../helpers/handleNetworkByQR";
 
 // probably we need to change value={toAddress} to address={toAddress}
 
@@ -34,29 +39,37 @@ import { isValidIban } from "../helpers/MoneriumHelper";
 
 const PasteButton = ({ stateSetter }) => {
   return (
-      <div
-          style={{ marginTop: 4, cursor: "pointer" }}
-          onClick={ async () => {
-              try {
-                  const text = await navigator.clipboard.readText();
-                  stateSetter(text);
-              } catch (err) {
-                  console.error('Failed to read clipboard:', err);
-              }
-          }}
-      >
-
-          <Badge>
-              <SnippetsOutlined style={{ color: "#000000", fontSize: 18 }} />
-          </Badge>{" "}
-
-          Paste
-      </div>
-      );
-  };
+    <div
+      style={{ marginTop: 4, cursor: "pointer" }}
+      onClick={async () => {
+        try {
+          const text = await navigator.clipboard.readText();
+          stateSetter(text);
+        } catch (err) {
+          console.error("Failed to read clipboard:", err);
+        }
+      }}
+    >
+      <Badge>
+        <SnippetsOutlined style={{ color: "#000000", fontSize: 18 }} />
+      </Badge>{" "}
+      Paste
+    </div>
+  );
+};
 
 export default function AddressInput(props) {
-  const { ensProvider, setAmount, setToAddress, ibanAddressObject, setIbanAddressObject, isMoneriumTransferReady } = props;
+  const {
+    ensProvider,
+    setAmount,
+    setToAddress,
+    ibanAddressObject,
+    setIbanAddressObject,
+    isMoneriumTransferReady,
+    setAmountEthMode,
+    setTargetNetwork,
+    networkSettingsHelper,
+  } = props;
 
   const [value, setValue] = useState(props.address);
 
@@ -84,11 +97,10 @@ export default function AddressInput(props) {
       setIsIbanAddress(true);
 
       setIbanAddressObject({
-      ...ibanAddressObject,
-        iban: iban
+        ...ibanAddressObject,
+        iban,
       });
-    }
-    else {
+    } else {
       setIsIbanAddress(false);
     }
   }, [ens, currentValue, value, isMoneriumTransferReady]);
@@ -119,15 +131,12 @@ export default function AddressInput(props) {
   const updateAddress = useCallback(
     async newValue => {
       if (typeof newValue !== "undefined") {
-
-        console.log("SCAN",newValue)
-
-
+        console.log("SCAN", newValue);
 
         try {
           // EPC QR code
           if (newValue.includes("BCD") && newValue.includes("SCT")) {
-            const elements = newValue.split('\n');
+            const elements = newValue.split("\n");
 
             const name = elements[5];
             const names = name.split(" ");
@@ -142,8 +151,7 @@ export default function AddressInput(props) {
             if (amountData) {
               try {
                 amount = parseFloat(amountData.replace("EUR", ""));
-              }
-              catch(error) {
+              } catch (error) {
                 console.log("Couldn't parse amount", error);
               }
             }
@@ -151,9 +159,9 @@ export default function AddressInput(props) {
             const memo = elements[10];
 
             setIbanAddressObject({
-              firstName:name,
-              iban:iban
-            })
+              firstName: name,
+              iban,
+            });
 
             setIbanFirstName(firstName);
             setIbanLastName(lastName);
@@ -169,12 +177,11 @@ export default function AddressInput(props) {
 
             return;
           }
-        }
-        catch (error) {
+        } catch (error) {
           console.log("Couldn't parse EPC QR", error);
         }
 
-        /*console.log("🔑 Incoming Private Key...");
+        /* console.log("🔑 Incoming Private Key...");
         rawPK = incomingPK;
         burnerConfig.privateKey = rawPK;
         window.history.pushState({}, "", "/");
@@ -182,10 +189,10 @@ export default function AddressInput(props) {
         if (currentPrivateKey && currentPrivateKey !== rawPK) {
           window.localStorage.setItem("metaPrivateKey_backup" + Date.now(), currentPrivateKey);
         }
-        window.localStorage.setItem("metaPrivateKey", rawPK);*/
-        if(newValue && newValue.indexOf && newValue.indexOf("wc:")===0){
-          props.walletConnect(newValue)
-        }else{
+        window.localStorage.setItem("metaPrivateKey", rawPK); */
+        if (newValue && newValue.indexOf && newValue.indexOf("wc:") === 0) {
+          props.walletConnect(newValue);
+        } else {
           let address = newValue;
           setValue(address);
           if (address.indexOf(".eth") > 0 || address.indexOf(".xyz") > 0) {
@@ -234,48 +241,65 @@ export default function AddressInput(props) {
         }}
         onScan={newValue => {
           if (newValue) {
-            console.log("SCAN VALUE",newValue);
+            console.log("SCAN VALUE", newValue);
 
-            if(newValue && newValue.length==66 && newValue.indexOf("0x")===0){
-              console.log("This might be a PK...",newValue)
-              setTimeout(()=>{
-                console.log("opening...")
-                let a = document.createElement("a");
+            if (newValue && newValue.length === 66 && newValue.indexOf("0x") === 0) {
+              console.log("This might be a PK...", newValue);
+              setTimeout(() => {
+                console.log("opening...");
+                const a = document.createElement("a");
                 document.body.appendChild(a);
                 a.style = "display: none";
-                a.href = "https://punkwallet.io/pk#"+newValue;
+                a.href = "https://punkwallet.io/pk#" + newValue;
                 a.click();
                 document.body.removeChild(a);
-              },250)
+              }, 250);
               setScan(false);
               updateAddress();
-            }else if(newValue && newValue.indexOf && newValue.indexOf("http")===0){
-              console.log("this is a link, following...")
-              setTimeout(()=>{
-                console.log("opening...")
-                let a = document.createElement("a");
+            } else if (newValue && newValue.indexOf && newValue.indexOf("http") === 0) {
+              console.log("this is a link, following...");
+              setTimeout(() => {
+                console.log("opening...");
+                const a = document.createElement("a");
                 document.body.appendChild(a);
                 a.style = "display: none";
                 a.href = newValue;
                 a.click();
                 document.body.removeChild(a);
-              },250)
+              }, 250);
 
               setScan(false);
               updateAddress();
-            }else{
+            } else {
               let possibleNewValue = newValue;
-              possibleNewValue = possibleNewValue.replace("ethereum:", "");
-              possibleNewValue = possibleNewValue.replace("eth:", "");
-              console.log("possibleNewValue",possibleNewValue)
+              let amount;
+              const eip681Object = parse(possibleNewValue);
+
+              // token transfer
+              if (possibleNewValue.includes("transfer") || possibleNewValue.includes("uint256")) {
+                console.log("TOKEN TRANSFER");
+                const chainId = eip681Object.chain_id;
+
+                handleNetworkByQR(chainId, networkSettingsHelper, setTargetNetwork);
+              } else if (possibleNewValue.includes("?")) {
+                amount = eip681Object.parameters.value;
+
+                amount = BigNumber.from(parseFloat(amount).toString());
+                amount = formatEther(amount);
+                amount = Math.round(amount);
+                setAmountEthMode(true);
+
+                console.log("eth amount: ", amount);
+              }
+
               if (possibleNewValue.indexOf("/") >= 0) {
                 possibleNewValue = possibleNewValue.substr(possibleNewValue.lastIndexOf("0x"));
                 console.log("CLEANED VALUE", possibleNewValue);
               }
               setScan(false);
-              updateAddress(possibleNewValue);
+              updateAddress(eip681Object.target_address);
+              setAmount(amount);
             }
-
           }
         }}
         style={{ width: "100%" }}
@@ -285,19 +309,12 @@ export default function AddressInput(props) {
     ""
   );
 
-  const punkSize = 45;
-
-  const part1 = currentValue && currentValue.substr && currentValue.substr(2, 20);
-  const part2 = currentValue && currentValue.substr && currentValue.substr(22);
-  const x = parseInt(part1, 16) % 100;
-  const y = parseInt(part2, 16) % 100;
-
   props.hoistScanner(() => {
     setScan(!scan);
   });
 
   return (
-    <div style={{ position: "relative"}}>
+    <div style={{ position: "relative" }}>
       <div style={{ position: "absolute", left: -212, top: 16 }}>
         {currentValue && currentValue.length > 41 ? <QRPunkBlockie scale={0.6} address={currentValue} /> : ""}
       </div>
@@ -318,43 +335,43 @@ export default function AddressInput(props) {
         }}
       />
 
-      {isIbanAddress && 
-        <div style={{ display: 'flex',  flexDirection: 'column' }}>
-            <div style={{ padding: 10 }}>  
-                <Input
-                    addonAfter={<PasteButton stateSetter={setIbanFirstName}/>}
-                    id={"firstName"}
-                    onChange={e => {
-                      setIbanFirstName(e.target.value);
-                    }}
-                    placeholder={"First Name"}
-                    value={ibanFirstName}
-                  />
-            </div>
-            <div style={{ padding: 10 }}>  
-                <Input
-                    addonAfter={<PasteButton stateSetter={setIbanLastName}/>}
-                    id={"lastName"}
-                    onChange={e => {
-                      setIbanLastName(e.target.value);
-                    }}
-                    placeholder={"Last Name"}
-                    value={ibanLastName}
-                  />
-            </div>
-            <div style={{ padding: 10 }}>  
-                <Input
-                    addonAfter={<PasteButton stateSetter={setIbanMemo}/>}
-                    id={"memo"}
-                    onChange={e => {
-                      setIbanMemo(e.target.value);
-                    }}
-                    placeholder={"Reference / Memo"}
-                    value={ibanMemo}
-                  />
-            </div>
+      {isIbanAddress && (
+        <div style={{ display: "flex", flexDirection: "column" }}>
+          <div style={{ padding: 10 }}>
+            <Input
+              addonAfter={<PasteButton stateSetter={setIbanFirstName} />}
+              id="firstName"
+              onChange={e => {
+                setIbanFirstName(e.target.value);
+              }}
+              placeholder="First Name"
+              value={ibanFirstName}
+            />
+          </div>
+          <div style={{ padding: 10 }}>
+            <Input
+              addonAfter={<PasteButton stateSetter={setIbanLastName} />}
+              id="lastName"
+              onChange={e => {
+                setIbanLastName(e.target.value);
+              }}
+              placeholder="Last Name"
+              value={ibanLastName}
+            />
+          </div>
+          <div style={{ padding: 10 }}>
+            <Input
+              addonAfter={<PasteButton stateSetter={setIbanMemo} />}
+              id="memo"
+              onChange={e => {
+                setIbanMemo(e.target.value);
+              }}
+              placeholder="Reference / Memo"
+              value={ibanMemo}
+            />
+          </div>
         </div>
-      }
+      )}
     </div>
   );
 }

@@ -32,7 +32,7 @@ const { utils } = require("ethers");
 */
 
 export default function EtherInput(props) {
-  const [mode, setMode] = useState(props.ethMode ? props.token : (props.price ? "USD" : props.token));
+  const [mode, setMode] = useState(props.ethMode ? props.token : props.price ? "USD" : props.token);
   const [value, setValue] = useState();
   const [displayMax, setDisplayMax] = useState();
 
@@ -42,7 +42,7 @@ export default function EtherInput(props) {
 
   const balance = useBalance(props.provider, props.address, 1000);
   let floatBalance = parseFloat("0.00");
-  let usingBalance = balance;
+  const usingBalance = balance;
 
   let gasCost = 0;
 
@@ -117,7 +117,13 @@ export default function EtherInput(props) {
   return (
     <div>
       <span
-        style={{ cursor: "pointer", color: "red", float: "right", marginTop: "-5px" }}
+        style={{
+          cursor: "pointer",
+          color: "red",
+          float: "right",
+          marginTop: "-5px",
+          visibility: !props.receiveMode ? "visible" : "hidden",
+        }}
         onClick={() => {
           setDisplay(getBalance(mode));
           setDisplayMax(true);
@@ -137,6 +143,13 @@ export default function EtherInput(props) {
         onChange={async e => {
           const newValue = e.target.value;
           setDisplayMax(false);
+
+          if (e.target.value === "") {
+            if (typeof props.onChange === "function") {
+              props.onChange(undefined);
+            }
+          }
+
           if (mode === "USD") {
             const possibleNewValue = parseFloat(newValue);
             if (possibleNewValue) {

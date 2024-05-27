@@ -719,3 +719,10 @@ export const NETWORKS = {
     token: "ONE",
   },
 };
+
+export const ERROR_MESSAGES = {
+  CHAIN_ERROR: {
+    NOT_SUPPORTED: "ChainId is not supported",
+    NOT_PROVIDED: "ChainId is not provided",
+  },
+};
