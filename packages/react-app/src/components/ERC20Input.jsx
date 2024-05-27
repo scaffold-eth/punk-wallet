@@ -101,11 +101,12 @@ export default function ERC20Input({
 
     setDisplayValue(calcDisplayValue(token, amount, dollarMode, price));
     setUserValue(0);
-  }, [dollarMode]);
 
-  useEffect(() => {
-    resetValues(setUserValue, setDisplayValue, setAmount);
-  }, [token]);
+    // eslint-disable-next-line consistent-return
+    return () => {
+      resetValues(setUserValue, setDisplayValue, setAmount);
+    };
+  }, [dollarMode, token]);
 
   useEffect(() => {
     // After we hit send, amount is set to the empty string
