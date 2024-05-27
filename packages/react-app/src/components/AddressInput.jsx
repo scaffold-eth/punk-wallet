@@ -273,12 +273,14 @@ export default function AddressInput(props) {
               let possibleNewValue = newValue;
               let amount;
               const eip681Object = parse(possibleNewValue);
+              const tokenAddress = eip681Object?.target_address;
 
               // token transfer
               if (possibleNewValue.includes("transfer") || possibleNewValue.includes("uint256")) {
                 console.log("TOKEN TRANSFER");
                 const chainId = eip681Object.chain_id;
                 const tokenAmount = eip681Object.parameters.uint256;
+                localStorage.setItem("switchToTokenAddress", tokenAddress);
                 setAmountEthMode(true);
                 amount = tokenAmount;
 
@@ -290,6 +292,7 @@ export default function AddressInput(props) {
                 amount = formatEther(amount);
                 amount = Math.round(amount);
                 setAmountEthMode(true);
+                localStorage.setItem("switchToEth", true);
 
                 console.log("eth amount: ", amount);
               }

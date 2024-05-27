@@ -1264,7 +1264,7 @@ function App(props) {
             <Input disabled={true} value={amount} />
           ) : selectedErc20Token ? (
             <ERC20Input
-              key={amount}
+              key={`${amount}_${selectedErc20Token}`}
               token={selectedErc20Token}
               value={amount}
               amount={amount}
