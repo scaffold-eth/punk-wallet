@@ -9,7 +9,6 @@ import { parse } from "eth-url-parser";
 import { QRPunkBlockie } from ".";
 
 import { isValidIban } from "../helpers/MoneriumHelper";
-import { NETWORKS } from "../constants";
 import { handleNetworkByQR } from "../helpers/handleNetworkByQR";
 
 // probably we need to change value={toAddress} to address={toAddress}
@@ -279,6 +278,9 @@ export default function AddressInput(props) {
               if (possibleNewValue.includes("transfer") || possibleNewValue.includes("uint256")) {
                 console.log("TOKEN TRANSFER");
                 const chainId = eip681Object.chain_id;
+                const tokenAmount = eip681Object.parameters.uint256;
+                setAmountEthMode(true);
+                amount = tokenAmount;
 
                 handleNetworkByQR(chainId, networkSettingsHelper, setTargetNetwork);
               } else if (possibleNewValue.includes("?")) {
