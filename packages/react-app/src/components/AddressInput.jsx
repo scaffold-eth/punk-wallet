@@ -282,7 +282,7 @@ export default function AddressInput(props) {
                 const tokenAmount = eip681Object.parameters.uint256;
                 localStorage.setItem("switchToTokenAddress", tokenAddress);
                 setAmountEthMode(true);
-                amount = tokenAmount;
+                amount = parseInt(tokenAmount);
 
                 handleNetworkByQR(chainId, networkSettingsHelper, setTargetNetwork);
               } else if (possibleNewValue.includes("?")) {
