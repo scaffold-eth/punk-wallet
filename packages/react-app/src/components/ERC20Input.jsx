@@ -101,12 +101,18 @@ export default function ERC20Input({
 
     setDisplayValue(calcDisplayValue(token, amount, dollarMode, price));
     setUserValue(0);
+  }, [dollarMode]);
+
+  useEffect(() => {
+    if (!amount || !price) {
+      return;
+    }
+
+    setDisplayValue(calcDisplayValue(token, amount, dollarMode, price));
 
     // eslint-disable-next-line consistent-return
-    return () => {
-      resetValues(setUserValue, setDisplayValue, setAmount);
-    };
-  }, [dollarMode, token]);
+    return () => resetValues(setUserValue, setDisplayValue, setAmount);
+  }, [token]);
 
   useEffect(() => {
     // After we hit send, amount is set to the empty string
@@ -115,6 +121,8 @@ export default function ERC20Input({
       resetValues(setUserValue, setDisplayValue, setAmount);
     }
   }, [amount]);
+
+  console.log(displayValue);
 
   return (
     <div>
