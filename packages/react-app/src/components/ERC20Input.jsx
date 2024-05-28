@@ -122,8 +122,6 @@ export default function ERC20Input({
     }
   }, [amount]);
 
-  console.log(displayValue);
-
   return (
     <div>
       <span
