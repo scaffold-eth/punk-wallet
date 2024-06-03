@@ -104,7 +104,14 @@ export default function ERC20Input({
   }, [dollarMode]);
 
   useEffect(() => {
-    resetValues(setUserValue, setDisplayValue, setAmount);
+    if (!amount || !price) {
+      return;
+    }
+
+    setDisplayValue(calcDisplayValue(token, amount, dollarMode, price));
+
+    // eslint-disable-next-line consistent-return
+    return () => resetValues(setUserValue, setDisplayValue, setAmount);
   }, [token]);
 
   useEffect(() => {
@@ -117,22 +124,20 @@ export default function ERC20Input({
 
   return (
     <div>
-      {!receiveMode && (
-        <span
-          style={{
-            cursor: "pointer",
-            color: "red",
-            float: "right",
-            marginTop: "-5px",
-            visibility: !receiveMode ? "visible" : "hidden",
-          }}
-          onClick={() => {
-            handleMax(token, setAmount, balance, setDisplayValue, dollarMode, price, setUserValue);
-          }}
-        >
-          max
-        </span>
-      )}
+      <span
+        style={{
+          cursor: "pointer",
+          color: "red",
+          float: "right",
+          marginTop: "-5px",
+          visibility: !receiveMode ? "visible" : "hidden",
+        }}
+        onClick={() => {
+          handleMax(token, setAmount, balance, setDisplayValue, dollarMode, price, setUserValue);
+        }}
+      >
+        max
+      </span>
       <Input
         value={displayValue}
         placeholder={"amount in " + (dollarMode ? "USD" : token.name)}
