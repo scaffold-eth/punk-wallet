@@ -117,7 +117,7 @@ export default function ERC20Input({
 
   return (
     <div>
-      {receiveMode && (
+      {!receiveMode && (
         <span
           style={{
             cursor: "pointer",

@@ -131,7 +131,6 @@ export default function QRPunkBlockie({
             letterSpacing: -0.8,
             color: "#666666",
             fontSize: 14.8,
-            minHeight: "50px",
           }}
         >
           {displayValue}
