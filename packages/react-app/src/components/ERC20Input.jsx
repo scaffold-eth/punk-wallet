@@ -117,20 +117,21 @@ export default function ERC20Input({
 
   return (
     <div>
-      <span
-        style={{
-          cursor: "pointer",
-          color: "red",
-          float: "right",
-          marginTop: "-5px",
-          visibility: !receiveMode ? "visible" : "hidden",
-        }}
-        onClick={() => {
-          handleMax(token, setAmount, balance, setDisplayValue, dollarMode, price, setUserValue);
-        }}
-      >
-        max
-      </span>
+      {receiveMode && (
+        <span
+          style={{
+            cursor: "pointer",
+            color: "red",
+            float: "right",
+            marginTop: "-5px",
+          }}
+          onClick={() => {
+            handleMax(token, setAmount, balance, setDisplayValue, dollarMode, price, setUserValue);
+          }}
+        >
+          max
+        </span>
+      )}
       <Input
         value={displayValue}
         placeholder={"amount in " + (dollarMode ? "USD" : token.name)}

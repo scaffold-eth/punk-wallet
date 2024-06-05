@@ -225,8 +225,7 @@ function App(props) {
 
       if (token) {
         tokenSettingsHelper.updateSelectedName(token.name);
-      }
-      else {
+      } else {
         // error screen that token is not supported
       }
     }
@@ -674,9 +673,9 @@ function App(props) {
   // Forcing white background for the QR code - Dark Reader issue
   useEffect(() => {
     setTimeout(() => {
-      const element = document.getElementById('QRPunkBlockieDiv');
+      const element = document.getElementById("QRPunkBlockieDiv");
       if (element) {
-        element.removeAttribute('data-darkreader-inline-bgcolor');
+        element.removeAttribute("data-darkreader-inline-bgcolor");
       }
     }, 50);
   }, []);
@@ -872,7 +871,7 @@ function App(props) {
 
         const chainId = eip681Object.chain_id;
 
-        handleNetworkByQR(chainId, networkSettingsHelper, setTargetNetwork)
+        handleNetworkByQR(chainId, networkSettingsHelper, setTargetNetwork);
 
         const functionName = eip681Object.function_name;
         const tokenAddress = eip681Object?.target_address;
@@ -882,10 +881,9 @@ function App(props) {
         if (functionName == "transfer" && tokenAddress) {
           localStorage.setItem("switchToTokenAddress", tokenAddress);
           toAddress = eip681Object?.params?.address;
-        }
-        else {
+        } else {
           localStorage.setItem("switchToEth", true);
-          toAddress = eip681Object?.target_address
+          toAddress = eip681Object?.target_address;
         }
       }
 
@@ -1170,7 +1168,10 @@ function App(props) {
       </div>
 
       {address && (
-        <div id="QRPunkBlockieDiv" style={{ padding: 16, cursor: "pointer", backgroundColor: "#FFFFFF", width: 420, margin: "auto" }}>
+        <div
+          id="QRPunkBlockieDiv"
+          style={{ padding: 16, cursor: "pointer", backgroundColor: "#FFFFFF", width: 420, margin: "auto" }}
+        >
           <QRPunkBlockie
             address={address}
             showAddress={true}
@@ -1215,7 +1216,8 @@ function App(props) {
               <Spin />
             </div>
           )}
-            <div style={{ visibility: !receiveMode ? 'visible' : 'hidden' }}>
+          {!receiveMode && (
+            <>
               {isMoneriumTransferReady && (
                 <MoneriumOnChainCrossChainRadio moneriumRadio={moneriumRadio} setMoneriumRadio={setMoneriumRadio} />
               )}
@@ -1256,7 +1258,8 @@ function App(props) {
                   }}
                 />
               )}
-            </div>
+            </>
+          )}
         </div>
 
         <div style={{ padding: !receiveMode ? 10 : 0 }}>
@@ -1296,7 +1299,8 @@ function App(props) {
 
         <div style={{ position: "relative", top: 10, left: 40 }}> {networkDisplay} </div>
 
-        <div style={{ padding: 10, visibility: !receiveMode ? "visible" : "hidden", }}>
+        {!receiveMode && (
+          <div style={{ padding: 10 }}>
             <Button
               key={receiveMode}
               type="primary"
@@ -1400,7 +1404,8 @@ function App(props) {
               )}{" "}
               Send
             </Button>
-        </div>
+          </div>
+        )}
       </div>
 
       <div style={{ padding: 16, backgroundColor: "#FFFFFF", width: 420, margin: "auto" }}>

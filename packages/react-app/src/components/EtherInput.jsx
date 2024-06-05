@@ -116,24 +116,25 @@ export default function EtherInput(props) {
 
   return (
     <div>
-      <span
-        style={{
-          cursor: "pointer",
-          color: "red",
-          float: "right",
-          marginTop: "-5px",
-          visibility: !props.receiveMode ? "visible" : "hidden",
-        }}
-        onClick={() => {
-          setDisplay(getBalance(mode));
-          setDisplayMax(true);
-          if (typeof props.onChange === "function") {
-            props.onChange(floatBalance);
-          }
-        }}
-      >
-        max
-      </span>
+      {!props.receiveMode && (
+        <span
+          style={{
+            cursor: "pointer",
+            color: "red",
+            float: "right",
+            marginTop: "-5px",
+          }}
+          onClick={() => {
+            setDisplay(getBalance(mode));
+            setDisplayMax(true);
+            if (typeof props.onChange === "function") {
+              props.onChange(floatBalance);
+            }
+          }}
+        >
+          max
+        </span>
+      )}
       <Input
         placeholder={props.placeholder ? props.placeholder : "amount in " + mode}
         autoFocus={props.autoFocus}
