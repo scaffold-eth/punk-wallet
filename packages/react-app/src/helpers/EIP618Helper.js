@@ -21,7 +21,7 @@ export const handleNetworkByQR = (chainId, networkSettingsHelper, setTargetNetwo
   }
 };
 
-export const parseEIP618 = (eip681URL, networkSettingsHelper, setTargetNetwork) => {
+export const parseEIP618 = (eip681URL, networkSettingsHelper, setTargetNetwork, setToAddress) => {
   const eip681Object = parse(eip681URL);
   console.log("eip681Object", eip681Object);
 
@@ -33,12 +33,17 @@ export const parseEIP618 = (eip681URL, networkSettingsHelper, setTargetNetwork) 
   const tokenAddress = eip681Object?.target_address;
 
   let toAddress;
+  let amount;
 
   if (functionName == "transfer" && tokenAddress) {
     localStorage.setItem("switchToTokenAddress", tokenAddress);
-    toAddress = eip681Object?.params?.address;
+    toAddress = eip681Object?.parameters?.address;
   } else {
     localStorage.setItem("switchToEth", true);
     toAddress = eip681Object?.target_address;
+  }
+
+  if (toAddress) {
+    setToAddress(toAddress);
   }
 };

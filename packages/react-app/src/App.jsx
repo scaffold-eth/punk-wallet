@@ -866,7 +866,7 @@ function App(props) {
       if (path.startsWith("ethereum:")) {
         const eip681URL = window.location.href.substring(window.location.href.indexOf("ethereum:"));
 
-        parseEIP618(eip681URL, networkSettingsHelper, setTargetNetwork);
+        parseEIP618(eip681URL, networkSettingsHelper, setTargetNetwork, setToAddress);
       }
 
       window.history.pushState({}, "", "/");
