@@ -104,14 +104,7 @@ export default function ERC20Input({
   }, [dollarMode]);
 
   useEffect(() => {
-    if (!amount || !price) {
-      return;
-    }
-
-    setDisplayValue(calcDisplayValue(token, amount, dollarMode, price));
-
-    // eslint-disable-next-line consistent-return
-    return () => resetValues(setUserValue, setDisplayValue, setAmount);
+    resetValues(setUserValue, setDisplayValue, setAmount);
   }, [token]);
 
   useEffect(() => {
