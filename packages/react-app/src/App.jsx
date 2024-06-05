@@ -41,7 +41,7 @@ import {
 } from "./components";
 import { INFURA_ID, NETWORK, NETWORKS } from "./constants";
 import { Transactor } from "./helpers";
-import { handleNetworkByQR } from "./helpers/handleNetworkByQR";
+import { parseEIP618 } from "./helpers/EIP618Helper";
 import { useBalance, useExchangePrice, useGasPrice, useLocalStorage, usePoller, useUserProvider } from "./hooks";
 
 import WalletConnect from "@walletconnect/client";
@@ -866,25 +866,27 @@ function App(props) {
       if (path.startsWith("ethereum:")) {
         const eip681URL = window.location.href.substring(window.location.href.indexOf("ethereum:"));
 
-        const eip681Object = parse(eip681URL);
-        console.log("eip681Object", eip681Object);
+        parseEIP618(eip681URL, networkSettingsHelper, setTargetNetwork);
 
-        const chainId = eip681Object.chain_id;
+        // const eip681Object = parse(eip681URL);
+        // console.log("eip681Object", eip681Object);
 
-        handleNetworkByQR(chainId, networkSettingsHelper, setTargetNetwork);
+        // const chainId = eip681Object.chain_id;
 
-        const functionName = eip681Object.function_name;
-        const tokenAddress = eip681Object?.target_address;
+        // handleNetworkByQR(chainId, networkSettingsHelper, setTargetNetwork);
 
-        let toAddress;
+        // const functionName = eip681Object.function_name;
+        // const tokenAddress = eip681Object?.target_address;
 
-        if (functionName == "transfer" && tokenAddress) {
-          localStorage.setItem("switchToTokenAddress", tokenAddress);
-          toAddress = eip681Object?.params?.address;
-        } else {
-          localStorage.setItem("switchToEth", true);
-          toAddress = eip681Object?.target_address;
-        }
+        // let toAddress;
+
+        // if (functionName == "transfer" && tokenAddress) {
+        //   localStorage.setItem("switchToTokenAddress", tokenAddress);
+        //   toAddress = eip681Object?.params?.address;
+        // } else {
+        //   localStorage.setItem("switchToEth", true);
+        //   toAddress = eip681Object?.target_address;
+        // }
       }
 
       window.history.pushState({}, "", "/");

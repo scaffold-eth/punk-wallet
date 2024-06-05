@@ -9,7 +9,7 @@ import { parse } from "eth-url-parser";
 import { QRPunkBlockie } from ".";
 
 import { isValidIban } from "../helpers/MoneriumHelper";
-import { handleNetworkByQR } from "../helpers/handleNetworkByQR";
+import { handleNetworkByQR } from "../helpers/EIP618Helper";
 
 // probably we need to change value={toAddress} to address={toAddress}
 
