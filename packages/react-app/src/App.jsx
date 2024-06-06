@@ -841,6 +841,9 @@ function App(props) {
   if (switchToTokenAddress) {
     localStorage.removeItem("switchToTokenAddress");
 
+    const storedAmount = localStorage.getItem("amount");
+    localStorage.removeItem("amount");
+
     let tokens = targetNetwork?.erc20Tokens;
 
     if (tokens) {
@@ -855,11 +858,9 @@ function App(props) {
       if (token) {
         tokenSettingsHelper.updateSelectedName(token.name);
 
-        const amount = localStorage.getItem("amount");
-
-        if (amount) {
-          console.log("Amount to set", amount);
-          const amountBigNumber = BigNumber.from(amount);
+        if (storedAmount) {
+          console.log("Amount to set", storedAmount);
+          const amountBigNumber = BigNumber.from(storedAmount);
           setAmount(amountBigNumber);
         }
       } else {
@@ -868,7 +869,14 @@ function App(props) {
     }
   }
 
+  const storedAmount = localStorage.getItem("amount");
   localStorage.removeItem("amount");
+
+  if (storedAmount) {
+    setAmountEthMode(true);
+    const decimalCorrectedAmount = parseFloat(ethers.utils.formatUnits(storedAmount));
+    setAmount(decimalCorrectedAmount);
+  }
 
   if (window.location.pathname !== "/") {
     try {
@@ -1284,6 +1292,7 @@ function App(props) {
                 setAmount(value);
               }}
               receiveMode={receiveMode}
+              amount={amount}
             />
           )}
         </div>
