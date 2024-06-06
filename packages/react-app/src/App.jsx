@@ -1247,7 +1247,6 @@ function App(props) {
                   isMoneriumTransferReady={isMoneriumTransferReady}
                   ibanAddressObject={ibanAddressObject}
                   setIbanAddressObject={setIbanAddressObject}
-                  setAmountEthMode={setAmountEthMode}
                   networkSettingsHelper={networkSettingsHelper}
                   setTargetNetwork={setTargetNetwork}
                   walletConnect={async wcLink => {

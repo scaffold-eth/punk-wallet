@@ -3,13 +3,10 @@ import { Badge, Input, message, Spin } from "antd";
 import { useLookupAddress } from "eth-hooks";
 import React, { useCallback, useState, useEffect } from "react";
 import QrReader from "react-qr-reader-es6";
-import { BigNumber } from "ethers";
-import { formatEther } from "ethers/lib/utils";
-import { parse } from "eth-url-parser";
 import { QRPunkBlockie } from ".";
 
 import { isValidIban } from "../helpers/MoneriumHelper";
-import { handleNetworkByQR } from "../helpers/EIP618Helper";
+import { parseEIP618 } from "../helpers/EIP618Helper";
 
 // probably we need to change value={toAddress} to address={toAddress}
 
@@ -65,7 +62,6 @@ export default function AddressInput(props) {
     ibanAddressObject,
     setIbanAddressObject,
     isMoneriumTransferReady,
-    setAmountEthMode,
     setTargetNetwork,
     networkSettingsHelper,
   } = props;
@@ -271,39 +267,26 @@ export default function AddressInput(props) {
               updateAddress();
             } else {
               let possibleNewValue = newValue;
-              let amount;
-              const eip681Object = parse(possibleNewValue);
-              const tokenAddress = eip681Object?.target_address;
 
-              // token transfer
-              if (possibleNewValue.includes("transfer") || possibleNewValue.includes("uint256")) {
-                console.log("TOKEN TRANSFER");
-                const chainId = eip681Object.chain_id;
-                const tokenAmount = eip681Object.parameters.uint256;
-                localStorage.setItem("switchToTokenAddress", tokenAddress);
-                setAmountEthMode(true);
-                amount = parseInt(tokenAmount);
-
-                handleNetworkByQR(chainId, networkSettingsHelper, setTargetNetwork);
-              } else if (possibleNewValue.includes("?")) {
-                amount = eip681Object.parameters.value;
-
-                amount = BigNumber.from(parseFloat(amount).toString());
-                amount = formatEther(amount);
-                amount = Math.round(amount);
-                setAmountEthMode(true);
-                localStorage.setItem("switchToEth", true);
-
-                console.log("eth amount: ", amount);
+              try {
+                if (possibleNewValue.startsWith("ethereum:")) {
+                  parseEIP618(possibleNewValue, networkSettingsHelper, setTargetNetwork, setToAddress);
+                  setScan(false);
+                  return;
+                }
+              } catch (error) {
+                console.log("Coudn't parse EIP681", error);
               }
 
+              possibleNewValue = possibleNewValue.replace("ethereum:", "");
+              possibleNewValue = possibleNewValue.replace("eth:", "");
+              console.log("possibleNewValue",possibleNewValue)
               if (possibleNewValue.indexOf("/") >= 0) {
                 possibleNewValue = possibleNewValue.substr(possibleNewValue.lastIndexOf("0x"));
                 console.log("CLEANED VALUE", possibleNewValue);
               }
               setScan(false);
-              updateAddress(eip681Object.target_address);
-              setAmount(amount);
+              updateAddress(possibleNewValue);
             }
           }
         }}
