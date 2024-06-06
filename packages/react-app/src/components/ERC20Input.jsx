@@ -74,6 +74,8 @@ export default function ERC20Input({
   const [userValue, setUserValue] = useState();
   const [displayValue, setDisplayValue] = useState();
 
+  const [tempAmount, setTempAmount] = useState();
+
   useEffect(() => {
     if (userValue === 0 || userValue === undefined) {
       return;
@@ -115,16 +117,22 @@ export default function ERC20Input({
     }
 
     if (typeof amount === "object") {
-      console.log("amount is a big number", amount.toString());
-      setDollarMode(false);
-
       const decimalCorrectedAmount = parseFloat(ethers.utils.formatUnits(amount, token.decimals));
 
       setAmount(decimalCorrectedAmount);
-      setDisplayValue(decimalCorrectedAmount);
-      
+      setTempAmount(decimalCorrectedAmount);
     }
   }, [amount]);
+
+  useEffect(() => {
+    if (!tempAmount || !price) {
+      return;
+    }
+
+    setDisplayValue(calcDisplayValue(token, tempAmount, dollarMode, price));
+    setTempAmount(undefined);
+
+  }, [tempAmount, price]);
 
   return (
     <div>
