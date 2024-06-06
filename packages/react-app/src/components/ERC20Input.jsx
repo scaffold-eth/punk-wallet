@@ -7,7 +7,7 @@ import TokenDisplay from "./TokenDisplay";
 
 import { getDisplayNumberWithDecimals, getInverseDecimalCorrectedAmountNumber } from "../helpers/ERC20Helper";
 
-const { ethers } = require("ethers");
+const { ethers, BigNumber } = require("ethers");
 
 // ToDo: add check if enough balance is available, otherwise don't allow user to send
 // ToDo: address check if valid
@@ -112,6 +112,17 @@ export default function ERC20Input({
     // setAmount("");
     if (typeof amount === "string" && amount.length === 0) {
       resetValues(setUserValue, setDisplayValue, setAmount);
+    }
+
+    if (typeof amount === "object") {
+      console.log("amount is a big number", amount.toString());
+      setDollarMode(false);
+
+      const decimalCorrectedAmount = parseFloat(ethers.utils.formatUnits(amount, token.decimals));
+
+      setAmount(decimalCorrectedAmount);
+      setDisplayValue(decimalCorrectedAmount);
+      
     }
   }, [amount]);
 

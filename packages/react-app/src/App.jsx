@@ -88,7 +88,7 @@ import {
 
 const { confirm } = Modal;
 
-const { ethers } = require("ethers");
+const { ethers, BigNumber } = require("ethers");
 
 const { OrderState } = require("@monerium/sdk");
 
@@ -203,30 +203,6 @@ function App(props) {
       if (targetNetwork?.nativeToken?.name) {
         tokenSettingsHelper.updateSelectedName(targetNetwork.nativeToken.name);
         console.log("Switched to native token");
-      }
-    }
-  }
-
-  const switchToTokenAddress = localStorage.getItem("switchToTokenAddress");
-
-  if (switchToTokenAddress) {
-    localStorage.removeItem("switchToTokenAddress");
-
-    let tokens = targetNetwork?.erc20Tokens;
-
-    if (tokens) {
-      const customTokens = tokenSettingsHelper.getCustomItems();
-
-      if (customTokens.length > 0) {
-        tokens = tokens.concat(customTokens);
-      }
-
-      const token = tokens.find(token => token.address == switchToTokenAddress);
-
-      if (token) {
-        tokenSettingsHelper.updateSelectedName(token.name);
-      } else {
-        // error screen that token is not supported
       }
     }
   }
@@ -854,10 +830,45 @@ function App(props) {
   const [toAddress, setToAddress] = useLocalStorage("punkWalletToAddress", "", 120000);
 
   const [amount, setAmount] = useState();
+  console.log("amount", amount);
 
   const [amountEthMode, setAmountEthMode] = useState(false);
 
   const [receiveMode, setReceiveMode] = useState(false);
+
+  const switchToTokenAddress = localStorage.getItem("switchToTokenAddress");
+
+  if (switchToTokenAddress) {
+    localStorage.removeItem("switchToTokenAddress");
+
+    let tokens = targetNetwork?.erc20Tokens;
+
+    if (tokens) {
+      const customTokens = tokenSettingsHelper.getCustomItems();
+
+      if (customTokens.length > 0) {
+        tokens = tokens.concat(customTokens);
+      }
+
+      const token = tokens.find(token => token.address == switchToTokenAddress);
+
+      if (token) {
+        tokenSettingsHelper.updateSelectedName(token.name);
+
+        const amount = localStorage.getItem("amount");
+
+        if (amount) {
+          console.log("Amount to set", amount);
+          const amountBigNumber = BigNumber.from(amount);
+          setAmount(amountBigNumber);
+        }
+      } else {
+        // error screen that token is not supported
+      }
+    }
+  }
+
+  localStorage.removeItem("amount");
 
   if (window.location.pathname !== "/") {
     try {

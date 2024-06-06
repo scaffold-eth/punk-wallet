@@ -38,9 +38,15 @@ export const parseEIP618 = (eip681URL, networkSettingsHelper, setTargetNetwork, 
   if (functionName == "transfer" && tokenAddress) {
     localStorage.setItem("switchToTokenAddress", tokenAddress);
     toAddress = eip681Object?.parameters?.address;
+    amount = eip681Object?.parameters?.uint256;
   } else {
     localStorage.setItem("switchToEth", true);
     toAddress = eip681Object?.target_address;
+    amount = eip681Object?.parameters?.value;
+  }
+
+  if (amount) {
+    localStorage.setItem("amount", amount);
   }
 
   if (toAddress) {
