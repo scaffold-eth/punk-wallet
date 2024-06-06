@@ -1249,7 +1249,6 @@ function App(props) {
             <Input disabled={true} value={amount} />
           ) : selectedErc20Token ? (
             <ERC20Input
-              key={`${amount}_${selectedErc20Token}_${priceERC20}`}
               token={selectedErc20Token}
               value={amount}
               amount={amount}
@@ -1263,7 +1262,6 @@ function App(props) {
             />
           ) : (
             <EtherInput
-              key={amount}
               price={price || targetNetwork.price}
               value={amount}
               token={targetNetwork.token || "ETH"}
