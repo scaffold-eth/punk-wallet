@@ -1,13 +1,12 @@
-import { CaretUpOutlined, ScanOutlined, SendOutlined, HistoryOutlined } from "@ant-design/icons";
+import { CaretUpOutlined, ScanOutlined, SendOutlined } from "@ant-design/icons";
 import { StaticJsonRpcProvider, Web3Provider } from "@ethersproject/providers";
 import { formatEther, parseEther } from "@ethersproject/units";
 import WalletConnectProvider from "@walletconnect/web3-provider";
-import { Alert, Button, Checkbox, Col, Row, Select, Spin, Switch, Input, Modal, notification } from "antd";
+import { Alert, Button, Col, Row, Spin, Switch, Input, Modal } from "antd";
 import "antd/dist/antd.css";
 import { useUserAddress } from "eth-hooks";
 import React, { useCallback, useEffect, useState, useMemo } from "react";
 import Web3Modal from "web3modal";
-import { parse } from "eth-url-parser";
 import "./App.css";
 import {
   Account,
