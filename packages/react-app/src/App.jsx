@@ -853,13 +853,12 @@ function App(props) {
         tokens = tokens.concat(customTokens);
       }
 
-      const token = tokens.find(token => token.address == switchToTokenAddress);
+      const token = tokens.find(token => token.address.toLowerCase() === switchToTokenAddress.toLowerCase());
 
       if (token) {
         tokenSettingsHelper.updateSelectedName(token.name);
 
         if (storedAmount) {
-          console.log("Amount to set", storedAmount);
           const amountBigNumber = BigNumber.from(storedAmount);
           setAmount(amountBigNumber);
         }
@@ -870,10 +869,12 @@ function App(props) {
   }
 
   const storedAmount = localStorage.getItem("amount");
-  localStorage.removeItem("amount");
 
   if (storedAmount) {
+    localStorage.removeItem("amount");
+
     setAmountEthMode(true);
+
     const decimalCorrectedAmount = parseFloat(ethers.utils.formatUnits(storedAmount));
     setAmount(decimalCorrectedAmount);
   }
