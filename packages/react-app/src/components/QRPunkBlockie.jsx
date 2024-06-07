@@ -60,11 +60,10 @@ export default function QRPunkBlockie({
       }
 
       const eip681 = build(eip681Data);
-      console.log("eip681", eip681);
 
       displayValue = eip681;
 
-      paymentLink = "http://localhost:3000/" + displayValue;
+      paymentLink = window.location.href + displayValue;
     } catch (error) {
       console.error("Couldn't create EIP-681 QR value", error);
     }
