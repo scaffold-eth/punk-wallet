@@ -7,7 +7,7 @@ import TokenDisplay from "./TokenDisplay";
 
 import { getDisplayNumberWithDecimals, getInverseDecimalCorrectedAmountNumber } from "../helpers/ERC20Helper";
 
-const { ethers, BigNumber } = require("ethers");
+const { ethers } = require("ethers");
 
 // ToDo: add check if enough balance is available, otherwise don't allow user to send
 // ToDo: address check if valid
