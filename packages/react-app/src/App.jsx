@@ -823,7 +823,10 @@ function App(props) {
   const [toAddress, setToAddress] = useLocalStorage("punkWalletToAddress", "", 120000);
 
   const [amount, setAmount] = useState();
-  console.log("amount", amount, typeof amount === 'string');
+
+  useEffect(() => {
+    setAmount("")
+  }, [targetNetwork, selectedErc20Token]);
 
   const [amountEthMode, setAmountEthMode] = useState(false);
 

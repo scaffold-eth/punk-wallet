@@ -3,8 +3,6 @@ import React, { useEffect, useState } from "react";
 import { useBalance } from "eth-hooks";
 const { ethers } = require("ethers");
 
-const { utils } = require("ethers");
-
 // small change in useEffect, display currentValue if it's provided by user
 
 /*
@@ -73,7 +71,7 @@ export default function EtherInput(props) {
       gasCost = (parseInt(props.gasPrice, 10) * 150000) / 10 ** 18;
     }
 
-    const etherBalance = utils.formatEther(usingBalance);
+    const etherBalance = ethers.utils.formatEther(usingBalance);
     parseFloat(etherBalance).toFixed(2);
     floatBalance = parseFloat(etherBalance - gasCost);
     if (floatBalance < 0) {
