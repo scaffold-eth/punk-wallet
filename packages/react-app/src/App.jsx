@@ -197,12 +197,10 @@ function App(props) {
   const switchToEth = localStorage.getItem("switchToEth");
   localStorage.removeItem("switchToEth");
 
-  if (selectedErc20Token) {
-    if (switchToEth) {
-      if (targetNetwork?.nativeToken?.name) {
-        tokenSettingsHelper.updateSelectedName(targetNetwork.nativeToken.name);
-        console.log("Switched to native token");
-      }
+  if (selectedErc20Token && switchToEth) {
+    if (targetNetwork?.nativeToken?.name) {
+      tokenSettingsHelper.updateSelectedName(targetNetwork.nativeToken.name);
+      console.log("Switched to native token");
     }
   }
 
@@ -823,6 +821,7 @@ function App(props) {
   const [toAddress, setToAddress] = useLocalStorage("punkWalletToAddress", "", 120000);
 
   const [amount, setAmount] = useState();
+  console.log("amount", amount);
 
   const [amountEthMode, setAmountEthMode] = useState(false);
 
@@ -834,10 +833,9 @@ function App(props) {
   const [priceERC20, setPriceERC20] = useState();
 
   const switchToTokenAddress = localStorage.getItem("switchToTokenAddress");
+  localStorage.removeItem("switchToTokenAddress");
 
   if (switchToTokenAddress) {
-    localStorage.removeItem("switchToTokenAddress");
-
     const storedAmount = localStorage.getItem("amount");
     localStorage.removeItem("amount");
 
@@ -875,17 +873,11 @@ function App(props) {
   }, [targetNetwork, selectedErc20Token]);
 
   const storedAmount = localStorage.getItem("amount");
+  localStorage.removeItem("amount");
 
   if (storedAmount) {
-    localStorage.removeItem("amount");
-
-    setAmountEthMode(true);
-
     const amountBigNumber = BigNumber.from(storedAmount);
     setAmount(amountBigNumber);
-
-    //const decimalCorrectedAmount = parseFloat(ethers.utils.formatUnits(storedAmount));
-    //setAmount(decimalCorrectedAmount);
   }
 
   if (window.location.pathname !== "/") {
