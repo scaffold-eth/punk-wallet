@@ -857,8 +857,10 @@ function App(props) {
       const token = tokens.find(token => token.address.toLowerCase() === switchToTokenAddress.toLowerCase());
 
       if (token) {
-        setPriceERC20(undefined);
-        tokenSettingsHelper.updateSelectedName(token.name);
+        if (selectedErc20Token?.address.toLowerCase() !== switchToTokenAddress.toLowerCase()) {
+          setPriceERC20(undefined);
+          tokenSettingsHelper.updateSelectedName(token.name);
+        }
 
         if (storedAmount) {
           const amountBigNumber = BigNumber.from(storedAmount);
