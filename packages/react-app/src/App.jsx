@@ -194,11 +194,11 @@ function App(props) {
       )
     : undefined;
 
-  if (selectedErc20Token) {
-    const switchToEth = localStorage.getItem("switchToEth");
-    if (switchToEth) {
-      localStorage.removeItem("switchToEth");
+  const switchToEth = localStorage.getItem("switchToEth");
+  localStorage.removeItem("switchToEth");
 
+  if (selectedErc20Token) {
+    if (switchToEth) {
       if (targetNetwork?.nativeToken?.name) {
         tokenSettingsHelper.updateSelectedName(targetNetwork.nativeToken.name);
         console.log("Switched to native token");
@@ -824,10 +824,6 @@ function App(props) {
 
   const [amount, setAmount] = useState();
 
-  useEffect(() => {
-    setAmount("")
-  }, [targetNetwork, selectedErc20Token]);
-
   const [amountEthMode, setAmountEthMode] = useState(false);
 
   const [receiveMode, setReceiveMode] = useState(false);
@@ -871,6 +867,12 @@ function App(props) {
       }
     }
   }
+
+  useEffect(() => {
+    if (!switchToEth && !switchToTokenAddress) {
+      setAmount("");
+    }
+  }, [targetNetwork, selectedErc20Token]);
 
   const storedAmount = localStorage.getItem("amount");
 

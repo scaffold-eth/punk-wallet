@@ -97,7 +97,7 @@ export default function ERC20Input({
   }, [userValue]);
 
   useEffect(() => {
-    if (!amount || !price) {
+    if (!amount || !price || typeof amount === "object") {
       return;
     }
 
