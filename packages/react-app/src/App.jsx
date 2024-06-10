@@ -829,7 +829,7 @@ function App(props) {
   const [toAddress, setToAddress] = useLocalStorage("punkWalletToAddress", "", 120000);
 
   const [amount, setAmount] = useState();
-  console.log("amount", amount);
+  console.log("amount", amount, typeof amount === 'string');
 
   const [amountEthMode, setAmountEthMode] = useState(false);
 
@@ -880,8 +880,11 @@ function App(props) {
 
     setAmountEthMode(true);
 
-    const decimalCorrectedAmount = parseFloat(ethers.utils.formatUnits(storedAmount));
-    setAmount(decimalCorrectedAmount);
+    const amountBigNumber = BigNumber.from(storedAmount);
+    setAmount(amountBigNumber);
+
+    //const decimalCorrectedAmount = parseFloat(ethers.utils.formatUnits(storedAmount));
+    //setAmount(decimalCorrectedAmount);
   }
 
   if (window.location.pathname !== "/") {

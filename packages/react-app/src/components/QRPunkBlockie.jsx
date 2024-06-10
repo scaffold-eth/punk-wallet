@@ -45,7 +45,9 @@ export default function QRPunkBlockie({
         try {
           const decimals = selectedErc20Token ? selectedErc20Token.decimals : 18;
 
-          amountString = ethers.utils.parseUnits(amount.toFixed(decimals).toString(), decimals).toString();
+          amountString = ethers.utils
+            .parseUnits(typeof amount === "string" ? amount : amount.toFixed(decimals).toString(), decimals)
+            .toString();
         } catch (error) {
           console.error("Couldn't parse amount", amount, error);
         }

@@ -1,6 +1,7 @@
 import { Input } from "antd";
 import React, { useEffect, useState } from "react";
 import { useBalance } from "eth-hooks";
+const { ethers } = require("ethers");
 
 const { utils } = require("ethers");
 
@@ -33,12 +34,33 @@ const { utils } = require("ethers");
 
 export default function EtherInput(props) {
   const [mode, setMode] = useState(props.ethMode ? props.token : props.price ? "USD" : props.token);
+  console.log("mode", mode);
   const [value, setValue] = useState();
   const [displayMax, setDisplayMax] = useState();
+  console.log("props.price", props.price);
 
   const currentValue = typeof props.value !== "undefined" ? props.value : value;
+  console.log("currentValue", currentValue);
 
   const [display, setDisplay] = useState(currentValue);
+  console.log("display", display);
+
+  useEffect(() => {
+    if (typeof props.value === "object") {
+      setDisplayMax(false);
+      
+      const decimalCorrectedAmount = parseFloat(ethers.utils.formatUnits(props.value));
+
+      if (mode !== "USD") {
+        props.onChange(decimalCorrectedAmount);
+        setDisplay(decimalCorrectedAmount);
+      }
+      else if (typeof props.price === "number") {
+        props.onChange(decimalCorrectedAmount);
+        setDisplay((decimalCorrectedAmount * props.price).toFixed(2));
+      } 
+    }
+  }, [props.value, props.price]);
 
   const balance = useBalance(props.provider, props.address, 1000);
   let floatBalance = parseFloat("0.00");
@@ -57,6 +79,8 @@ export default function EtherInput(props) {
     if (floatBalance < 0) {
       floatBalance = 0;
     }
+    console.log("xxx etherBalance", etherBalance);
+    console.log("xxx floatBalance", floatBalance);
   }
 
   let displayBalance = floatBalance.toFixed(4);
