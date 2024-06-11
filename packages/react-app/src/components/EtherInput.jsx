@@ -44,10 +44,8 @@ export default function EtherInput(props) {
   const [displayMax, setDisplayMax] = useState();
 
   const currentValue = typeof props.value !== "undefined" ? props.value : value;
-  console.log("currentValue", currentValue);
 
   const [display, setDisplay] = useState(currentValue);
-  console.log("display", display);
 
   useEffect(() => {
     resetValues(setValue, setDisplayMax, setAmount);
@@ -87,8 +85,6 @@ export default function EtherInput(props) {
     if (floatBalance < 0) {
       floatBalance = 0;
     }
-    console.log("xxx etherBalance", etherBalance);
-    console.log("xxx floatBalance", floatBalance);
   }
 
   let displayBalance = floatBalance.toFixed(4);
