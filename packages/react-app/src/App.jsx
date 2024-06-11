@@ -866,12 +866,6 @@ function App(props) {
     }
   }
 
-  useEffect(() => {
-    if (!switchToEth && !switchToTokenAddress) {
-      setAmount("");
-    }
-  }, [targetNetwork, selectedErc20Token]);
-
   const storedAmount = localStorage.getItem("amount");
   localStorage.removeItem("amount");
 
@@ -1289,6 +1283,8 @@ function App(props) {
               }}
               receiveMode={receiveMode}
               amount={amount}
+              selectedErc20Token={selectedErc20Token}
+              targetNetwork={targetNetwork}
             />
           )}
         </div>

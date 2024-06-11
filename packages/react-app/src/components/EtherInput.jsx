@@ -30,12 +30,18 @@ const { ethers } = require("ethers");
   - Control input change by onChange={value => { setAmount(value);}}
 */
 
+const resetValues = (setValue, setDisplayMax, setAmount) => {
+  setValue(undefined);
+  setDisplayMax(undefined);
+  setAmount(undefined);
+};
+
 export default function EtherInput(props) {
+  const setAmount = props.onChange;
+
   const [mode, setMode] = useState(props.ethMode ? props.token : props.price ? "USD" : props.token);
-  console.log("mode", mode);
   const [value, setValue] = useState();
   const [displayMax, setDisplayMax] = useState();
-  console.log("props.price", props.price);
 
   const currentValue = typeof props.value !== "undefined" ? props.value : value;
   console.log("currentValue", currentValue);
@@ -44,17 +50,21 @@ export default function EtherInput(props) {
   console.log("display", display);
 
   useEffect(() => {
+    resetValues(setValue, setDisplayMax, setAmount);
+  }, [props.selectedErc20Token, props.targetNetwork]);
+
+  useEffect(() => {
     if (typeof props.value === "object") {
       setDisplayMax(false);
       
       const decimalCorrectedAmount = parseFloat(ethers.utils.formatUnits(props.value));
 
       if (mode !== "USD") {
-        props.onChange(decimalCorrectedAmount);
+        setAmount(decimalCorrectedAmount);
         setDisplay(decimalCorrectedAmount);
       }
       else if (typeof props.price === "number") {
-        props.onChange(decimalCorrectedAmount);
+        setAmount(decimalCorrectedAmount);
         setDisplay((decimalCorrectedAmount * props.price).toFixed(2));
       } 
     }
@@ -149,9 +159,7 @@ export default function EtherInput(props) {
           onClick={() => {
             setDisplay(getBalance(mode));
             setDisplayMax(true);
-            if (typeof props.onChange === "function") {
-              props.onChange(floatBalance);
-            }
+            setAmount(floatBalance);
           }}
         >
           max
@@ -168,9 +176,7 @@ export default function EtherInput(props) {
           setDisplayMax(false);
 
           if (e.target.value === "") {
-            if (typeof props.onChange === "function") {
-              props.onChange(undefined);
-            }
+            setAmount(undefined);
           }
 
           if (mode === "USD") {
@@ -178,18 +184,14 @@ export default function EtherInput(props) {
             if (possibleNewValue) {
               const ethValue = possibleNewValue / props.price;
               setValue(ethValue);
-              if (typeof props.onChange === "function") {
-                props.onChange(ethValue);
-              }
+              setAmount(ethValue);
               setDisplay(newValue);
             } else {
               setDisplay(newValue);
             }
           } else {
             setValue(newValue);
-            if (typeof props.onChange === "function") {
-              props.onChange(newValue);
-            }
+            setAmount(newValue);
             setDisplay(newValue);
           }
         }}
