@@ -53,7 +53,7 @@ export default function EtherInput(props) {
 
   useEffect(() => {
     if (typeof props.value === "object") {
-      resetValues(setValue, setDisplayMax, setAmount);
+      setDisplayMax(false);
       
       const decimalCorrectedAmount = parseFloat(ethers.utils.formatUnits(props.value));
 
