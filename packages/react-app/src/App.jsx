@@ -195,12 +195,15 @@ function App(props) {
     : undefined;
 
   const switchToEth = localStorage.getItem("switchToEth");
-  localStorage.removeItem("switchToEth");
 
-  if (selectedErc20Token && switchToEth) {
-    if (targetNetwork?.nativeToken?.name) {
-      tokenSettingsHelper.updateSelectedName(targetNetwork.nativeToken.name);
-      console.log("Switched to native token");
+  if (switchToEth) {
+    localStorage.removeItem("switchToEth");
+
+    if (selectedErc20Token) {
+      if (targetNetwork?.nativeToken?.name) {
+        tokenSettingsHelper.updateSelectedName(targetNetwork.nativeToken.name);
+        console.log("Switched to native token");
+      }
     }
   }
 
@@ -833,11 +836,13 @@ function App(props) {
   const [priceERC20, setPriceERC20] = useState();
 
   const switchToTokenAddress = localStorage.getItem("switchToTokenAddress");
-  localStorage.removeItem("switchToTokenAddress");
 
   if (switchToTokenAddress) {
+    localStorage.removeItem("switchToTokenAddress");
     const storedAmount = localStorage.getItem("amount");
-    localStorage.removeItem("amount");
+    if (storedAmount) {
+      localStorage.removeItem("amount");
+    }
 
     let tokens = targetNetwork?.erc20Tokens;
 
@@ -867,9 +872,10 @@ function App(props) {
   }
 
   const storedAmount = localStorage.getItem("amount");
-  localStorage.removeItem("amount");
 
   if (storedAmount) {
+    localStorage.removeItem("amount");
+
     const amountBigNumber = BigNumber.from(storedAmount);
     setAmount(amountBigNumber);
   }
