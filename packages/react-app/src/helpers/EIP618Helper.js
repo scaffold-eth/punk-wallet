@@ -1,6 +1,7 @@
 import showModal from "../components/GenericModal";
 import { NETWORKS, ERROR_MESSAGES } from "../constants";
 import { parse } from "eth-url-parser";
+import BigNumber from 'bignumber.js';
 
 const { CHAIN_ERROR } = ERROR_MESSAGES;
 
@@ -52,7 +53,7 @@ export const parseEIP618 = (eip681URL, networkSettingsHelper, setTargetNetwork, 
   }
 
   if (amount) {
-    localStorage.setItem("amount", amount);
+    localStorage.setItem("amount", new BigNumber(amount).toFixed());
   }
 
   if (toAddress) {
