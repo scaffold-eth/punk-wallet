@@ -157,7 +157,12 @@ export default function ERC20Input({
         prefix={<Prefix dollarMode={dollarMode} token={token} />}
         addonAfter={<AmountDollarSwitch token={token} dollarMode={dollarMode} setDollarMode={setDollarMode} />}
         onChange={async e => {
-          setUserValue(e.target.value);
+          if (e.target.value === "") {
+            resetValues(setUserValue, setDisplayValue, setAmount);
+          }
+          else {
+            setUserValue(e.target.value);
+          }
         }}
       />
     </div>
