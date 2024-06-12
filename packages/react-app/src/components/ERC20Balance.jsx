@@ -62,12 +62,16 @@ export default function ERC20Balance({
   // https://medium.com/doctolib/react-stop-checking-if-your-component-is-mounted-3bb2568a4934
 
   useEffect(() => {
+    if (price === 0 || price !== undefined) {
+      return;
+    }
+
     async function getPrice() {
       setPrice(await getTokenPrice(targetNetwork.chainId, token.address));
     }
 
     getPrice();
-  }, [targetNetwork, token]);
+  }, [targetNetwork, token, price]);
 
   useEffect(() => {
     async function getBalance() {
