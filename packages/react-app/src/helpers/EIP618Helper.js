@@ -24,7 +24,7 @@ const handleNetworkChange = (chainId, networkSettingsHelper, setTargetNetwork) =
   }
 };
 
-export const parseEIP618 = (eip681URL, networkSettingsHelper, setTargetNetwork, setToAddress) => {
+export const parseEIP618 = (eip681URL, networkSettingsHelper, setTargetNetwork, setToAddress, setAmount) => {
   const eip681Object = parse(eip681URL);
 
   const chainId = eip681Object.chain_id;
@@ -54,6 +54,9 @@ export const parseEIP618 = (eip681URL, networkSettingsHelper, setTargetNetwork, 
 
   if (amount) {
     localStorage.setItem("amount", new BigNumber(amount).toFixed());
+  }
+  else {
+    setAmount("");
   }
 
   if (toAddress) {

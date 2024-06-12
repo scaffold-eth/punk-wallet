@@ -270,7 +270,7 @@ export default function AddressInput(props) {
 
               try {
                 if (possibleNewValue.startsWith("ethereum:")) {
-                  parseEIP618(possibleNewValue, networkSettingsHelper, setTargetNetwork, setToAddress);
+                  parseEIP618(possibleNewValue, networkSettingsHelper, setTargetNetwork, setToAddress, setAmount);
                   setScan(false);
                   return;
                 }
