@@ -833,6 +833,7 @@ function App(props) {
   const [balanceERC20, setBalanceERC20] = useState(null);
 
   const [priceERC20, setPriceERC20] = useState();
+  console.log("priceERC20", priceERC20);
 
   const switchToTokenAddress = localStorage.getItem("switchToTokenAddress");
 
@@ -855,7 +856,7 @@ function App(props) {
       const token = tokens.find(token => token.address.toLowerCase() === switchToTokenAddress.toLowerCase());
 
       if (token) {
-        setPriceERC20(undefined);
+        setPriceERC20(null);
 
         if (selectedErc20Token?.address.toLowerCase() !== switchToTokenAddress.toLowerCase()) {
           tokenSettingsHelper.updateSelectedName(token.name);
