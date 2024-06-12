@@ -38,7 +38,8 @@ import {
   WalletConnectTransactionPopUp,
   WalletConnectV2ConnectionError,
 } from "./components";
-import { INFURA_ID, NETWORK, NETWORKS } from "./constants";
+import showModal from "./components/GenericModal";
+import { INFURA_ID, NETWORK, NETWORKS, ERROR_MESSAGES } from "./constants";
 import { Transactor } from "./helpers";
 import { parseEIP618 } from "./helpers/EIP618Helper";
 import { useBalance, useExchangePrice, useGasPrice, useLocalStorage, usePoller, useUserProvider } from "./hooks";
@@ -84,6 +85,8 @@ import {
   getTokens,
   migrateSelectedTokenStorageSetting,
 } from "./helpers/TokenSettingsHelper";
+
+const { TOKEN_ERROR } = ERROR_MESSAGES;
 
 const { confirm } = Modal;
 
@@ -867,7 +870,7 @@ function App(props) {
           setAmount(amountBigNumber);
         }
       } else {
-        // error screen that token is not supported
+        showModal(TOKEN_ERROR.NOT_SUPPORTED + " :" + switchToTokenAddress);
       }
     }
   }

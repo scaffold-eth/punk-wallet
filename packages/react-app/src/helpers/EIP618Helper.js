@@ -17,10 +17,10 @@ const handleNetworkChange = (chainId, networkSettingsHelper, setTargetNetwork) =
         setTargetNetwork(networkSettingsHelper.getSelectedItem(true));
       }
     } else {
-      showModal(CHAIN_ERROR.NOT_SUPPORTED, true);
+      showModal(CHAIN_ERROR.NOT_SUPPORTED + " : " + chainId);
     }
   } else {
-    showModal(CHAIN_ERROR.NOT_PROVIDED, false);
+    showModal(CHAIN_ERROR.NOT_PROVIDED);
   }
 };
 

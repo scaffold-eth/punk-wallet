@@ -1,54 +1,20 @@
-import { Button } from "antd";
 import React from "react";
-import { createPortal, render } from "react-dom";
+import { Modal } from "antd";
 
-const showModal = (error, isError) => {
-  console.error(error);
+const showModal = (error) => {
+  const popUp = () => {
+    const title = "Coudn't parse the payment link/QR code!";
 
-  const closeModal = () => {
-    const modalElement = document.getElementById("errorModal");
-    document.body.removeChild(modalElement);
+    Modal.confirm({
+      width: "90%",
+      title: title,
+      maskClosable: true,
+      cancelButtonProps: { style: { display: "none" } },
+      content: <div>{error}</div>,
+    });
   };
 
-  return render(
-    createPortal(
-      <div
-        style={{
-          padding: "4rem",
-          textAlign: "center",
-          display: "flex",
-          gap: "2rem",
-          flexDirection: "column",
-          height: "auto",
-          width: "80vw",
-          position: "absolute",
-          zIndex: "999",
-          top: "50%",
-          left: "50%",
-          backgroundColor: "#fff",
-          border: `4px solid ${isError ? "#ffbdbd" : "#ffefbd"}`,
-          borderRadius: "4px",
-          transform: "translate(-50%, -50%)",
-        }}
-        id="errorModal"
-      >
-        <span onClick={closeModal} style={{ padding: "1rem", cursor: "pointer" }} className="ant-modal-close">
-          X
-        </span>
-        <span>Something went wrong:</span>
-        {error}
-        <Button
-          onClick={closeModal}
-          style={{ cursor: "pointer", color: isError ? "red" : "yellow" }}
-          className="ant-btn-default"
-        >
-          OK
-        </Button>
-      </div>,
-      document.body,
-    ),
-    document.createElement("div"),
-  );
+  return popUp();
 };
 
 export default showModal;

@@ -725,4 +725,7 @@ export const ERROR_MESSAGES = {
     NOT_SUPPORTED: "ChainId is not supported",
     NOT_PROVIDED: "ChainId is not provided",
   },
+  TOKEN_ERROR: {
+    NOT_SUPPORTED: "Token is not supported",
+  },
 };
