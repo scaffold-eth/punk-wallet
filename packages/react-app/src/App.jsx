@@ -195,16 +195,15 @@ function App(props) {
     : undefined;
 
   const switchToEth = localStorage.getItem("switchToEth");
+  console.log("switchToEth", switchToEth);
 
   if (switchToEth) {
-    localStorage.removeItem("switchToEth");
-
-    if (selectedErc20Token) {
-      if (targetNetwork?.nativeToken?.name) {
-        tokenSettingsHelper.updateSelectedName(targetNetwork.nativeToken.name);
-        console.log("Switched to native token");
-      }
+    if (targetNetwork?.nativeToken?.name) {
+      tokenSettingsHelper.updateSelectedName(targetNetwork.nativeToken.name);
+      console.log("Switched to native token");
     }
+
+    localStorage.removeItem("switchToEth");
   }
 
   const mainnetProvider = new StaticJsonRpcProvider(NETWORKS.ethereum.rpcUrl);
