@@ -47,8 +47,11 @@ export default function EtherInput(props) {
 
   const [display, setDisplay] = useState(currentValue);
 
+
   useEffect(() => {
-    resetValues(setValue, setDisplayMax, setAmount);
+    if (typeof props.value !== "object") {
+      resetValues(setValue, setDisplayMax, setAmount);
+    }
   }, [props.selectedErc20Token, props.targetNetwork]);
 
   useEffect(() => {
@@ -165,7 +168,7 @@ export default function EtherInput(props) {
         placeholder={props.placeholder ? props.placeholder : "amount in " + mode}
         autoFocus={props.autoFocus}
         prefix={prefix}
-        value={display}
+        value={typeof props.value !== "object" ? display : ""}
         addonAfter={addonAfter}
         onChange={async e => {
           const newValue = e.target.value;
