@@ -198,7 +198,6 @@ function App(props) {
     : undefined;
 
   const switchToEth = localStorage.getItem("switchToEth");
-  console.log("switchToEth", switchToEth);
 
   if (switchToEth) {
     if (targetNetwork?.nativeToken?.name) {
@@ -826,7 +825,6 @@ function App(props) {
   const [toAddress, setToAddress] = useLocalStorage("punkWalletToAddress", "", 120000);
 
   const [amount, setAmount] = useState();
-  console.log("amount", amount);
 
   const [amountEthMode, setAmountEthMode] = useState(false);
 
@@ -836,7 +834,6 @@ function App(props) {
   const [balanceERC20, setBalanceERC20] = useState(null);
 
   const [priceERC20, setPriceERC20] = useState();
-  console.log("priceERC20", priceERC20);
 
   const switchToTokenAddress = localStorage.getItem("switchToTokenAddress");
 
