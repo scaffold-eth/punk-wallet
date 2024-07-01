@@ -33,7 +33,10 @@ const OPTS = {
   }
 }
 
-export default function WalletConnectTransactionDisplay({payload, chainId, currentlySelectedChainId}) {
+export default function WalletConnectTransactionDisplay({payload, chainId, currentlySelectedChainId, walletConnectPeerMeta}) {
+  const walletConnectIcon = Array.isArray(walletConnectPeerMeta?.icons) && walletConnectPeerMeta.icons.length > 0 ? walletConnectPeerMeta.icons[0] : null;
+  const walletConnectName = walletConnectPeerMeta?.name;
+
   const [paramsArray, setParamsArray] = useState([]);
   const [simulated, setSimulated] = useState(false);
   const [simulationFailed, setSimulationFailed] = useState(false);
@@ -190,6 +193,21 @@ try {
         <div style={{ display: "flex", flexDirection: "column", justifyContent:"space-around"}}>
           {options}
         </div>
+
+        {(walletConnectIcon || walletConnectName)  && (
+            <div style={{ display: "flex", justifyContent: "center", paddingTop: "1em" }}>
+              {walletConnectIcon ? (
+                <img
+                  style={{ width: 40 }}
+                  src={walletConnectIcon}
+                  alt={walletConnectName ? walletConnectName : ""}
+                />
+              ) : (
+                <b>{walletConnectName}</b>
+              )}
+            </div>
+          )
+        }
       </pre>
     );  
   }
