@@ -1,8 +1,8 @@
-import { CaretUpOutlined, ScanOutlined, SendOutlined, HistoryOutlined } from "@ant-design/icons";
+import { CaretUpOutlined, ScanOutlined, SendOutlined } from "@ant-design/icons";
 import { StaticJsonRpcProvider, Web3Provider } from "@ethersproject/providers";
 import { formatEther, parseEther } from "@ethersproject/units";
 import WalletConnectProvider from "@walletconnect/web3-provider";
-import { Alert, Button, Checkbox, Col, Row, Select, Spin, Input, Modal, notification } from "antd";
+import { Alert, Button, Col, Row, Spin, Switch, Input, Modal } from "antd";
 import "antd/dist/antd.css";
 import { useUserAddress } from "eth-hooks";
 import React, { useCallback, useEffect, useState, useMemo } from "react";
@@ -38,8 +38,10 @@ import {
   WalletConnectTransactionPopUp,
   WalletConnectV2ConnectionError,
 } from "./components";
-import { INFURA_ID, NETWORK, NETWORKS } from "./constants";
+import showModal from "./components/GenericModal";
+import { INFURA_ID, NETWORK, NETWORKS, ERROR_MESSAGES } from "./constants";
 import { Transactor } from "./helpers";
+import { parseEIP618 } from "./helpers/EIP618Helper";
 import { useBalance, useExchangePrice, useGasPrice, useLocalStorage, usePoller, useUserProvider } from "./hooks";
 
 import WalletConnect from "@walletconnect/client";
@@ -84,11 +86,11 @@ import {
   migrateSelectedTokenStorageSetting,
 } from "./helpers/TokenSettingsHelper";
 
-import { getChain } from "./helpers/ChainHelper";
+const { TOKEN_ERROR } = ERROR_MESSAGES;
 
 const { confirm } = Modal;
 
-const { ethers } = require("ethers");
+const { ethers, BigNumber } = require("ethers");
 
 const { OrderState } = require("@monerium/sdk");
 
@@ -195,16 +197,15 @@ function App(props) {
       )
     : undefined;
 
-  if (selectedErc20Token) {
-    const switchToEth = localStorage.getItem("switchToEth");
-    if (switchToEth) {
-      localStorage.removeItem("switchToEth");
+  const switchToEth = localStorage.getItem("switchToEth");
 
-      if (targetNetwork?.nativeToken?.name) {
-        tokenSettingsHelper.updateSelectedName(targetNetwork.nativeToken.name);
-        console.log("Switched to native token");
-      }
+  if (switchToEth) {
+    if (targetNetwork?.nativeToken?.name) {
+      tokenSettingsHelper.updateSelectedName(targetNetwork.nativeToken.name);
+      console.log("Switched to native token");
     }
+
+    localStorage.removeItem("switchToEth");
   }
 
   const mainnetProvider = new StaticJsonRpcProvider(NETWORKS.ethereum.rpcUrl);
@@ -649,9 +650,9 @@ function App(props) {
   // Forcing white background for the QR code - Dark Reader issue
   useEffect(() => {
     setTimeout(() => {
-      const element = document.getElementById('QRPunkBlockieDiv');
+      const element = document.getElementById("QRPunkBlockieDiv");
       if (element) {
-        element.removeAttribute('data-darkreader-inline-bgcolor');
+        element.removeAttribute("data-darkreader-inline-bgcolor");
       }
     }, 50);
   }, []);
@@ -774,12 +775,6 @@ function App(props) {
         </div>
       );
     }
-  } else {
-    networkDisplay = (
-      <div style={{ zIndex: -1, position: "absolute", right: 154, top: 28, padding: 16, color: targetNetwork.color }}>
-        {networkName}
-      </div>
-    );
   }
 
   const loadWeb3Modal = useCallback(async () => {
@@ -833,7 +828,76 @@ function App(props) {
 
   const [amountEthMode, setAmountEthMode] = useState(false);
 
-  if (window.location.pathname) {
+  const [receiveMode, setReceiveMode] = useState(false);
+
+  // ERC20 Token balance to use in ERC20Balance and in ERC20Input
+  const [balanceERC20, setBalanceERC20] = useState(null);
+
+  const [priceERC20, setPriceERC20] = useState();
+
+  const switchToTokenAddress = localStorage.getItem("switchToTokenAddress");
+
+  if (switchToTokenAddress) {
+    localStorage.removeItem("switchToTokenAddress");
+    const storedAmount = localStorage.getItem("amount");
+    if (storedAmount) {
+      localStorage.removeItem("amount");
+    }
+
+    let tokens = targetNetwork?.erc20Tokens;
+
+    if (tokens) {
+      const customTokens = tokenSettingsHelper.getCustomItems();
+
+      if (customTokens.length > 0) {
+        tokens = tokens.concat(customTokens);
+      }
+
+      const token = tokens.find(token => token.address.toLowerCase() === switchToTokenAddress.toLowerCase());
+
+      if (token) {
+        setPriceERC20(null);
+
+        if (selectedErc20Token?.address.toLowerCase() !== switchToTokenAddress.toLowerCase()) {
+          tokenSettingsHelper.updateSelectedName(token.name);
+        }
+
+        if (storedAmount) {
+          const amountBigNumber = BigNumber.from(storedAmount);
+          setAmount(amountBigNumber);
+        }
+      } else {
+        showModal(TOKEN_ERROR.NOT_SUPPORTED + " :" + switchToTokenAddress);
+      }
+    }
+  }
+
+  const storedAmount = localStorage.getItem("amount");
+
+  if (storedAmount) {
+    localStorage.removeItem("amount");
+
+    const amountBigNumber = BigNumber.from(storedAmount);
+    setAmount(amountBigNumber);
+  }
+
+  if (window.location.pathname !== "/") {
+    try {
+      const path = window.location.pathname.replace("/", "");
+
+      if (path.startsWith("ethereum:")) {
+        const eip681URL = window.location.href.substring(window.location.href.indexOf("ethereum:"));
+
+        parseEIP618(eip681URL, networkSettingsHelper, setTargetNetwork, setToAddress, setAmount);
+      }
+
+      window.history.pushState({}, "", "/");
+    } catch (error) {
+      console.log("Coudn't parse EIP681", error);
+    }
+  }
+
+  if (window.location.pathname !== "/") {
     try {
       const incoming = window.location.pathname.replace("/", "");
 
@@ -927,11 +991,6 @@ function App(props) {
 
   const [depositing, setDepositing] = useState();
   const [depositAmount, setDepositAmount] = useState();
-
-  // ERC20 Token balance to use in ERC20Balance and in ERC20Input
-  const [balanceERC20, setBalanceERC20] = useState(null);
-
-  const [priceERC20, setPriceERC20] = useState();
 
   const walletDisplay =
     web3Modal && web3Modal.cachedProvider ? (
@@ -1108,8 +1167,19 @@ function App(props) {
       </div>
 
       {address && (
-        <div id="QRPunkBlockieDiv" style={{ padding: 16, cursor: "pointer", backgroundColor: "#FFFFFF", width: 420, margin: "auto" }}>
-          <QRPunkBlockie withQr address={address} showAddress={true} />
+        <div
+          id="QRPunkBlockieDiv"
+          style={{ padding: 16, cursor: "pointer", backgroundColor: "#FFFFFF", width: 420, margin: "auto" }}
+        >
+          <QRPunkBlockie
+            address={address}
+            showAddress={true}
+            withQr
+            receiveMode={receiveMode}
+            chainId={targetNetwork.chainId}
+            amount={amount}
+            selectedErc20Token={selectedErc20Token}
+          />
         </div>
       )}
 
@@ -1145,45 +1215,52 @@ function App(props) {
               <Spin />
             </div>
           )}
-          {isMoneriumTransferReady && (
-            <MoneriumOnChainCrossChainRadio moneriumRadio={moneriumRadio} setMoneriumRadio={setMoneriumRadio} />
-          )}
-          {isMoneriumTransferReady && isCrossChain(moneriumRadio) ? (
-            <MoneriumCrossChainAddressSelector
-              clientData={moneriumClientData}
-              currentPunkAddress={address}
-              targetChain={moneriumTargetChain}
-              setTargetChain={setMoneriumTargetChain}
-              targetAddress={moneriumTargetAddress}
-              setTargetAddress={setMoneriumTargetAddress}
-              networkName={targetNetwork.name}
-            />
-          ) : (
-            <AddressInput
-              ensProvider={mainnetProvider}
-              placeholder={isMoneriumTransferReady ? "to address / IBAN" : "to address"}
-              disabled={walletConnectTx}
-              value={toAddress}
-              setAmount={setAmount}
-              setToAddress={setToAddress}
-              hoistScanner={toggle => {
-                scanner = toggle;
-              }}
-              isMoneriumTransferReady={isMoneriumTransferReady}
-              ibanAddressObject={ibanAddressObject}
-              setIbanAddressObject={setIbanAddressObject}
-              walletConnect={async wcLink => {
-                if (walletConnectConnected) {
-                  await disconnectFromWalletConnect(wallectConnectConnector, web3wallet);
-                }
+          {!receiveMode && (
+            <>
+              {isMoneriumTransferReady && (
+                <MoneriumOnChainCrossChainRadio moneriumRadio={moneriumRadio} setMoneriumRadio={setMoneriumRadio} />
+              )}
+              {isMoneriumTransferReady && isCrossChain(moneriumRadio) ? (
+                <MoneriumCrossChainAddressSelector
+                  clientData={moneriumClientData}
+                  currentPunkAddress={address}
+                  targetChain={moneriumTargetChain}
+                  setTargetChain={setMoneriumTargetChain}
+                  targetAddress={moneriumTargetAddress}
+                  setTargetAddress={setMoneriumTargetAddress}
+                  networkName={targetNetwork.name}
+                />
+              ) : (
+                <AddressInput
+                  key={receiveMode}
+                  ensProvider={mainnetProvider}
+                  placeholder={isMoneriumTransferReady ? "to address / IBAN" : "to address"}
+                  disabled={walletConnectTx}
+                  value={toAddress}
+                  setAmount={setAmount}
+                  setToAddress={setToAddress}
+                  hoistScanner={toggle => {
+                    scanner = toggle;
+                  }}
+                  isMoneriumTransferReady={isMoneriumTransferReady}
+                  ibanAddressObject={ibanAddressObject}
+                  setIbanAddressObject={setIbanAddressObject}
+                  networkSettingsHelper={networkSettingsHelper}
+                  setTargetNetwork={setTargetNetwork}
+                  walletConnect={async wcLink => {
+                    if (walletConnectConnected) {
+                      await disconnectFromWalletConnect(wallectConnectConnector, web3wallet);
+                    }
 
-                setWalletConnectUrl(wcLink);
-              }}
-            />
+                    setWalletConnectUrl(wcLink);
+                  }}
+                />
+              )}
+            </>
           )}
         </div>
 
-        <div style={{ padding: 10 }}>
+        <div style={{ padding: !receiveMode ? 10 : 0 }}>
           {walletConnectTx ? (
             <Input disabled={true} value={amount} />
           ) : selectedErc20Token ? (
@@ -1197,6 +1274,7 @@ function App(props) {
               setPrice={setPriceERC20}
               dollarMode={dollarMode}
               setDollarMode={setDollarMode}
+              receiveMode={receiveMode}
             />
           ) : (
             <EtherInput
@@ -1210,16 +1288,20 @@ function App(props) {
               onChange={value => {
                 setAmount(value);
               }}
+              receiveMode={receiveMode}
+              amount={amount}
+              selectedErc20Token={selectedErc20Token}
+              targetNetwork={targetNetwork}
             />
           )}
         </div>
 
         <div style={{ position: "relative", top: 10, left: 40 }}> {networkDisplay} </div>
 
-        <div style={{ padding: 10 }}>
-          {
+        {!receiveMode && (
+          <div style={{ padding: 10 }}>
             <Button
-              key="submit"
+              key={receiveMode}
               type="primary"
               disabled={
                 loading ||
@@ -1321,8 +1403,8 @@ function App(props) {
               )}{" "}
               Send
             </Button>
-          }
-        </div>
+          </div>
+        )}
       </div>
 
       <div style={{ padding: 16, backgroundColor: "#FFFFFF", width: 420, margin: "auto" }}>
@@ -1339,6 +1421,15 @@ function App(props) {
             setShowHistory={setShowHistory}
           />
         }
+      </div>
+
+      <div style={{ padding: "1em" }}>
+        <Switch
+          checkedChildren="Send"
+          unCheckedChildren="Receive"
+          defaultChecked
+          onChange={() => setReceiveMode(!receiveMode)}
+        />
       </div>
 
       <div style={{ zIndex: -1, paddingTop: 20, opacity: 0.5, fontSize: 12 }}>
