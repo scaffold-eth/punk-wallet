@@ -5,11 +5,11 @@ import { SendOutlined } from "@ant-design/icons";
 
 import { WalletConnectTransactionDisplay } from "./";
 
-import { sendWalletConnectTx, approveRequestV1, approveRequestV2, rejectRequestV1, rejectRequestV2, signTransaction, signMessage } from "../helpers/WalletConnectV2Helper";
+import { sendWalletConnectTx, approveRequestV2, getPeerMeta, rejectRequestV2, signTransaction, signMessage } from "../helpers/WalletConnectV2Helper";
 import { getChainIdNumber } from "../helpers/EIP1559Helper";
 
 export default function WalletConnectTransactionPopUp(
-    payload, userProvider, connector, web3wallet,
+    payload, userProvider, web3wallet,
     currentlySelectedChainId) {
 
     const popUp = () => {
@@ -33,6 +33,7 @@ export default function WalletConnectTransactionPopUp(
                     payload={payload}
                     chainId={chainId}
                     currentlySelectedChainId={currentlySelectedChainId}
+                    walletConnectPeerMeta={getPeerMeta(web3wallet, event.topic)}
                 />
             ),
             onOk: async () => {
@@ -55,10 +56,6 @@ export default function WalletConnectTransactionPopUp(
 
                 let wcRecult = result.hash ? result.hash : result.raw ? result.raw : result;
 
-                if (connector) {
-                    approveRequestV1(connector, payload.id, wcRecult);
-                }
-
                 if (web3wallet) {
                     approveRequestV2(web3wallet, event, wcRecult);
                 }
@@ -72,10 +69,6 @@ export default function WalletConnectTransactionPopUp(
             onCancel: () => {
                 if (web3wallet) {
                     rejectRequestV2(web3wallet, event)
-                }
-
-                if (connector) {
-                    rejectRequestV1(connector, payload.id);
                 }
             },
         });
