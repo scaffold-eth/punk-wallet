@@ -156,6 +156,7 @@ function App(props) {
 
   const [targetNetwork, setTargetNetwork] = useState(() => networkSettingsHelper.getSelectedItem(true));
 
+  const [mainnetProvider] = useState(() => new StaticJsonRpcProvider(NETWORKS.ethereum.rpcUrl));
   const [localProvider, setLocalProvider] = useState(() => new StaticJsonRpcProvider(targetNetwork.rpcUrl));
   useEffect(() => {
     setLocalProvider(prevProvider =>
@@ -202,8 +203,6 @@ function App(props) {
 
     localStorage.removeItem("switchToEth");
   }
-
-  const mainnetProvider = new StaticJsonRpcProvider(NETWORKS.ethereum.rpcUrl);
 
   const [injectedProvider, setInjectedProvider] = useState();
 
@@ -430,9 +429,6 @@ function App(props) {
       }
     }
   }, [injectedProvider, localProvider, address]);
-
-  // Just plug in different 🛰 providers to get your balance on different chains:
-  const yourMainnetBalance = useBalance(mainnetProvider, address);
 
   //
   // 🧫 DEBUG 👨🏻‍🔬
