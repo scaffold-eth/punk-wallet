@@ -430,9 +430,6 @@ function App(props) {
     }
   }, [injectedProvider, localProvider, address]);
 
-  // Just plug in different 🛰 providers to get your balance on different chains:
-  const yourMainnetBalance = useBalance(mainnetProvider, address);
-
   //
   // 🧫 DEBUG 👨🏻‍🔬
   //
