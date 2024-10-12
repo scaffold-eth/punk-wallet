@@ -372,7 +372,7 @@ export const NETWORKS = {
     price: "uniswap",
     chainId: 10,
     blockExplorer: "https://optimistic.etherscan.io/",
-    rpcUrl: `https://opt-mainnet.g.alchemy.com/v2/gzr_xuzv2SPwbPchC9Z41qmfodlDglKp`,
+    rpcUrl: "https://opt-mainnet.g.alchemy.com/v2/" + ALCHEMY_API_KEY_MAINNET,
     //rpcUrl: `https://mainnet.optimism.io`,
     //gasPrice: 1000000,
     erc20Tokens: [
@@ -411,7 +411,7 @@ export const NETWORKS = {
     color: "#0052ff",
     price: "uniswap",
     chainId: 8453,
-    rpcUrl: "https://mainnet.base.org",
+    rpcUrl: "https://base-mainnet.g.alchemy.com/v2/" + ALCHEMY_API_KEY_MAINNET,
     blockExplorer: "https://basescan.org/",
     erc20Tokens: [
       {
@@ -486,7 +486,7 @@ export const NETWORKS = {
     price: "uniswap",
     chainId: 42161,
     blockExplorer: "https://arbiscan.io/",
-    rpcUrl: `https://arb-mainnet.g.alchemy.com/v2/tYM-Tr8c9dHV5a8AgvXnVmS9e-xvoxeM`,
+    rpcUrl: "https://arb-mainnet.g.alchemy.com/v2/" + ALCHEMY_API_KEY_MAINNET,
     //gasPrice: 1000000000,// TODO ASK RPC
     erc20Tokens: [
       {
@@ -524,7 +524,7 @@ export const NETWORKS = {
     color: "#2bbdf7",
     price: "uniswap:0x7D1AfA7B718fb893dB30A3aBc0Cfc608AaCfeBB0",
     chainId: 137,
-    rpcUrl: "https://polygon-mainnet.g.alchemy.com/v2/7ls4W5wc3Cu-4-Zq2QaQxgUhJKjUIDay",
+    rpcUrl: "https://polygon-mainnet.g.alchemy.com/v2/" + ALCHEMY_API_KEY_MAINNET,
     faucet: "https://faucet.matic.network/",
     blockExplorer: "https://polygonscan.com/",
     erc20Tokens: [
@@ -571,7 +571,7 @@ export const NETWORKS = {
     color: "#ffdbb0",
     price: "uniswap",
     chainId: 534352,
-    rpcUrl: "https://rpc.scroll.io",
+    rpcUrl: "https://scroll-mainnet.g.alchemy.com/v2/" + ALCHEMY_API_KEY_MAINNET,
     blockExplorer: "https://scrollscan.com/",
   },
   gnosis: {
@@ -584,7 +584,7 @@ export const NETWORKS = {
       symbol: "xDAI",
       decimals: 18,
     },
-    rpcUrl: "https://rpc.gnosischain.com/",
+    rpcUrl: "https://gnosis-mainnet.g.alchemy.com/v2/"  + ALCHEMY_API_KEY_MAINNET,
     faucet: "https://xdai-faucet.top/",
     blockExplorer: "https://gnosisscan.io/",
     erc20Tokens: [
@@ -632,7 +632,7 @@ export const NETWORKS = {
     color: "#45488f",
     price: "uniswap",
     chainId: 324,
-    rpcUrl: "https://mainnet.era.zksync.io",
+    rpcUrl: "https://zksync-mainnet.g.alchemy.com/v2/" + ALCHEMY_API_KEY_MAINNET,
     blockExplorer: "https://explorer.zksync.io/",
   },
   buidlguidl: {
@@ -661,7 +661,7 @@ export const NETWORKS = {
     blockExplorer: "https://sepolia.etherscan.io/",
     //rpcUrl: `https://rpc.sepolia.dev`,
     //rpcUrl: `https://rpc.sepolia.org/`,
-    rpcUrl: `https://eth-sepolia.g.alchemy.com/v2/4vFnzFt4K0gFDvYodzTuH9ZjbGI-awSf`,
+    rpcUrl: "https://eth-sepolia.g.alchemy.com/v2/" + ALCHEMY_API_KEY_MAINNET,
   },
   localhost: {
     name: "localhost",
