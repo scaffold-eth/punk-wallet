@@ -1,6 +1,5 @@
 {
   "short_name": "PunkWallet.io",
-  "start_url": ".",
   "name": "PunkWallet.io",
   "icons": [
     {
@@ -19,8 +18,25 @@
       "sizes": "512x512"
     }
   ],
-  "start_url": ".",
-  "display": "browser",
+  "id": "/",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
   "theme_color": "#000000",
-  "background_color": "#ffffff"
+  "background_color": "#ffffff",
+  "description": "An open source Ethereum web wallet",
+  "screenshots": [
+    {
+      "src": "/screenshot-desktop.png",
+      "type": "image/png",
+      "sizes": "1100x980",
+      "form_factor": "wide"
+    },
+    {
+      "src": "/screenshot-mobile.png",
+      "type": "image/png",
+      "sizes": "375x666",
+      "form_factor": "narrow"
+    }
+  ]
 }
