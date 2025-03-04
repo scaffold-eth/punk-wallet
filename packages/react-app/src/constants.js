@@ -663,6 +663,15 @@ export const NETWORKS = {
     //rpcUrl: `https://rpc.sepolia.org/`,
     rpcUrl: "https://eth-sepolia.g.alchemy.com/v2/" + ALCHEMY_API_KEY_MAINNET,
   },
+  baseSepolia: {
+    name: "baseSepolia",
+    color: "#0052ff",
+    price: "uniswap",
+    chainId: 84532,
+    faucet: "https://www.alchemy.com/faucets/base-sepolia/",
+    blockExplorer: "https://sepolia.basescan.org/",
+    rpcUrl: "https://sepolia.base.org",
+  },
   localhost: {
     name: "localhost",
     color: "#666666",
