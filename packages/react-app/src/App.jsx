@@ -1112,8 +1112,9 @@ function App(props) {
                   }
 
                   if (networkName == "arbitrum") {
-                    //txConfig.gasLimit = 21000;
-                    //ask rpc for gas price
+                    // Fix "max fee per gas less than block base fee:"
+                    // Arbitrum refunds the gas
+                    txConfig.gasPrice = gasPrice.mul(2);
                   } else if (networkName == "optimism") {
                     //ask rpc for gas price
                   } else if (networkName == "gnosis") {
