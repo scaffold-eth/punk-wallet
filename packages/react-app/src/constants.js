@@ -627,6 +627,17 @@ export const NETWORKS = {
     faucet: "https://cantofaucet.com/",
     blockExplorer: "https://evm.explorer.canto.io/",
   },
+  celo: {
+    name: "celo",
+    color: "#476520",
+    //price: "uniswap:0xe452e6ea2ddeb012e20db73bf5d3863a3ac8d77a",
+    // UniswapV2 pool for Celo is too small, https://etherscan.io/address/0x8D1cA95559ABEd542eF4402a252974221B5E1036
+    chainId: 42220,
+    rpcUrl: "https://celo-mainnet.g.alchemy.com/v2/" + ALCHEMY_API_KEY_MAINNET,
+    // rpcUrl: "https://celo.drpc.org",
+    faucet: "https://faucet.celo.org/",
+    blockExplorer: "https://celoscan.io/",
+  },
   zkSyncEra: {
     name: "zkSyncEra",
     color: "#45488f",
@@ -726,6 +737,15 @@ export const NETWORKS = {
     rpcUrl: `https://api.harmony.one`,
     gasPrice: 1000000000,
     token: "ONE",
+  },
+  celoAlfajores: {
+    name: "celoAlfajores",
+    color: "#476520",
+    chainId: 44787,
+    rpcUrl: "https://celo-alfajores.g.alchemy.com/v2/" + ALCHEMY_API_KEY_MAINNET,
+    // rpcUrl: "https://celo-alfajores.drpc.org",
+    faucet: "https://faucet.celo.org/",
+    blockExplorer: "https://alfajores.celoscan.io/",
   },
 };
 
