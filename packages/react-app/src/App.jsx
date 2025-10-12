@@ -13,6 +13,7 @@ import {
   Address,
   AddressInput,
   Balance,
+  DarkMode,
   ERC20Balance,
   ERC20Input,
   SelectorWithSettings,
@@ -847,6 +848,9 @@ function App(props) {
               networkSettingsHelper={networkSettingsHelper}
               setTargetNetwork={setTargetNetwork}
             />,
+
+            <DarkMode/>,
+            
             <Account
               key="account"
               address={address}
