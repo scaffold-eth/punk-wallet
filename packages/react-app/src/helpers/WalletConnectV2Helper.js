@@ -195,11 +195,18 @@ export const signTransaction = txParams => {
 export const signMessage = message => {
   const ethersWallet = createEthersWallet();
 
-  if (ethers.utils.isHexString(message)) {
-    message = ethers.utils.toUtf8String(message);
-  }
+  // For `personal_sign`, a hex-string param is the *raw bytes* to sign
+  // (EIP-191) — NOT UTF-8 text. Arrayify and sign the bytes directly so
+  // `signMessage` applies the "\x19Ethereum Signed Message:\n<len>" prefix
+  // over those exact bytes. The old `toUtf8String` path threw
+  // "invalid codepoint / unexpected continuation byte" on any payload that
+  // wasn't valid UTF-8 (e.g. a 32-byte hash from a Safe/multisig approval
+  // or a login challenge); for payloads that *were* valid UTF-8 it just
+  // round-tripped to the same bytes anyway, so this is strictly safer.
+  // A non-hex param stays a literal string and is signed as UTF-8.
+  const data = ethers.utils.isHexString(message) ? ethers.utils.arrayify(message) : message;
 
-  return ethersWallet.signMessage(message);
+  return ethersWallet.signMessage(data);
 };
 
 export const sendWalletConnectTx = async (userProvider, payload, chainId) => {
